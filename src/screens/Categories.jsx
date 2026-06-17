@@ -1,30 +1,28 @@
 import { TopBar } from "../components/TopBar";
 import { CATS } from "../data/demo";
+import { CatIcon, UIIcon } from "../components/icons";
 
 export function Categories({ onBack, onSelect }) {
   return (
     <div className="screen active">
       <TopBar title="Browse Categories" onBack={onBack} />
-      
+
       <div className="scroll">
-        <div style={{ padding: "16px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" }}>
-            {CATS.map((cat) => (
-              <div
-                key={cat.t}
-                className="card"
-                onClick={() => onSelect("category", cat.t)}
-                style={{
-                  cursor: "pointer",
-                  textAlign: "center",
-                  padding: "20px 12px",
-                  transition: "all 0.2s",
-                }}
-              >
-                <div style={{ fontSize: "32px", marginBottom: "8px" }}>{cat.ic}</div>
-                <div style={{ fontSize: "12px", fontWeight: "600" }}>{cat.t}</div>
-              </div>
-            ))}
+        <div className="home">
+          <div className="cat-grid">
+            {CATS.map((cat) => {
+              const Ic = CatIcon[cat.t] || UIIcon.grid;
+              return (
+                <button
+                  key={cat.t}
+                  className="cat-tile cat-tile--lg"
+                  onClick={() => onSelect("category", cat.t)}
+                >
+                  <Ic width="28" height="28" />
+                  <span>{cat.t}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
