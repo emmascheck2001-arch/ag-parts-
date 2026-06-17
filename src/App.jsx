@@ -21,7 +21,9 @@ export default function App() {
 
   // Navigation handlers
   const handleNavigation = (navScreen) => {
-    setScreen(navScreen)
+    // Map nav-tab ids to real screens (tabs without a dedicated screen fall back to home).
+    const map = { search: 'home', machines: 'home', account: 'home', orders: 'order-tracking' }
+    setScreen(map[navScreen] || navScreen)
   }
 
   const handleHome = () => {
@@ -68,7 +70,7 @@ export default function App() {
     <div className="phone">
       {/* All Screens */}
       <div style={{ display: screen === 'home' ? 'flex' : 'none', flexDirection: 'column', flex: 1, minHeight: 0, paddingBottom: '74px' }}>
-        <Home onSelect={handleSelect} onSearch={handleSearch} />
+        <Home onSelect={handleSelect} onSearch={handleSearch} onNav={handleNavigation} />
       </div>
 
       {screen === 'search-results' && (
