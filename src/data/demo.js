@@ -1,9 +1,9 @@
 /* Demo Data for PartFinder AG */
 
 export const MACHINES = [
-  { nm: "John Deere 8320R", ty: "Tractor", ic: "🚜" },
-  { nm: "New Holland CR8.90", ty: "Combine", ic: "🌾" },
-  { nm: "Case IH Magnum 340", ty: "Tractor", ic: "🚜" },
+  { nm: "John Deere 8320R", ty: "Tractor", ic: "🚜", hp: "320 hp", img: "/machines/jd-8320r.jpg" },
+  { nm: "New Holland CR8.90", ty: "Combine", ic: "🌾", hp: "523 hp", img: "/machines/nh-cr890.jpg" },
+  { nm: "Case IH Magnum 340", ty: "Tractor", ic: "🚜", hp: "340 hp", img: "/machines/caseih-magnum340.jpg" },
 ];
 
 export const CATS = [

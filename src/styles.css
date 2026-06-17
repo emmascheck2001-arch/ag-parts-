@@ -68,6 +68,7 @@ body {
   display: none;
   flex-direction: column;
   flex: 1;
+  min-height: 0;
   padding-bottom: 74px;
 }
 
@@ -77,6 +78,7 @@ body {
 
 .scroll {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 76px;
@@ -369,7 +371,7 @@ button:active {
     border-radius: 0;
     box-shadow: none;
   }
-  
+
   body {
     background: linear-gradient(135deg, #0a1515 0%, #051010 100%);
   }

@@ -67,7 +67,7 @@ export default function App() {
   return (
     <div className="phone">
       {/* All Screens */}
-      <div style={{ display: screen === 'home' ? 'flex' : 'none', flexDirection: 'column', flex: 1, paddingBottom: '74px' }}>
+      <div style={{ display: screen === 'home' ? 'flex' : 'none', flexDirection: 'column', flex: 1, minHeight: 0, paddingBottom: '74px' }}>
         <Home onSelect={handleSelect} onSearch={handleSearch} />
       </div>
 

@@ -70,9 +70,14 @@ export function Home({ onSelect, onSearch }) {
                 key={machine.nm}
                 className="card"
                 onClick={() => onSelect("machines", machine.nm)}
-                style={{ cursor: "pointer", marginBottom: "8px" }}
+                style={{ cursor: "pointer", marginBottom: "8px", display: "flex", alignItems: "center", gap: "10px" }}
               >
-                <span style={{ fontSize: "20px", marginRight: "8px" }}>{machine.ic}</span>
+                <img
+                  src={machine.img}
+                  alt={machine.nm}
+                  loading="lazy"
+                  style={{ width: "44px", height: "32px", borderRadius: "6px", objectFit: "cover", flexShrink: 0 }}
+                />
                 {machine.nm}
               </div>
             ))}
