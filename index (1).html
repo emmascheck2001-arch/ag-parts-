@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PartFinder AG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ag-green:#24b33f; --ag-green-dark:#1d9735; --ag-green-soft:rgba(36,179,63,.14);
+  --ink:#f5f7f5; --text:#f3f5f3; --text-muted:#9aa29d;
+  --bg:#050d0d; --card:#121a1a; --card-2:#172021; --surface:#121a1a; --surface-2:#172021; --border:#20302f;
+  --price:#24b33f; --track:#6c5ce7; --star:#f5a623; --danger:#d64545;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{background:#111;font-family:'Inter',system-ui,sans-serif;color:var(--text);}
+body{display:flex;justify-content:center;min-height:100vh;}
+
+/* phone shell */
+.phone{width:302px;min-height:654px;max-height:100vh;background:
+  radial-gradient(circle at 50% -12%,rgba(45,90,75,.22),transparent 36%),
+  linear-gradient(180deg,#061010 0%,#030909 100%);position:relative;
+  display:flex;flex-direction:column;box-shadow:0 0 0 4px #151a1b,0 0 0 6px #050707,0 20px 55px rgba(0,0,0,.45);
+  overflow:hidden;border-radius:29px;}
+.screen{display:none;flex-direction:column;flex:1;padding-bottom:74px;}
+.screen.active{display:flex;}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:76px;}
+.scroll::-webkit-scrollbar,.mrow::-webkit-scrollbar,.sortrow::-webkit-scrollbar{display:none;}
+
+/* demo banner */
+.demo-flag{display:none;}
+.statusbar{height:31px;padding:10px 17px 0;display:flex;align-items:flex-start;justify-content:space-between;color:#fff;font-size:13px;font-weight:700;line-height:1;}
+.status-icons{display:flex;gap:4px;align-items:center;color:#fff;opacity:.95;}
+.status-icons svg{display:block}
+
+/* headers */
+.topbar{display:flex;align-items:center;gap:12px;padding:16px 18px 14px;}
+.topbar .back{font-size:22px;color:var(--ink);background:none;border:none;cursor:pointer;line-height:1;}
+.topbar h1{font-size:17px;font-weight:700;color:var(--ink);flex:1;text-align:center;}
+.topbar .spacer{width:22px;}
+.topbar.green{background:var(--ag-green);}
+.topbar.green h1,.topbar.green .back{color:#fff;}
+.topbar.track{background:var(--track);}
+.topbar.track h1,.topbar.track .back{color:#fff;}
+
+/* home header (dark) */
+.home-head{padding:24px 20px 8px;}
+.brand{display:grid;grid-template-columns:24px 1fr 24px;align-items:center;margin-bottom:5px;}
+.brand-mark{text-align:center;white-space:nowrap;}
+.brand .logo{color:#fff;font-weight:900;font-size:20px;letter-spacing:.2px;font-style:italic;}
+.brand .ag{color:var(--ag-green);font-weight:900;font-size:20px;letter-spacing:.2px;font-style:italic;margin-left:2px;}
+.brand .bell{color:#fff;opacity:.95;display:grid;place-items:center;}
+.tagline{color:#a2aaa4;font-size:9.5px;font-weight:600;text-align:center;margin-bottom:26px;}
+.searchbar{display:flex;align-items:center;background:#f6f6f5;border:1px solid rgba(255,255,255,.5);border-radius:14px;padding:0 4px 0 13px;height:48px;box-shadow:0 8px 20px rgba(0,0,0,.24);}
+.searchbar input{flex:1;border:none;outline:none;font-size:11px;font-family:inherit;color:#3f4643;background:none;min-width:0;}
+.searchbar input::placeholder{color:#5d6561;opacity:1;}
+.searchbar .go{background:var(--ag-green);border:none;width:39px;height:39px;border-radius:11px;color:#fff;cursor:pointer;display:grid;place-items:center;box-shadow:inset 0 -1px 0 rgba(0,0,0,.16);}
+
+/* action cards */
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:18px 20px 4px;}
+.action{background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.025)),var(--card);
+  border:1px solid rgba(255,255,255,.035);border-radius:8px;padding:17px 6px 12px;text-align:center;cursor:pointer;transition:.12s;min-height:96px;}
+.action:active{transform:scale(.97);}
+.action .ic{display:block;margin:0 auto 12px;width:28px;height:28px;color:#f2f4f2;}
+.action .t{font-size:11.5px;font-weight:800;color:var(--text);line-height:1.2;display:block;}
+.action .s{font-size:10px;color:#b4bbb6;margin-top:7px;display:block;line-height:1.2;}
+
+/* section */
+.sec{padding:20px 20px 0;}
+.sec-head{display:flex;align-items:center;margin-bottom:12px;}
+.sec-head h2{font-size:13px;font-weight:800;color:var(--text);}
+.sec-head a{margin-left:auto;font-size:11.5px;color:var(--ag-green);font-weight:700;cursor:pointer;}
+
+/* machines row */
+.mrow{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding-bottom:2px;}
+.mcard{min-width:0;background:var(--card);border:1px solid rgba(255,255,255,.04);border-radius:8px;overflow:hidden;cursor:pointer;}
+.mcard:active{transform:scale(.98);}
+.mcard .img{height:98px;background:#25312a center/cover no-repeat;}
+.mcard .meta{padding:9px 9px 10px;}
+.mcard .nm{font-size:11.5px;font-weight:800;color:var(--text);line-height:1.35;}
+.mcard .ty{font-size:10.5px;color:#b3bbb5;margin-top:5px;}
+
+/* categories */
+.cats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px 7px;}
+.cat{background:linear-gradient(180deg,rgba(255,255,255,.042),rgba(255,255,255,.024)),var(--card);
+  border:1px solid rgba(255,255,255,.035);border-radius:8px;padding:13px 6px 12px;text-align:center;cursor:pointer;min-height:85px;}
+.cat:active{transform:scale(.97);}
+.cat .ic{display:block;margin:0 auto 9px;width:28px;height:28px;color:var(--ag-green);}
+.cat .t{font-size:12px;font-weight:800;color:var(--text);}
+
+/* search results header */
+.resbar{padding:14px 18px 4px;}
+.resbar .sb{display:flex;align-items:center;background:#fff;border:1px solid var(--border);
+  border-radius:11px;padding:0 12px;height:44px;}
+.resbar .sb input{flex:1;border:none;outline:none;font-size:13.5px;font-family:inherit;background:none;}
+.resbar .sb .x{color:var(--text-muted);font-size:18px;cursor:pointer;}
+.res-meta{display:flex;align-items:center;justify-content:space-between;padding:12px 18px 6px;}
+.res-meta .count{font-size:12.5px;color:var(--text-muted);}
+.res-meta .filter{display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;
+  color:var(--ink);background:#fff;border:1px solid var(--border);padding:6px 11px;border-radius:9px;cursor:pointer;}
+.sortrow{display:flex;gap:8px;padding:0 18px 8px;overflow-x:auto;}
+.chip{font-size:12px;font-weight:600;padding:7px 13px;border-radius:20px;white-space:nowrap;cursor:pointer;
+  background:#fff;border:1px solid var(--border);color:var(--text);}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+
+/* result card */
+.list{padding:4px 18px 18px;display:flex;flex-direction:column;gap:12px;}
+.rcard{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:14px;cursor:pointer;position:relative;}
+.rcard:active{transform:scale(.995);}
+.rcard.best{border-color:var(--ag-green);box-shadow:0 0 0 1px var(--ag-green);}
+.best-tag{position:absolute;top:-9px;left:14px;background:var(--ag-green);color:#fff;
+  font-size:10px;font-weight:700;letter-spacing:.4px;padding:3px 9px;border-radius:6px;}
+.rtop{display:flex;gap:12px;}
+.thumb{width:62px;height:62px;border-radius:10px;background:#eef1ee;display:grid;place-items:center;font-size:26px;flex-shrink:0;}
+.rinfo{flex:1;min-width:0;}
+.rinfo .nm{font-size:14px;font-weight:700;color:var(--ink);line-height:1.25;}
+.rinfo .pn{font-size:11.5px;color:var(--text-muted);margin-top:1px;}
+.vfit{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:700;
+  color:var(--ag-green);background:var(--ag-green-soft);padding:2px 7px;border-radius:5px;margin-top:6px;}
+.rprice{text-align:right;}
+.rprice .p{font-size:18px;font-weight:800;color:var(--price);}
+.divider{height:1px;background:var(--border);margin:11px 0;}
+.rbot{display:flex;align-items:center;justify-content:space-between;}
+.supp{font-size:12.5px;}
+.supp .s1{font-weight:700;color:var(--ink);}
+.stars{color:var(--star);font-size:11px;}
+.smeta{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.smeta .in{color:var(--ag-green);font-weight:600;}
+.buy{background:var(--ag-green);color:#fff;border:none;font-size:13px;font-weight:700;
+  padding:9px 16px;border-radius:9px;cursor:pointer;font-family:inherit;}
+.buy:active{background:var(--ag-green-dark);}
+.buy.ghost{background:#fff;color:var(--ink);border:1px solid var(--border);}
+
+/* part details */
+.hero{background:#eef1ee;height:210px;display:grid;place-items:center;font-size:78px;margin:0 18px;border-radius:16px;margin-top:6px;}
+.dots{display:flex;gap:6px;justify-content:center;margin:12px 0 0;}
+.dots i{width:6px;height:6px;border-radius:50%;background:#cfcfca;}
+.dots i.on{background:var(--ink);width:18px;border-radius:3px;}
+.pd-head{padding:16px 18px 0;}
+.pd-head .nm{font-size:21px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.pd-head .pn{font-size:12.5px;color:var(--text-muted);margin-top:4px;}
+.specrow{display:flex;gap:10px;padding:16px 18px 0;}
+.spec{flex:1;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;}
+.spec .v{font-size:15px;font-weight:800;color:var(--ink);}
+.spec .l{font-size:10.5px;color:var(--text-muted);margin-top:2px;}
+.cmp{margin:18px;background:var(--card);border:1px solid var(--border);border-radius:15px;padding:14px;}
+.cmp h3{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px;display:flex;align-items:center;}
+.cmp h3 a{margin-left:auto;font-size:12px;color:var(--ag-green);}
+.crow{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);}
+.crow:last-child{border:none;padding-bottom:0;}
+.crow .left .s1{font-size:13.5px;font-weight:700;color:var(--ink);}
+.crow .left .m{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.crow .left .m .in{color:var(--ag-green);font-weight:600;}
+.crow .right{text-align:right;}
+.crow .right .p{font-size:16px;font-weight:800;color:var(--price);}
+.crow .right .bp{font-size:10px;color:var(--ag-green);font-weight:700;}
+.cta-bar{position:sticky;bottom:74px;display:flex;gap:10px;padding:12px 18px;background:var(--bg);border-top:1px solid var(--border);}
+.cta-bar .buy{flex:1;padding:14px;font-size:14.5px;border-radius:12px;}
+
+/* checkout */
+.block{margin:14px 18px 0;background:var(--card);border:1px solid var(--border);border-radius:15px;padding:15px;}
+.block .bh{display:flex;align-items:center;margin-bottom:10px;}
+.block .bh h3{font-size:13px;font-weight:700;color:var(--ink);text-transform:uppercase;letter-spacing:.4px;}
+.block .bh a{margin-left:auto;font-size:12px;color:var(--ag-green);font-weight:600;cursor:pointer;}
+.osumm{display:flex;gap:12px;align-items:center;}
+.osumm .t{flex:1;}
+.osumm .t .nm{font-size:14px;font-weight:700;color:var(--ink);}
+.osumm .t .q{font-size:11.5px;color:var(--text-muted);}
+.osumm .pr{font-size:15px;font-weight:800;color:var(--ink);}
+.lrow{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;color:var(--text);}
+.lrow.tot{font-weight:800;color:var(--ink);font-size:16px;border-top:1px solid var(--border);margin-top:6px;padding-top:11px;}
+.addr{font-size:13px;line-height:1.5;color:var(--text);}
+.pay{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:600;color:var(--ink);}
+.placebar{position:sticky;bottom:74px;padding:12px 18px;background:var(--bg);border-top:1px solid var(--border);}
+.place{width:100%;background:var(--ag-green);color:#fff;border:none;font-size:15px;font-weight:700;
+  padding:15px;border-radius:13px;cursor:pointer;font-family:inherit;}
+.place:active{background:var(--ag-green-dark);}
+.fineprint{text-align:center;font-size:10.5px;color:var(--text-muted);margin-top:8px;}
+
+/* confirmation / tracking */
+.conf{text-align:center;padding:30px 18px 10px;}
+.checkc{width:64px;height:64px;border-radius:50%;background:var(--ag-green);color:#fff;
+  display:grid;place-items:center;font-size:32px;margin:0 auto 16px;}
+.conf h2{font-size:21px;font-weight:800;color:var(--ink);}
+.conf p{font-size:13px;color:var(--text-muted);margin-top:6px;}
+.ordbox{margin:16px 18px;background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:16px;text-align:center;}
+.ordbox .on{font-size:18px;font-weight:800;color:var(--ink);}
+.ordbox .od{font-size:11.5px;color:var(--text-muted);margin-top:3px;}
+.timeline{margin:0 18px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;}
+.timeline h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--ink);margin-bottom:14px;}
+.tstep{display:flex;gap:13px;position:relative;padding-bottom:20px;}
+.tstep:last-child{padding-bottom:0;}
+.tstep .node{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;
+  font-size:12px;z-index:1;}
+.tstep .node.done{background:var(--ag-green);color:#fff;}
+.tstep .node.wait{background:#fff;border:2px solid var(--border);}
+.tstep::before{content:"";position:absolute;left:10px;top:22px;bottom:0;width:2px;background:var(--border);}
+.tstep:last-child::before{display:none;}
+.tstep.done::before{background:var(--ag-green);}
+.tstep .tx{flex:1;}
+.tstep .tx .l{font-size:13.5px;font-weight:600;color:var(--ink);}
+.tstep .tx .d{font-size:11.5px;color:var(--text-muted);margin-top:1px;}
+.eta{margin:16px 18px;display:flex;justify-content:space-between;align-items:center;
+  background:var(--ag-green-soft);border-radius:12px;padding:14px 16px;}
+.eta .l{font-size:12.5px;color:var(--text);}
+.eta .d{font-size:14px;font-weight:800;color:var(--ag-green);}
+
+/* machine details */
+.mhero{height:170px;margin:6px 18px 0;border-radius:16px;background:#dfe7df;display:grid;place-items:center;font-size:64px;}
+.mdetail{margin:16px 18px 0;background:var(--card);border:1px solid var(--border);border-radius:15px;padding:16px;}
+.mdetail h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--ink);margin-bottom:12px;}
+.mfield{display:flex;justify-content:space-between;padding:7px 0;font-size:13px;}
+.mfield .k{color:var(--text-muted);}
+.mfield .v{font-weight:600;color:var(--ink);}
+.tabs{display:flex;gap:24px;padding:18px 18px 0;border-bottom:1px solid var(--border);margin:16px 0 0;}
+.tab{font-size:13.5px;font-weight:600;color:var(--text-muted);padding-bottom:10px;cursor:pointer;border-bottom:2px solid transparent;}
+.tab.on{color:var(--ink);border-color:var(--ag-green);}
+
+/* scan */
+.scan{background:#0e0e0e;flex:1;display:flex;flex-direction:column;padding-bottom:0;}
+.scan .topbar h1{color:#fff;}
+.scan .topbar .back{color:#fff;}
+.viewfinder{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;padding:24px;}
+.frame{width:230px;height:230px;position:relative;}
+.frame span{position:absolute;width:34px;height:34px;border:3px solid #fff;}
+.frame .tl{top:0;left:0;border-right:none;border-bottom:none;border-radius:6px 0 0 0;}
+.frame .tr{top:0;right:0;border-left:none;border-bottom:none;border-radius:0 6px 0 0;}
+.frame .bl{bottom:0;left:0;border-right:none;border-top:none;border-radius:0 0 0 6px;}
+.frame .br{bottom:0;right:0;border-left:none;border-top:none;border-radius:0 0 6px 0;}
+.frame .chip-mid{position:absolute;inset:0;display:grid;place-items:center;font-size:74px;opacity:.5;}
+.scan-hint{color:#fff;text-align:center;margin-top:28px;}
+.scan-hint .h{font-size:14px;font-weight:600;}
+.scan-hint .s{font-size:12px;color:#9a9a9a;margin-top:4px;}
+.scan-ctrl{display:flex;align-items:center;justify-content:space-around;padding:24px 30px 34px;}
+.scan-ctrl .b{color:#fff;text-align:center;font-size:11px;cursor:pointer;}
+.scan-ctrl .b .ic{font-size:24px;display:block;margin-bottom:4px;}
+.shutter{width:64px;height:64px;border-radius:50%;background:#fff;border:4px solid #555;cursor:pointer;}
+
+/* recent searches */
+.recent{padding:6px 18px 0;}
+.allcat-row{margin:10px 20px 0;background:linear-gradient(180deg,rgba(255,255,255,.042),rgba(255,255,255,.024)),var(--card);
+  border:1px solid rgba(255,255,255,.035);border-radius:8px;padding:13px 15px;display:flex;align-items:center;gap:13px;cursor:pointer;}
+.allcat-row .ic{width:27px;height:27px;color:var(--ag-green);flex:0 0 auto;}
+.allcat-row .t{font-size:12px;font-weight:800;color:var(--text);}
+.allcat-row .s{font-size:10.5px;color:#b3bbb5;margin-top:3px;}
+.allcat-row .chev{margin-left:auto;color:var(--text-muted);}
+.recent{padding:0 20px;}
+.rec-item{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.07);cursor:pointer;}
+.rec-item .ic{color:#d9dfdc;width:15px;height:15px;flex:0 0 auto;}
+.rec-item .t{font-size:11.5px;color:var(--text);font-weight:800;flex:1;}
+.rec-item .chev{width:15px;height:15px;border-radius:50%;display:grid;place-items:center;background:rgba(36,179,63,.12);color:var(--ag-green);border:1px solid rgba(36,179,63,.22);font-size:13px;}
+
+/* bottom nav */
+.nav{position:absolute;bottom:0;left:0;right:0;height:73px;background:#091314;border-top:1px solid rgba(255,255,255,.04);
+  display:flex;align-items:flex-start;justify-content:space-around;padding:10px 8px 0;}
+.nav:after{content:"";position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:108px;height:4px;border-radius:999px;background:#fff;}
+.nav .n{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:9px;color:#f0f2f0;cursor:pointer;min-width:44px;}
+.nav .n .ic{width:18px;height:18px;color:currentColor;}
+.nav .n.on{color:var(--ag-green);font-weight:800;}
+
+/* generic */
+.empty{padding:60px 30px;text-align:center;color:var(--text-muted);font-size:13.5px;line-height:1.6;}
+</style>
+</head>
+<body>
+<div class="demo-flag">DEMO DATA</div>
+<div class="phone">
+  <div class="statusbar">
+    <span>9:41</span>
+    <span class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none" aria-hidden="true"><rect x="1" y="7" width="3" height="3" rx="1" fill="currentColor"/><rect x="5.5" y="5" width="3" height="5" rx="1" fill="currentColor"/><rect x="10" y="2.5" width="3" height="7.5" rx="1" fill="currentColor"/></svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none" aria-hidden="true"><path d="M1 3.7C4.8.7 10.2.7 14 3.7M3.5 6.1c2.3-1.8 5.7-1.8 8 0M6 8.4c.9-.7 2.1-.7 3 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <svg width="20" height="10" viewBox="0 0 20 10" fill="none" aria-hidden="true"><rect x=".7" y="1.2" width="16" height="7.6" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M18 3.5v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><rect x="2.5" y="3" width="12.5" height="4" rx="1" fill="currentColor"/></svg>
+    </span>
+  </div>
+
+  <!-- ============ HOME ============ -->
+  <section class="screen active" id="home">
+    <div class="scroll">
+      <div class="home-head">
+        <div class="brand">
+          <span></span>
+          <span class="brand-mark"><span class="logo">PARTFINDER</span><span class="ag">AG</span></span>
+          <span class="bell"><svg width="19" height="22" viewBox="0 0 19 22" fill="none" aria-hidden="true"><path d="M15.4 8.8v4.5l1.7 3H1.9l1.7-3V8.8a5.9 5.9 0 0 1 11.8 0Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M7 18.7a2.6 2.6 0 0 0 5 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+        </div>
+        <div class="tagline">Search every supplier. Find the right part.</div>
+        <div class="searchbar">
+          <input id="homeSearch" placeholder="Search part number, name, or description" onkeydown="if(event.key==='Enter')runSearch(this.value)">
+          <button class="go" onclick="runSearch(document.getElementById('homeSearch').value)" aria-label="Search"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="m16.2 16.2 4.1 4.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        </div>
+      </div>
+
+      <div class="actions">
+        <div class="action" onclick="go('scan')"><span class="ic"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M10.5 10.5 12.3 7h7.4l1.8 3.5H25a2 2 0 0 1 2 2V24a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V12.5a2 2 0 0 1 2-2h3.5Z" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="18" r="5" stroke="currentColor" stroke-width="2"/><path d="M24 8V5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="t">Scan Part</span><span class="s">Use camera</span></div>
+        <div class="action" onclick="go('machine')"><span class="ic"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M8 20h8l3-8h4l3 8" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 20V9h5v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="9" cy="23" r="4" stroke="currentColor" stroke-width="2"/><circle cx="23" cy="23" r="3" stroke="currentColor" stroke-width="2"/><path d="M13 12h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="t">Search by<br>Machine</span><span class="s">Find parts</span></div>
+        <div class="action" onclick="runSearch('RE548693')"><span class="ic"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect x="5" y="7" width="22" height="17" rx="2" stroke="currentColor" stroke-width="2"/><path d="M10 12h2M15 12h2M20 12h2M10 17h12M10 21h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="t">Enter Part<br>Number</span><span class="s">Manual search</span></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-head"><h2>My Machines</h2><a onclick="go('machine')">View all</a></div>
+        <div class="mrow" id="machineRow"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-head"><h2>Quick Categories</h2></div>
+        <div class="cats" id="quickCats"></div>
+      </div>
+      <div class="allcat-row" onclick="go('categories')">
+        <span class="ic"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M5 9h8v7H5V9Zm0 14h8v-7M19 9h8v7h-8V9Zm0 14h8v-7" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M13 12h6M13 20h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <div><div class="t">View all categories</div><div class="s">Browse all parts</div></div>
+      </div>
+      <div class="sec">
+        <div class="sec-head"><h2>Recent Searches</h2><a onclick="toast('Cleared')">Clear all</a></div>
+      </div>
+      <div class="recent" id="recentList"></div>
+    </div>
+  </section>
+
+  <!-- ============ CATEGORIES ============ -->
+  <section class="screen" id="categories">
+    <div class="topbar"><button class="back" onclick="go('home')">‹</button><h1>Browse Categories</h1><span class="spacer"></span></div>
+    <div class="scroll">
+      <div class="sec" style="padding-top:4px"><div class="cats" id="allCats"></div></div>
+    </div>
+  </section>
+
+  <!-- ============ SEARCH RESULTS ============ -->
+  <section class="screen" id="results">
+    <div class="topbar"><button class="back" onclick="go('home')">‹</button><h1>Search Results</h1><span class="spacer"></span></div>
+    <div class="resbar">
+      <div class="sb"><input id="resSearch" onkeydown="if(event.key==='Enter')runSearch(this.value)"><span class="x" onclick="go('home')">✕</span></div>
+    </div>
+    <div class="res-meta"><span class="count" id="resCount">0 results found</span>
+      <span class="filter">⚙ Filter</span></div>
+    <div class="sortrow">
+      <span class="chip on">Lowest price</span><span class="chip">Best match</span>
+      <span class="chip">Fastest delivery</span><span class="chip">Verified fit</span>
+    </div>
+    <div class="scroll"><div class="list" id="resList"></div></div>
+  </section>
+
+  <!-- ============ PART DETAILS ============ -->
+  <section class="screen" id="part">
+    <div class="topbar"><button class="back" onclick="go('results')">‹</button><h1>Part Details</h1><span class="spacer">⤴</span></div>
+    <div class="scroll">
+      <div class="hero" id="partHero">🔧</div>
+      <div class="dots"><i class="on"></i><i></i><i></i><i></i></div>
+      <div class="pd-head">
+        <div class="nm" id="partName">Hydraulic Pump <span class="vfit">✓ VERIFIED FIT</span></div>
+        <div class="pn" id="partFits"></div>
+      </div>
+      <div class="specrow">
+        <div class="spec"><div class="v">New</div><div class="l">Condition</div></div>
+        <div class="spec"><div class="v" id="partStock">14</div><div class="l">In stock</div></div>
+        <div class="spec"><div class="v">2 days</div><div class="l">Est. delivery</div></div>
+      </div>
+      <div class="cmp">
+        <h3>Price comparison <a id="cmpAll">See all</a></h3>
+        <div id="cmpList"></div>
+      </div>
+      <div style="height:8px"></div>
+    </div>
+    <div class="cta-bar">
+      <button class="buy" onclick="go('checkout')">Buy now</button>
+      <button class="buy ghost" onclick="toast('Saved to your parts')">♡ Save part</button>
+    </div>
+  </section>
+
+  <!-- ============ CHECKOUT ============ -->
+  <section class="screen" id="checkout">
+    <div class="topbar green"><button class="back" onclick="go('part')">‹</button><h1>Checkout</h1><span class="spacer"></span></div>
+    <div class="scroll">
+      <div class="block">
+        <div class="bh"><h3>Order Summary</h3></div>
+        <div class="osumm">
+          <div class="thumb">🔧</div>
+          <div class="t"><div class="nm" id="coName">Hydraulic Pump</div><div class="q" id="coPN">RE548693 · Qty 1</div></div>
+          <div class="pr" id="coPrice">$389.00</div>
+        </div>
+        <div class="divider"></div>
+        <div class="lrow"><span>Subtotal</span><span id="coSub">$389.00</span></div>
+        <div class="lrow"><span>Shipping</span><span id="coShip">$25.00</span></div>
+        <div class="lrow tot"><span>Total</span><span id="coTotal">$414.00</span></div>
+      </div>
+      <div class="block">
+        <div class="bh"><h3>Ship To</h3><a onclick="toast('Edit address')">Change</a></div>
+        <div class="addr">Emma Scheck<br>RR 3, Township 35<br>Saskatchewan, S0K</div>
+      </div>
+      <div class="block">
+        <div class="bh"><h3>Supplier</h3></div>
+        <div class="osumm"><div class="t"><div class="nm" id="coSupp">Prairie Equipment</div>
+          <div class="q"><span class="stars">★★★★★</span> 4.8 (230) · Ships in 2 days</div></div></div>
+      </div>
+      <div class="block">
+        <div class="bh"><h3>Payment Method</h3><a onclick="toast('Change card')">Change</a></div>
+        <div class="pay">💳 •••• •••• •••• 4242</div>
+      </div>
+      <div style="height:6px"></div>
+    </div>
+    <div class="placebar">
+      <button class="place" onclick="placeOrder()">Place order</button>
+      <div class="fineprint">By placing this order you agree to our Terms of Service.</div>
+    </div>
+  </section>
+
+  <!-- ============ ORDER CONFIRMATION / TRACKING ============ -->
+  <section class="screen" id="order">
+    <div class="topbar track"><button class="back" onclick="go('home')">‹</button><h1>Order Tracking</h1><span class="spacer"></span></div>
+    <div class="scroll">
+      <div class="conf">
+        <div class="checkc">✓</div>
+        <h2>Order confirmed</h2>
+        <p>Your order has been sent to the supplier.</p>
+      </div>
+      <div class="ordbox"><div class="on">Order #48293</div><div class="od">Placed today</div></div>
+      <div class="timeline">
+        <h3>Tracking</h3>
+        <div class="tstep done"><div class="node done">✓</div><div class="tx"><div class="l">Order confirmed</div><div class="d">Today, 9:41 AM</div></div></div>
+        <div class="tstep done"><div class="node done">✓</div><div class="tx"><div class="l">Processing</div><div class="d">Today, 10:15 AM</div></div></div>
+        <div class="tstep"><div class="node wait"></div><div class="tx"><div class="l">Shipped</div><div class="d">Expected tomorrow</div></div></div>
+        <div class="tstep"><div class="node wait"></div><div class="tx"><div class="l">Out for delivery</div><div class="d">—</div></div></div>
+        <div class="tstep"><div class="node wait"></div><div class="tx"><div class="l">Delivered</div><div class="d">—</div></div></div>
+      </div>
+      <div class="eta"><span class="l">Estimated delivery</span><span class="d">In 2 days</span></div>
+      <div style="padding:0 18px 8px"><button class="place" onclick="go('home')">Back to home</button></div>
+    </div>
+  </section>
+
+  <!-- ============ MACHINE DETAILS ============ -->
+  <section class="screen" id="machine">
+    <div class="topbar"><button class="back" onclick="go('home')">‹</button><h1 id="mTitle">John Deere 8320R</h1><span class="spacer">✎</span></div>
+    <div class="scroll">
+      <div class="mhero">🚜</div>
+      <div class="mdetail">
+        <h3>Machine Details</h3>
+        <div class="mfield"><span class="k">Model</span><span class="v">8320R</span></div>
+        <div class="mfield"><span class="k">Year</span><span class="v">2019</span></div>
+        <div class="mfield"><span class="k">PIN</span><span class="v">1RW8320RKKP123456</span></div>
+        <div class="mfield"><span class="k">Engine hours</span><span class="v">2,453</span></div>
+      </div>
+      <div class="tabs"><span class="tab on">Parts</span><span class="tab">Maintenance</span><span class="tab">History</span></div>
+      <div class="sec" style="padding-top:16px">
+        <div class="sec-head"><h2>Common Parts</h2><a onclick="runSearch('RE548693')">View all</a></div>
+        <div class="list" style="padding:0">
+          <div class="rcard" onclick="openPart('RE548693')">
+            <div class="rtop">
+              <div class="thumb">🔧</div>
+              <div class="rinfo"><div class="nm">Hydraulic Pump</div><div class="pn">RE548693</div>
+                <span class="vfit">✓ VERIFIED FIT</span></div>
+              <div class="rprice"><div style="font-size:11px;color:var(--text-muted)">From</div><div class="p">$389</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="height:18px"></div>
+    </div>
+  </section>
+
+  <!-- ============ SCAN ============ -->
+  <section class="screen scan" id="scan">
+    <div class="topbar"><button class="back" onclick="go('home')">‹</button><h1>Scan Part</h1><span class="spacer">⚡</span></div>
+    <div class="viewfinder">
+      <div class="frame"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span>
+        <div class="chip-mid">⚙️</div></div>
+      <div class="scan-hint"><div class="h">Position part inside the frame</div><div class="s">We'll find matches for you</div></div>
+    </div>
+    <div class="scan-ctrl">
+      <div class="b"><span class="ic">🖼</span>Photo Library</div>
+      <div class="shutter" onclick="runSearch('RE548693')"></div>
+      <div class="b"><span class="ic">💡</span>Light</div>
+    </div>
+  </section>
+
+  <!-- ============ ORDERS (placeholder) ============ -->
+  <section class="screen" id="orders">
+    <div class="topbar"><span class="spacer"></span><h1>Orders</h1><span class="spacer"></span></div>
+    <div class="scroll"><div class="empty">No orders yet.<br>When you buy a part, your orders and tracking show up here.</div></div>
+  </section>
+
+  <!-- ============ ACCOUNT (placeholder) ============ -->
+  <section class="screen" id="account">
+    <div class="topbar"><span class="spacer"></span><h1>Account</h1><span class="spacer"></span></div>
+    <div class="scroll"><div class="empty">Account, saved parts, and addresses live here.</div></div>
+  </section>
+
+  <!-- ============ BOTTOM NAV ============ -->
+  <nav class="nav" id="nav">
+    <div class="n on" data-screen="home" onclick="go('home')"><span class="ic"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 10.8 12 3l9 7.8v9a1 1 0 0 1-1 1h-5.2v-6h-5.6v6H4a1 1 0 0 1-1-1v-9Z"/></svg></span>Home</div>
+    <div class="n" data-screen="results" onclick="runSearch('')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>Search</div>
+    <div class="n" data-screen="orders" onclick="go('orders')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 4h10v16H7z" stroke="currentColor" stroke-width="2"/><path d="M9.5 8h5M9.5 12h5M9.5 16H13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>Orders</div>
+    <div class="n" data-screen="machine" onclick="go('machine')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 15h7l2-6h4l2.5 6" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="6.5" cy="17.5" r="2.8" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="17.5" r="2.2" stroke="currentColor" stroke-width="1.8"/></svg></span>Machines</div>
+    <div class="n" data-screen="account" onclick="go('account')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="3.2" stroke="currentColor" stroke-width="2"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>Account</div>
+  </nav>
+
+</div>
+
+<script>
+/* ---------- DEMO DATA (replace with Supabase later) ---------- */
+const icon = {
+  engine:'<svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M9 13h4l2-3h5v4h3l2 3v7h-5l-2 3h-7l-2-3H6v-8h3v-3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 7h5M6 19H3M25 19h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+  hydraulic:'<svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M9 24c0-5 5-7 5-12 0-3-2-5-2-5s-6 5-6 11c0 4 1 6 3 6Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M23 25c3 0 5-2 5-5 0-5-5-9-5-9s-5 4-5 9c0 3 2 5 5 5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M16 18h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+  electrical:'<svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M18 3 6 18h9l-1 11 12-16h-9l1-10Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
+  filters:'<svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M8 8h16M9 11h14v16H9V11Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M13 14v10M16 14v10M19 14v10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  belts:'<svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M8 23c-3-5 3-16 9-15 5 .8 4 7 1 11-2 4 0 7 4 5 4-2 4-8 1-11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+  bearings:'<svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="10" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="16" r="3.5" stroke="currentColor" stroke-width="2"/><path d="M16 6v3M16 23v3M6 16h3M23 16h3M9 9l2 2M21 21l2 2M23 9l-2 2M11 21l-2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  clock:'<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3.2 2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+};
+const MACHINES = [
+  {nm:'John Deere 8320R', ty:'Tractor', img:'https://images.unsplash.com/photo-1592982537447-6d3f4f02f2d7?auto=format&fit=crop&w=260&q=80'},
+  {nm:'New Holland CR8.90', ty:'Combine', img:'https://images.unsplash.com/photo-1605330359813-0101d1220dbe?auto=format&fit=crop&w=260&q=80'},
+  {nm:'Case IH Magnum 340', ty:'Tractor', img:'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=260&q=80'},
+];
+const CATS = [
+  {t:'Engine',ic:icon.engine},{t:'Hydraulic',ic:icon.hydraulic},{t:'Electrical',ic:icon.electrical},
+  {t:'Filters',ic:icon.filters},{t:'Belts',ic:icon.belts},{t:'Bearings',ic:icon.bearings},
+  {t:'Drivetrain',ic:icon.engine},{t:'Cooling',ic:icon.hydraulic},{t:'Cab & Body',ic:icon.filters},
+];
+// suppliers: total = price + shipping; sorted ascending = lowest price wins
+const PARTS = {
+  'RE548693':{name:'Hydraulic Pump', cat:'Hydraulic', ic:'🔧', fits:'John Deere 8320R, 8345R, 8370R', stock:14,
+    suppliers:[
+      {s:'Prairie Equipment', price:389, ship:25, rating:4.8, n:230, days:2, stock:14},
+      {s:'Greenline Supply', price:412, ship:25, rating:4.6, n:98, days:3, stock:3},
+      {s:'Agriline Parts', price:392, ship:26, rating:4.7, n:150, days:2, stock:12},
+      {s:'Ag Valley Supply', price:405, ship:25, rating:4.8, n:86, days:3, stock:8},
+    ]},
+  'P606860':{name:'Fuel Filter', cat:'Filters', ic:'🔲', fits:'John Deere 8320R, 8345R', stock:40,
+    suppliers:[
+      {s:'Prairie Equipment', price:38, ship:9, rating:4.8, n:230, days:2, stock:40},
+      {s:'Agriline Parts', price:41, ship:9, rating:4.7, n:150, days:2, stock:25},
+    ]},
+  '8PK2610':{name:'Serpentine Belt', cat:'Belts', ic:'➰', fits:'Case IH Magnum 340', stock:18,
+    suppliers:[
+      {s:'Ag Valley Supply', price:52, ship:10, rating:4.8, n:86, days:3, stock:18},
+      {s:'Greenline Supply', price:49, ship:12, rating:4.6, n:98, days:3, stock:6},
+    ]},
+};
+const RECENT = ['RE548693 hydraulic pump','P606860 fuel filter','8PK2610 serpentine belt'];
+
+/* ---------- RENDER HELPERS ---------- */
+const $=id=>document.getElementById(id);
+function money(n){return '$'+n.toFixed(0);}
+function stars(r){const f=Math.round(r);return '★★★★★'.slice(0,f)+'☆☆☆☆☆'.slice(0,5-f);}
+
+function renderHome(){
+  $('machineRow').innerHTML = MACHINES.map(m=>
+    `<div class="mcard" onclick="go('machine')"><div class="img" style="background-image:url('${m.img}')"></div>
+     <div class="meta"><div class="nm">${m.nm}</div><div class="ty">${m.ty}</div></div></div>`).join('');
+  $('quickCats').innerHTML = CATS.slice(0,6).map(c=>
+    `<div class="cat" onclick="runSearch('${c.t}')"><span class="ic">${c.ic}</span><span class="t">${c.t}</span></div>`).join('');
+  $('allCats').innerHTML = CATS.map(c=>
+    `<div class="cat" onclick="runSearch('${c.t}')"><span class="ic">${c.ic}</span><span class="t">${c.t}</span></div>`).join('');
+  $('recentList').innerHTML = RECENT.map(q=>
+    `<div class="rec-item" onclick="runSearch('${q.split(' ')[0]}')"><span class="ic">${icon.clock}</span><span class="t">${q}</span><span class="chev">›</span></div>`).join('');
+}
+
+/* ---------- SEARCH ---------- */
+function matchParts(q){
+  q=(q||'').toLowerCase().trim();
+  let out=[];
+  for(const pn in PARTS){
+    const p=PARTS[pn];
+    if(!q || pn.toLowerCase().includes(q) || p.name.toLowerCase().includes(q) || p.cat.toLowerCase().includes(q)){
+      const best=[...p.suppliers].sort((a,b)=>(a.price+a.ship)-(b.price+b.ship))[0];
+      out.push({pn,...p,best});
+    }
+  }
+  return out;
+}
+function runSearch(q){
+  const parts=matchParts(q);
+  $('resSearch').value = q || '';
+  $('resCount').textContent = parts.length+' result'+(parts.length===1?'':'s')+' found';
+  $('resList').innerHTML = parts.map(p=>{
+    const sorted=[...p.suppliers].sort((a,b)=>(a.price+a.ship)-(b.price+b.ship));
+    const b=sorted[0];
+    return `<div class="rcard best" onclick="openPart('${p.pn}')">
+      <span class="best-tag">BEST PRICE</span>
+      <div class="rtop">
+        <div class="thumb">${p.ic}</div>
+        <div class="rinfo"><div class="nm">${p.name}</div><div class="pn">${p.pn}</div>
+          <span class="vfit">✓ VERIFIED FIT</span></div>
+        <div class="rprice"><div class="p">${money(b.price)}</div></div>
+      </div>
+      <div class="divider"></div>
+      <div class="rbot">
+        <div class="supp"><div class="s1">${b.s}</div>
+          <div class="smeta"><span class="stars">${stars(b.rating)}</span> ${b.rating} (${b.n})</div>
+          <div class="smeta"><span class="in">${b.stock} in stock</span> · ${money(b.ship)} shipping · Ships in ${b.days} days</div></div>
+        <button class="buy" onclick="event.stopPropagation();openPart('${p.pn}')">Buy now</button>
+      </div>
+    </div>`;
+  }).join('') || `<div class="empty">No parts match "${q}".<br>Try a part number like RE548693, or browse categories.</div>`;
+  go('results');
+}
+
+/* ---------- PART DETAILS ---------- */
+let currentPart=null, currentSupplier=null;
+function openPart(pn){
+  const p=PARTS[pn]; if(!p) return;
+  currentPart=pn;
+  const sorted=[...p.suppliers].sort((a,b)=>(a.price+a.ship)-(b.price+b.ship));
+  currentSupplier=sorted[0];
+  $('partHero').textContent=p.ic;
+  $('partName').innerHTML=`${p.name} <span class="vfit">✓ VERIFIED FIT</span>`;
+  $('partFits').textContent=`${pn} · Fits: ${p.fits} · ${p.cat} system`;
+  $('partStock').textContent=p.stock;
+  $('cmpList').innerHTML=sorted.map((s,i)=>`
+    <div class="crow">
+      <div class="left"><div class="s1">${s.s} ${i===0?'<span class="bp">· Best price</span>':''}</div>
+        <div class="m"><span class="stars" style="color:var(--star)">${stars(s.rating)}</span> ${s.rating} · <span class="in">${s.stock} in stock</span> · Ships ${s.days}d</div></div>
+      <div class="right"><div class="p">${money(s.price)}</div><div style="font-size:10px;color:var(--text-muted)">+${money(s.ship)} ship</div></div>
+    </div>`).join('');
+  go('part');
+}
+
+/* ---------- CHECKOUT ---------- */
+function syncCheckout(){
+  if(!currentPart||!currentSupplier) return;
+  const p=PARTS[currentPart], s=currentSupplier;
+  $('coName').textContent=p.name; $('coPN').textContent=`${currentPart} · Qty 1`;
+  $('coPrice').textContent=money(s.price);
+  $('coSub').textContent=money(s.price); $('coShip').textContent=money(s.ship);
+  $('coTotal').textContent=money(s.price+s.ship);
+  $('coSupp').textContent=s.s;
+}
+function placeOrder(){ go('order'); }
+
+/* ---------- NAV ---------- */
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $(id).classList.add('active');
+  if(id==='checkout') syncCheckout();
+  document.querySelectorAll('.nav .n').forEach(n=>{
+    n.classList.toggle('on', n.dataset.screen===id ||
+      (id==='results'&&n.dataset.screen==='results') ||
+      (id==='categories'&&n.dataset.screen==='results') ||
+      (id==='part'&&n.dataset.screen==='results') ||
+      (id==='order'&&n.dataset.screen==='orders') ||
+      (id==='scan'&&n.dataset.screen==='home'));
+  });
+  $(id).querySelector('.scroll')?.scrollTo(0,0);
+}
+
+/* ---------- TOAST ---------- */
+let toastTimer;
+function toast(msg){
+  let t=$('toast');
+  if(!t){t=document.createElement('div');t.id='toast';
+    t.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:200;opacity:0;transition:.2s;';
+    document.body.appendChild(t);}
+  t.textContent=msg; t.style.opacity='1';
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.style.opacity='0',1600);
+}
+
+renderHome();
+</script>
+</body>
+</html>

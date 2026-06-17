@@ -1,0 +1,376 @@
+/* ============================================================
+   PartFinder AG — Design Tokens (Single Source of Truth)
+   ============================================================ */
+
+:root {
+  --ag-green: #24b33f;
+  --ag-green-dark: #1d9735;
+  --ag-green-soft: rgba(36, 179, 63, 0.14);
+  
+  --ink: #f5f7f5;
+  --text: #f3f5f3;
+  --text-muted: #9aa29d;
+  
+  --bg: #050d0d;
+  --card: #121a1a;
+  --card-2: #172021;
+  --surface: #121a1a;
+  --surface-2: #172021;
+  --border: #20302f;
+  
+  --price: #24b33f;
+  --track: #6c5ce7;
+  --star: #f5a623;
+  --danger: #d64545;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  background: var(--bg);
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--text);
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+#root {
+  width: 100%;
+  max-width: 390px;
+}
+
+/* Phone Shell */
+.phone {
+  width: 302px;
+  min-height: 654px;
+  max-height: 100vh;
+  background: radial-gradient(circle at 50% -12%, rgba(45, 90, 75, 0.22), transparent 36%),
+              linear-gradient(180deg, #061010 0%, #030909 100%);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 0 4px #151a1b, 0 0 0 6px #050707, 0 20px 55px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  border-radius: 29px;
+}
+
+/* Screens */
+.screen {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  padding-bottom: 74px;
+}
+
+.screen.active {
+  display: flex;
+}
+
+.scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 76px;
+}
+
+.scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Top Bar */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px 14px;
+}
+
+.topbar .back {
+  font-size: 22px;
+  color: var(--ink);
+  background: none;
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+
+.topbar h1 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+  flex: 1;
+  text-align: center;
+}
+
+.topbar .spacer {
+  width: 22px;
+}
+
+.topbar.green {
+  background: var(--ag-green);
+}
+
+.topbar.green h1, .topbar.green .back {
+  color: #fff;
+}
+
+.topbar.track {
+  background: var(--track);
+}
+
+.topbar.track h1, .topbar.track .back {
+  color: #fff;
+}
+
+/* Bottom Navigation */
+.botnav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 74px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding-top: 12px;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 22px;
+  padding: 6px 12px;
+  transition: color 0.2s;
+}
+
+.nav-btn.active {
+  color: var(--ag-green);
+}
+
+.nav-btn-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Cards and Components */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 12px;
+}
+
+.rcard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rcard:hover {
+  border-color: var(--ag-green);
+  transform: translateY(-2px);
+}
+
+.rcard.best {
+  border-color: var(--price);
+  background: rgba(36, 179, 63, 0.08);
+}
+
+.best-tag {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--price);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.rtop {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.supp {
+  flex: 1;
+}
+
+.s1 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.oem-tag {
+  background: var(--track);
+  color: #fff;
+  font-size: 9px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-weight: 700;
+}
+
+.rate {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.stars {
+  color: var(--star);
+}
+
+.rprice {
+  text-align: right;
+}
+
+.p {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--price);
+}
+
+.rmeta {
+  font-size: 11px;
+  color: var(--text-muted);
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.in {
+  color: var(--ag-green);
+}
+
+.dot {
+  opacity: 0.5;
+}
+
+.rbot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ships {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ag-green);
+}
+
+.buy {
+  background: var(--price);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.buy:hover {
+  background: var(--ag-green-dark);
+  transform: scale(1.05);
+}
+
+.buy.ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.buy.ghost:hover {
+  border-color: var(--ag-green);
+  color: var(--ag-green);
+}
+
+/* Buttons */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+button:active {
+  opacity: 0.8;
+}
+
+.btn-primary {
+  background: var(--ag-green);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background: var(--ag-green-dark);
+}
+
+/* Text Utilities */
+.vfit {
+  display: inline-block;
+  background: var(--ag-green-soft);
+  color: var(--ag-green);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+  .phone {
+    width: 100%;
+    max-width: 390px;
+    min-height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  
+  body {
+    background: linear-gradient(135deg, #0a1515 0%, #051010 100%);
+  }
+}
