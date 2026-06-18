@@ -2,8 +2,7 @@ import { TopBar } from "../components/TopBar";
 import { SupplierCard } from "../components/SupplierCard";
 import { VerifiedFit } from "../components/Badge";
 import { PARTS, SUPPLIERS_MAP, calculateDistance, USER_LOCATION } from "../data/demo";
-
-const byPrice = (list) => [...list].sort((a, b) => (a.price + a.ship) - (b.price + b.ship));
+import { rankSuppliers, lowestTotal } from "../lib/ranking";
 
 export function PartDetails({ partNum, onBack, onBuy, onViewMap }) {
   const part = PARTS[partNum];
@@ -19,7 +18,8 @@ export function PartDetails({ partNum, onBack, onBuy, onViewMap }) {
     );
   }
 
-  const sorted = byPrice(part.suppliers);
+  const sorted = rankSuppliers(part.suppliers);
+  const lowest = lowestTotal(part.suppliers);
 
   const handleBuyClick = (pn, supplier, total) => {
     onBuy({ pn, supplier, total, partName: part.name });
@@ -50,17 +50,23 @@ export function PartDetails({ partNum, onBack, onBuy, onViewMap }) {
             </div>
           </div>
 
-          {/* Price Summary */}
+          {/* Best match summary */}
           <div className="card" style={{ marginBottom: "16px", background: "rgba(36, 179, 63, 0.08)", borderColor: "var(--ag-green)" }}>
             <div style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "4px" }}>
-              LOWEST PRICE
+              BEST MATCH · {sorted[0].s}
             </div>
             <div style={{ fontSize: "24px", fontWeight: "700", color: "var(--price)" }}>
               ${(sorted[0].price + sorted[0].ship).toFixed(2)}
             </div>
             <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "4px" }}>
-              Including ${sorted[0].ship.toFixed(2)} shipping
+              Incl. ${sorted[0].ship.toFixed(2)} shipping · ships in {sorted[0].days} day{sorted[0].days > 1 ? "s" : ""}
+              {sorted[0].distance != null ? ` · ${sorted[0].distance} mi away` : ""}
             </div>
+            {lowest < sorted[0].price + sorted[0].ship && (
+              <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>
+                Lowest available: ${lowest.toFixed(2)}
+              </div>
+            )}
           </div>
 
           {/* Available from Suppliers */}

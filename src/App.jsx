@@ -11,6 +11,7 @@ import { HowItWorks } from './screens/HowItWorks'
 import { Map } from './screens/Map'
 import { Account } from './screens/Account'
 import { Dealer } from './screens/Dealer'
+import { DealerDashboard } from './screens/DealerDashboard'
 import { BottomNav } from './components/BottomNav'
 
 export default function App() {
@@ -146,7 +147,11 @@ export default function App() {
       )}
 
       {screen === 'dealer' && (
-        <Dealer onBack={() => setScreen('account')} />
+        <Dealer onBack={() => setScreen('account')} onNav={handleNavigation} />
+      )}
+
+      {screen === 'dealer-dashboard' && (
+        <DealerDashboard orders={orders} onBack={() => setScreen('dealer')} />
       )}
 
       {/* Bottom Navigation */}

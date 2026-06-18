@@ -11,7 +11,7 @@ import {
 
 const feePct = Math.round(PLATFORM_FEE_RATE * 100);
 
-export function Dealer({ onBack }) {
+export function Dealer({ onBack, onNav }) {
   const [acctId, setAcctId] = useState(getDealerAccount());
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -108,6 +108,14 @@ export function Dealer({ onBack }) {
               {loading ? "Opening Stripe…" : acctId ? "Continue payout setup" : "Set up payouts with Stripe"}
             </button>
           )}
+
+          <button
+            onClick={() => onNav && onNav("dealer-dashboard")}
+            className="btn-primary"
+            style={{ width: "100%", padding: "14px", marginTop: "10px", background: "transparent", border: "1px solid var(--ag-green)", color: "var(--ag-green)" }}
+          >
+            View order dashboard
+          </button>
 
           {acctId && (
             <button

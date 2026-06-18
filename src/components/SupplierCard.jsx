@@ -7,7 +7,7 @@ const stars = (r) => {
 export function SupplierCard({ supplier, partNum, best, onBuy, distance }) {
   return (
     <div className={"rcard " + (best ? "best" : "")}>
-      {best && <span className="best-tag">BEST PRICE</span>}
+      {best && <span className="best-tag">BEST MATCH</span>}
 
       <div className="rtop">
         <div className="supp">

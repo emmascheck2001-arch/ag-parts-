@@ -3,8 +3,7 @@ import { TopBar } from "../components/TopBar";
 import { SupplierCard } from "../components/SupplierCard";
 import { VerifiedFit } from "../components/Badge";
 import { PARTS } from "../data/demo";
-
-const byPrice = (list) => [...list].sort((a, b) => (a.price + a.ship) - (b.price + b.ship));
+import { rankSuppliers } from "../lib/ranking";
 
 export function SearchResults({ query, onBack, onPartSelect, onBuy, onViewMap }) {
   // Simple search - find parts matching query
@@ -64,7 +63,7 @@ export function SearchResults({ query, onBack, onPartSelect, onBuy, onViewMap })
                 </button>
               </div>
               {results.map((part) => {
-                const sorted = byPrice(part.suppliers);
+                const sorted = rankSuppliers(part.suppliers);
                 return (
                   <div key={part.pn} style={{ marginBottom: "20px" }}>
                     <div
