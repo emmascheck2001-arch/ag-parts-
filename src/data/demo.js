@@ -34,6 +34,14 @@ export const MACHINES = [
       { type: "Parts Catalog", title: "John Deere Parts Catalog", url: "https://partscatalog.deere.com/" },
     ],
   },
+  {
+    nm: "John Deere 4440", ty: "Tractor", ic: "🚜", hp: "130 hp", img: "/machines/jd-4440.jpg",
+    make: "John Deere", model: "4440", year: "1977–1982",
+    manuals: [
+      { type: "Operator's Manual", title: "40-Series Operator's Manual", url: "https://www.deere.com/en/parts-and-service/manuals-and-training/" },
+      { type: "Parts Catalog", title: "John Deere Parts Catalog", url: "https://partscatalog.deere.com/" },
+    ],
+  },
 ];
 
 export const CATS = [
@@ -199,6 +207,76 @@ export const PARTS = {
       { machine: "John Deere 3020", years: "1964–1972", position: "Hydraulic/transmission filter element", qty: 1, verified: true },
     ],
     suppliers: sellers(18, 9) },
+
+  // ── Case IH Magnum 340 (CNH, FPT Cursor 9) service parts ────────────────────
+  // Real OEM part numbers from public Case IH parts listings. Several CNH filters
+  // cross to New Holland T8 tractors. Prices/stock illustrative.
+  "84283691": { name: "Fuel Filter", cat: "Filters", ic: "⛽", fits: "Case IH Magnum 310/340/380; New Holland T8.410/T8.435",
+    fitment: [
+      { machine: "Case IH Magnum 340", years: "2014–2018", position: "Engine fuel filter", qty: 1, verified: true },
+      { machine: "Case IH Magnum 310", years: "2014–2018", position: "Engine fuel filter", qty: 1, verified: true },
+      { machine: "New Holland T8.410", years: "2014–2018", position: "Engine fuel filter", qty: 1, verified: true },
+    ],
+    suppliers: sellers(28, 10) },
+  "5801659560": { name: "Air Filter (Outer)", cat: "Filters", ic: "🔲", fits: "Case IH Magnum 310/340 and Magnum series",
+    fitment: [
+      { machine: "Case IH Magnum 340", years: "2014–2018", position: "Primary engine air filter", qty: 1, verified: true },
+      { machine: "Case IH Magnum 310", years: "2014–2018", position: "Primary engine air filter", qty: 1, verified: true },
+    ],
+    suppliers: sellers(78, 14) },
+  "84487937": { name: "Hydraulic / Transmission Filter", cat: "Hydraulic", ic: "🔧", fits: "Case IH Magnum series",
+    fitment: [
+      { machine: "Case IH Magnum 340", years: "2014–2018", position: "Hydraulic/transmission oil filter", qty: 1, verified: true },
+    ],
+    suppliers: sellers(62, 12) },
+  "87267363": { name: "Cab Air Filter", cat: "Cab & Body", ic: "🚪", fits: "Case IH Magnum 310/340",
+    fitment: [
+      { machine: "Case IH Magnum 340", years: "2014–2018", position: "Cab air filter", qty: 1, verified: true },
+      { machine: "Case IH Magnum 310", years: "2014–2018", position: "Cab air filter", qty: 1, verified: true },
+    ],
+    suppliers: sellers(40, 10) },
+  "1907539": { name: "Fuel / Water Separator Filter", cat: "Filters", ic: "💧", fits: "Case IH Magnum (FPT/Iveco engine)",
+    fitment: [
+      { machine: "Case IH Magnum 340", years: "2014–2018", position: "Fuel/water separator filter", qty: 1, verified: true },
+    ],
+    suppliers: sellers(26, 9) },
+
+  // ── John Deere 4440 (40-Series "Iron Horse") service parts ──────────────────
+  // Real part numbers from JD's 40-Series filter overview and public listings.
+  AR43261: { name: "Engine Oil Filter", cat: "Filters", ic: "🛢", fits: "John Deere 4040, 4230, 4240, 4430, 4440, 4630",
+    fitment: [
+      { machine: "John Deere 4440", years: "1977–1982", position: "Engine oil filter (spin-on)", qty: 1, verified: true },
+      { machine: "John Deere 4040", years: "1977–1982", position: "Engine oil filter (spin-on)", qty: 1, verified: true },
+      { machine: "John Deere 4240", years: "1977–1982", position: "Engine oil filter (spin-on)", qty: 1, verified: true },
+      { machine: "John Deere 4640", years: "1978–1982", position: "Engine oil filter (spin-on)", qty: 1, verified: true },
+    ],
+    suppliers: sellers(12.5, 8),
+    cross: [{ brand: "Baldwin", pn: "BT287" }, { brand: "WIX", pn: "51758" }, { brand: "Fram", pn: "PH47" }, { brand: "Case", pn: "A57857" }] },
+  AR79679: { name: "Primary Air Filter", cat: "Filters", ic: "🔲", fits: "John Deere 40-Series (4040–4840)",
+    fitment: [
+      { machine: "John Deere 4440", years: "1977–1982", position: "Primary engine air filter", qty: 1, verified: true },
+      { machine: "John Deere 4240", years: "1977–1982", position: "Primary engine air filter", qty: 1, verified: true },
+      { machine: "John Deere 4640", years: "1978–1982", position: "Primary engine air filter", qty: 1, verified: true },
+    ],
+    suppliers: sellers(38, 11) },
+  AR79680: { name: "Secondary Air Filter", cat: "Filters", ic: "🔲", fits: "John Deere 40-Series (4040–4840)",
+    fitment: [
+      { machine: "John Deere 4440", years: "1977–1982", position: "Secondary engine air filter", qty: 1, verified: true },
+      { machine: "John Deere 4240", years: "1977–1982", position: "Secondary engine air filter", qty: 1, verified: true },
+    ],
+    suppliers: sellers(22, 9) },
+  AR50041: { name: "Fuel / Water Separator Filter", cat: "Filters", ic: "💧", fits: "John Deere 4020, 4040, 4440 and others",
+    fitment: [
+      { machine: "John Deere 4440", years: "1977–1982", position: "Fuel/water separator element", qty: 1, verified: true },
+      { machine: "John Deere 4240", years: "1977–1982", position: "Fuel/water separator element", qty: 1, verified: true },
+    ],
+    suppliers: sellers(10.5, 8) },
+  AR94510: { name: "Transmission / Hydraulic Oil Filter", cat: "Hydraulic", ic: "🔧", fits: "John Deere 40-Series (2WD), 25 micron",
+    fitment: [
+      { machine: "John Deere 4440", years: "1977–1982", position: "Transmission/hydraulic oil filter (2WD, 25 micron)", qty: 1, verified: true },
+      { machine: "John Deere 4240", years: "1977–1982", position: "Transmission/hydraulic oil filter (2WD, 25 micron)", qty: 1, verified: true },
+    ],
+    suppliers: sellers(24, 9) },
 };
 
 export const MACHINE_PARTS = [
