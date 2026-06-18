@@ -53,6 +53,25 @@ export function Account({ onBack, onNav }) {
             <span style={{ fontSize: "22px", color: "var(--ag-green)" }}>›</span>
           </button>
 
+          {/* Admin: catalog extractor */}
+          <button
+            onClick={() => onNav && onNav("extract")}
+            className="card"
+            style={{
+              width: "100%", textAlign: "left", display: "flex", alignItems: "center",
+              justifyContent: "space-between", gap: "10px", marginBottom: "14px",
+              cursor: "pointer", color: "var(--text)",
+            }}
+          >
+            <div>
+              <div style={{ fontSize: "14px", fontWeight: 700 }}>Catalog Extractor</div>
+              <div style={{ fontSize: "11.5px", color: "var(--text-muted)", marginTop: "2px" }}>
+                Admin — turn a catalog page into structured fitment.
+              </div>
+            </div>
+            <span style={{ fontSize: "22px", color: "var(--text-muted)" }}>›</span>
+          </button>
+
           <Section title="Contact">
             <div><strong style={{ color: "var(--text)" }}>{CONTACT.business}</strong></div>
             <div>{CONTACT.region}</div>
