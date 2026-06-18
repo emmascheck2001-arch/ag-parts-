@@ -26,6 +26,14 @@ export const MACHINES = [
       { type: "Parts & Service", title: "Case IH Parts & Service", url: "https://www.caseih.com/northamerica/en-us/service-support" },
     ],
   },
+  {
+    nm: "John Deere 4020", ty: "Tractor", ic: "🚜", hp: "96 hp", img: "/machines/jd-4020.jpg",
+    make: "John Deere", model: "4020", year: "1964–1972",
+    manuals: [
+      { type: "Operator's Manual", title: "4020 Operator's Manual", url: "https://www.deere.com/en/parts-and-service/manuals-and-training/" },
+      { type: "Parts Catalog", title: "John Deere Parts Catalog", url: "https://partscatalog.deere.com/" },
+    ],
+  },
 ];
 
 export const CATS = [
@@ -156,6 +164,41 @@ export const PARTS = {
     fitment: fitAll("Fuel/water separator filter (if equipped)"), suppliers: sellers(29, 9) },
   AL204884: { name: "Air Brake Air Dryer Filter", cat: "Filters", ic: "🛞", fits: FITS_STR,
     fitment: fitAll("Trailer air brake air dryer filter (if equipped) — annually"), suppliers: sellers(68, 12) },
+
+  // ── John Deere 4020 (New Generation era) service parts ──────────────────────
+  // Real part numbers from public JD parts listings; these famously fit a broad
+  // range of 1960s–70s tractors. Prices/stock are illustrative.
+  AR26350: { name: "Engine Oil Filter", cat: "Filters", ic: "🛢", fits: "John Deere 4020, 3020, 4000, 4010, 4230 (gas & diesel)",
+    fitment: [
+      { machine: "John Deere 4020", years: "1964–1972", position: "Engine oil filter (gas & diesel)", qty: 1, verified: true },
+      { machine: "John Deere 3020", years: "1964–1972", position: "Engine oil filter", qty: 1, verified: true },
+      { machine: "John Deere 4000", years: "1969–1972", position: "Engine oil filter", qty: 1, verified: true },
+      { machine: "John Deere 4010", years: "1960–1963", position: "Engine oil filter", qty: 1, verified: true },
+      { machine: "John Deere 4230", years: "1973–1977", position: "Engine oil filter", qty: 1, verified: true },
+    ],
+    suppliers: sellers(11.5, 8) },
+  AR44077: { name: "Fuel Filter (Diesel)", cat: "Filters", ic: "⛽", fits: "John Deere 3010, 3020, 4000, 4010, 4020, 4520 (diesel)",
+    fitment: [
+      { machine: "John Deere 4020", years: "1964–1972", position: "Diesel fuel filter element", qty: 1, verified: true },
+      { machine: "John Deere 3020", years: "1964–1972", position: "Diesel fuel filter element", qty: 1, verified: true },
+      { machine: "John Deere 4000", years: "1969–1972", position: "Diesel fuel filter element", qty: 1, verified: true },
+      { machine: "John Deere 4010", years: "1960–1963", position: "Diesel fuel filter element", qty: 1, verified: true },
+    ],
+    suppliers: sellers(9.5, 8),
+    cross: [{ brand: "WIX", pn: "33143" }, { brand: "Fleetguard", pn: "FF130" }, { brand: "Baldwin", pn: "PF814" }, { brand: "Donaldson", pn: "P551748" }, { brand: "Fram", pn: "C1168PL" }] },
+  AH69798: { name: "Air Filter", cat: "Filters", ic: "🔲", fits: "John Deere 3020, 4000, 4020, 450",
+    fitment: [
+      { machine: "John Deere 4020", years: "1964–1972", position: "Engine air filter element", qty: 1, verified: true },
+      { machine: "John Deere 3020", years: "1964–1972", position: "Engine air filter element", qty: 1, verified: true },
+      { machine: "John Deere 4000", years: "1969–1972", position: "Engine air filter element", qty: 1, verified: true },
+    ],
+    suppliers: sellers(34, 10) },
+  AR75603: { name: "Hydraulic Filter Element", cat: "Hydraulic", ic: "🔧", fits: "John Deere 4020 and New Generation series",
+    fitment: [
+      { machine: "John Deere 4020", years: "1964–1972", position: "Hydraulic/transmission filter element", qty: 1, verified: true },
+      { machine: "John Deere 3020", years: "1964–1972", position: "Hydraulic/transmission filter element", qty: 1, verified: true },
+    ],
+    suppliers: sellers(18, 9) },
 };
 
 export const MACHINE_PARTS = [
