@@ -23,6 +23,13 @@ export function PartDetails({ partNum, onBack, onBuy, onViewMap, onMachineSelect
   const sorted = rankSuppliers(part.suppliers);
   const lowest = lowestTotal(part.suppliers);
 
+  // "Used On" detail (position · qty · years). When it's identical across every
+  // machine, show it once instead of repeating it on all 8 rows.
+  const fitment = part.fitment || [];
+  const fitDetail = (f) =>
+    `${f.position || ""}${f.qty ? ` · Qty ${f.qty}` : ""}${f.years ? ` · ${f.years}` : ""}`;
+  const sameDetail = fitment.length > 1 && fitment.every((f) => fitDetail(f) === fitDetail(fitment[0]));
+
   const handleBuyClick = (pn, supplier, total) => {
     onBuy({ pn, supplier, total, partName: part.name });
   };
@@ -52,47 +59,59 @@ export function PartDetails({ partNum, onBack, onBuy, onViewMap, onMachineSelect
             </div>
           </div>
 
-          {/* Used On — where this part fits, and how */}
-          {part.fitment?.length > 0 && (
+          {/* Used On — where this part fits */}
+          {fitment.length > 0 && (
             <div className="card" style={{ marginBottom: "16px" }}>
               <h3 style={{ fontSize: "13px", fontWeight: 700, marginBottom: "4px" }}>
-                Used On {part.fitment.length} Machine{part.fitment.length > 1 ? "s" : ""}
+                Used On {fitment.length} Machine{fitment.length > 1 ? "s" : ""}
               </h3>
-              <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "6px" }}>
-                Every machine that uses part #{partNum}, and how it's fitted.
-              </div>
-              {part.fitment.map((f, i) => {
+
+              {/* When every machine shares the same fitment detail, show it once. */}
+              {sameDetail && (
+                <div style={{ fontSize: "11.5px", color: "var(--text-muted)", marginBottom: "10px", lineHeight: 1.4 }}>
+                  {fitDetail(fitment[0])} — same on all
+                </div>
+              )}
+
+              {fitment.map((f, i) => {
                 const tappable = MACHINE_NAMES.has(f.machine);
                 return (
-                <div
-                  key={i}
-                  onClick={tappable ? () => onMachineSelect(f.machine) : undefined}
-                  style={{ borderTop: i ? "1px solid var(--border)" : "none", padding: "10px 0 8px", cursor: tappable ? "pointer" : "default" }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px" }}>
-                    <div style={{ fontSize: "13px", fontWeight: 600, color: tappable ? "var(--ag-green)" : "var(--text)" }}>
-                      {f.machine}{tappable ? " ›" : ""}
+                  <div
+                    key={i}
+                    onClick={tappable ? () => onMachineSelect(f.machine) : undefined}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      gap: "8px",
+                      borderTop: i ? "1px solid var(--border)" : "none",
+                      padding: sameDetail ? "8px 0" : "10px 0 8px",
+                      cursor: tappable ? "pointer" : "default",
+                    }}
+                  >
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontSize: "13px", fontWeight: 600, color: tappable ? "var(--ag-green)" : "var(--text)" }}>
+                        {f.machine}{tappable ? " ›" : ""}
+                      </div>
+                      {/* Per-row detail only when it differs between machines */}
+                      {!sameDetail && (
+                        <div style={{ fontSize: "11.5px", color: "var(--text-muted)", marginTop: "3px" }}>
+                          {fitDetail(f)}
+                        </div>
+                      )}
                     </div>
                     <span
                       style={{
                         fontSize: "9.5px",
                         fontWeight: 700,
-                        padding: "2px 6px",
-                        borderRadius: "4px",
                         whiteSpace: "nowrap",
-                        background: f.verified ? "var(--ag-green-soft)" : "rgba(245, 166, 35, 0.15)",
                         color: f.verified ? "var(--ag-green)" : "var(--star)",
                       }}
+                      title={f.verified ? "Verified fit" : "Unverified"}
                     >
-                      {f.verified ? "✓ VERIFIED" : "⚠ UNVERIFIED"}
+                      {f.verified ? "✓" : "⚠"}
                     </span>
                   </div>
-                  <div style={{ fontSize: "11.5px", color: "var(--text-muted)", marginTop: "3px" }}>
-                    {f.position}
-                    {f.qty ? ` · Qty ${f.qty}` : ""}
-                    {f.years ? ` · ${f.years}` : ""}
-                  </div>
-                </div>
                 );
               })}
             </div>
