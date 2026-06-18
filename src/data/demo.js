@@ -134,6 +134,10 @@ export const PARTS = {
     fitment: fitAll("Primary engine air filter (TSN 110760– ) — 1000 h / annually"), suppliers: sellers(84, 14) },
   RE587792: { name: "Secondary Air Filter", cat: "Filters", ic: "🔲", fits: FITS_STR,
     fitment: fitAll("Secondary engine air filter (TSN 110760– ) — every 2nd primary change"), suppliers: sellers(52, 12) },
+  RE587793: { name: "Primary Air Filter (early)", cat: "Filters", ic: "🔲", fits: FITS_STR,
+    fitment: fitAll("Primary engine air filter (TSN 090001–110759) — 1000 h / annually"), suppliers: sellers(82, 14) },
+  RE587794: { name: "Secondary Air Filter (early)", cat: "Filters", ic: "🔲", fits: FITS_STR,
+    fitment: fitAll("Secondary engine air filter (TSN 090001–110759) — every 2nd primary change"), suppliers: sellers(50, 12) },
   RE573817: { name: "Hydraulic / Transmission Oil Filter", cat: "Hydraulic", ic: "🔧", fits: FITS_STR,
     fitment: fitAll("Hydraulic/transmission (Hy-Gard) oil filter — every 1500 h"), suppliers: sellers(58, 12) },
   RE269061: { name: "SCV Oil Filter", cat: "Hydraulic", ic: "🔧", fits: FITS_STR,
@@ -176,6 +180,41 @@ export function partsForMachine(machineName) {
     });
   }
   return out;
+}
+
+// ── Serial-number resolution ("never the wrong part") ────────────────────────
+// Some parts change at a serial break — same model, different correct part.
+// Real example: the 8R FT4 engine air filters switch at TSN 110760.
+const FT4_AIR_RULES = [
+  { role: "Primary Air Filter", brk: 110760, below: "RE587793", atOrAbove: "RE587791" },
+  { role: "Secondary Air Filter", brk: 110760, below: "RE587794", atOrAbove: "RE587792" },
+];
+const SERIAL_BREAKS = Object.fromEntries(FT4_8R.map((m) => [m, FT4_AIR_RULES]));
+
+export const hasSerialBreaks = (machineName) => Boolean(SERIAL_BREAKS[machineName]);
+
+// Pull the production sequence number out of a serial / PIN (last digit group).
+export function serialSequence(serial) {
+  const groups = (serial || "").match(/\d+/g);
+  if (!groups || !groups.length) return null;
+  return parseInt(groups[groups.length - 1], 10);
+}
+
+// Given a machine + serial, return the exact part for each serial-dependent role.
+export function resolveExactParts(machineName, serial) {
+  const seq = serialSequence(serial);
+  if (seq == null) return { error: "Enter a serial / PIN that includes the production number." };
+  const rules = SERIAL_BREAKS[machineName] || [];
+  const parts = rules.map((r) => {
+    const pn = seq >= r.brk ? r.atOrAbove : r.below;
+    return {
+      role: r.role,
+      pn,
+      name: PARTS[pn]?.name || r.role,
+      range: seq >= r.brk ? `TSN ${r.brk} and up` : `TSN up to ${r.brk - 1}`,
+    };
+  });
+  return { seq, parts };
 }
 
 export const REMINDERS = [
