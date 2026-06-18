@@ -19,13 +19,40 @@ function Section({ title, children }) {
   );
 }
 
-export function Account({ onBack }) {
+export function Account({ onBack, onNav }) {
   return (
     <div className="screen active">
       <TopBar title="Account & Info" onBack={onBack} />
 
       <div className="scroll">
         <div style={{ padding: "16px" }}>
+          {/* Dealer call-to-action */}
+          <button
+            onClick={() => onNav && onNav("dealer")}
+            className="card"
+            style={{
+              width: "100%",
+              textAlign: "left",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "10px",
+              marginBottom: "14px",
+              cursor: "pointer",
+              borderColor: "var(--ag-green)",
+              background: "var(--ag-green-soft)",
+              color: "var(--text)",
+            }}
+          >
+            <div>
+              <div style={{ fontSize: "14px", fontWeight: 700 }}>Sell on EzParts</div>
+              <div style={{ fontSize: "11.5px", color: "var(--text-muted)", marginTop: "2px" }}>
+                Are you a dealer? Set up payouts and start selling.
+              </div>
+            </div>
+            <span style={{ fontSize: "22px", color: "var(--ag-green)" }}>›</span>
+          </button>
+
           <Section title="Contact">
             <div><strong style={{ color: "var(--text)" }}>{CONTACT.business}</strong></div>
             <div>{CONTACT.region}</div>

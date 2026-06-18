@@ -4,7 +4,7 @@ import { TopBar } from "../components/TopBar";
 import { PaymentForm } from "../components/PaymentForm";
 import { SUPPLIERS_MAP, calculateDistance, USER_LOCATION } from "../data/demo";
 import { orderMath, money } from "../lib/marketplace";
-import { STRIPE_ENABLED, stripePromise, createPaymentIntent } from "../lib/stripe";
+import { STRIPE_ENABLED, stripePromise, createPaymentIntent, getDealerAccount } from "../lib/stripe";
 
 const stripeAppearance = {
   theme: "night",
@@ -75,7 +75,9 @@ export function Checkout({ cart, onBack, onConfirm }) {
       const res = await createPaymentIntent({
         amount: m.customerTotal,
         platformFee: m.platformFee,
-        // dealerAccountId: <dealer's Connect account> once dealers are onboarded
+        // In the demo, the onboarded dealer (stored in the browser) receives the
+        // payout; in production this comes from the chosen dealer's record.
+        dealerAccountId: getDealerAccount() || undefined,
         metadata: { orderId: order.orderId, dealer: dealerName, fulfillment },
       });
       if (res.clientSecret) {

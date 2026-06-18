@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Home } from './screens/Home'
 import { SearchResults } from './screens/SearchResults'
 import { PartDetails } from './screens/PartDetails'
@@ -10,6 +10,7 @@ import { Scan } from './screens/Scan'
 import { HowItWorks } from './screens/HowItWorks'
 import { Map } from './screens/Map'
 import { Account } from './screens/Account'
+import { Dealer } from './screens/Dealer'
 import { BottomNav } from './components/BottomNav'
 
 export default function App() {
@@ -19,6 +20,15 @@ export default function App() {
   const [selectedMachine, setSelectedMachine] = useState(null)
   const [cart, setCart] = useState([])
   const [orders, setOrders] = useState([])
+
+  // Deep-link back from Stripe Connect onboarding (?screen=dealer).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('screen') === 'dealer') {
+      setScreen('dealer')
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+  }, [])
 
   // Navigation handlers
   const handleNavigation = (navScreen) => {
@@ -132,7 +142,11 @@ export default function App() {
       )}
 
       {screen === 'account' && (
-        <Account onBack={handleHome} />
+        <Account onBack={handleHome} onNav={handleNavigation} />
+      )}
+
+      {screen === 'dealer' && (
+        <Dealer onBack={() => setScreen('account')} />
       )}
 
       {/* Bottom Navigation */}
