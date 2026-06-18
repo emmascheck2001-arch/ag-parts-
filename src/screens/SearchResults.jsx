@@ -26,6 +26,39 @@ export function SearchResults({ query, onBack, onPartSelect, onBuy, onViewMap, o
   const handleBuyClick = (pn, supplier, total) => onBuy({ pn, supplier, total });
   const nothing = machineResults.length === 0 && results.length === 0;
 
+  // Own nothing: index dealers' listings, and point to where the rest already lives.
+  const enc = encodeURIComponent((query || "") + " tractor part");
+  const webSources = [
+    { label: "Google", url: "https://www.google.com/search?q=" + enc },
+    { label: "eBay", url: "https://www.ebay.com/sch/i.html?_nkw=" + enc },
+    { label: "Amazon", url: "https://www.amazon.com/s?k=" + enc },
+  ];
+  const externalSearch = (
+    <div className="card" style={{ marginTop: "8px" }}>
+      <h3 style={{ fontSize: "13px", fontWeight: 700, marginBottom: "4px" }}>Search the web for “{query}”</h3>
+      <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "10px", lineHeight: 1.4 }}>
+        Not listed by a dealer yet? Find it anywhere — EzParts indexes dealers and points you to the rest.
+      </div>
+      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+        {webSources.map((s) => (
+          <a
+            key={s.label}
+            href={s.url}
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              flex: 1, minWidth: "90px", textAlign: "center", padding: "10px",
+              borderRadius: "8px", border: "1px solid var(--ag-green)",
+              color: "var(--ag-green)", textDecoration: "none", fontSize: "12px", fontWeight: 600,
+            }}
+          >
+            {s.label} ›
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <div className="screen active">
       <TopBar title={`Results for "${query}"`} onBack={onBack} />
@@ -33,13 +66,13 @@ export function SearchResults({ query, onBack, onPartSelect, onBuy, onViewMap, o
       <div className="scroll">
         <div style={{ padding: "16px" }}>
           {nothing ? (
-            <div style={{ textAlign: "center", padding: "40px 20px", color: "var(--text-muted)" }}>
-              <div style={{ fontSize: "40px", marginBottom: "12px" }}>🔍</div>
-              <div>No machines or parts found matching "{query}"</div>
-              <button className="btn-primary" onClick={onBack} style={{ marginTop: "16px" }}>
-                Back to Search
-              </button>
-            </div>
+            <>
+              <div style={{ textAlign: "center", padding: "28px 20px 16px", color: "var(--text-muted)" }}>
+                <div style={{ fontSize: "40px", marginBottom: "12px" }}>🔍</div>
+                <div>No dealer has listed “{query}” yet — but you can still find it:</div>
+              </div>
+              {externalSearch}
+            </>
           ) : (
             <>
               {/* Machines */}
@@ -107,6 +140,9 @@ export function SearchResults({ query, onBack, onPartSelect, onBuy, onViewMap, o
                   })}
                 </>
               )}
+
+              {/* Always offer the web — own nothing, find anything */}
+              {externalSearch}
             </>
           )}
         </div>
