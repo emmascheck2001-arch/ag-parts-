@@ -8,11 +8,13 @@ const byPrice = (list) => [...list].sort((a, b) => (a.price + a.ship) - (b.price
 
 export function SearchResults({ query, onBack, onPartSelect, onBuy, onViewMap }) {
   // Simple search - find parts matching query
+  const q = (query || "").toLowerCase();
   const results = Object.entries(PARTS)
-    .filter(([pn, part]) => 
-      pn.toLowerCase().includes(query.toLowerCase()) ||
-      part.name.toLowerCase().includes(query.toLowerCase()) ||
-      part.fits.toLowerCase().includes(query.toLowerCase())
+    .filter(([pn, part]) =>
+      pn.toLowerCase().includes(q) ||
+      part.name.toLowerCase().includes(q) ||
+      part.fits.toLowerCase().includes(q) ||
+      (part.cat || "").toLowerCase().includes(q)
     )
     .map(([pn, part]) => ({ pn, ...part }));
 

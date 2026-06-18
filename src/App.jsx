@@ -40,8 +40,10 @@ export default function App() {
     if (type === 'machines') {
       setSelectedMachine(value)
       setScreen('machine-details')
+    } else if (type === 'category') {
+      // Tapping a category shows the parts in it (via search match on category).
+      handleSearch(value)
     } else if (type === 'categories') {
-      // For now, categories just shows home
       handleHome()
     }
   }
