@@ -157,6 +157,37 @@ export function PartDetails({ partNum, onBack, onBuy, onViewMap, onMachineSelect
               );
             })}
           </div>
+
+          {/* Cross-references — equivalent aftermarket part numbers */}
+          {part.cross?.length > 0 && (
+            <div className="card" style={{ marginBottom: "16px" }}>
+              <h3 style={{ fontSize: "13px", fontWeight: 700, marginBottom: "4px" }}>
+                Cross-References ({part.cross.length})
+              </h3>
+              <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "8px" }}>
+                Equivalent aftermarket part numbers for #{partNum} — give any of these to a supplier.
+              </div>
+              {part.cross.map((c) => (
+                <div
+                  key={c.brand + c.pn}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    fontSize: "13px",
+                    padding: "8px 0",
+                    borderTop: "1px solid var(--border)",
+                  }}
+                >
+                  <span style={{ color: "var(--text-muted)" }}>{c.brand}</span>
+                  <span style={{ fontWeight: 700, fontFamily: "monospace" }}>{c.pn}</span>
+                </div>
+              ))}
+              <div style={{ fontSize: "10px", color: "var(--text-muted)", marginTop: "8px", lineHeight: 1.4 }}>
+                Cross-references are for guidance — confirm specs/dimensions for your application.
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
