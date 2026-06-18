@@ -46,9 +46,46 @@ export function PartDetails({ partNum, onBack, onBuy, onViewMap }) {
               <VerifiedFit />
             </div>
             <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
-              <strong>Compatible with:</strong> {part.fits}
+              <strong>Fits:</strong> {part.fits}
             </div>
           </div>
+
+          {/* Used On — where this part fits, and how */}
+          {part.fitment?.length > 0 && (
+            <div className="card" style={{ marginBottom: "16px" }}>
+              <h3 style={{ fontSize: "13px", fontWeight: 700, marginBottom: "4px" }}>
+                Used On {part.fitment.length} Machine{part.fitment.length > 1 ? "s" : ""}
+              </h3>
+              <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "6px" }}>
+                Every machine that uses part #{partNum}, and how it's fitted.
+              </div>
+              {part.fitment.map((f, i) => (
+                <div key={i} style={{ borderTop: i ? "1px solid var(--border)" : "none", padding: "10px 0 8px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px" }}>
+                    <div style={{ fontSize: "13px", fontWeight: 600 }}>{f.machine}</div>
+                    <span
+                      style={{
+                        fontSize: "9.5px",
+                        fontWeight: 700,
+                        padding: "2px 6px",
+                        borderRadius: "4px",
+                        whiteSpace: "nowrap",
+                        background: f.verified ? "var(--ag-green-soft)" : "rgba(245, 166, 35, 0.15)",
+                        color: f.verified ? "var(--ag-green)" : "var(--star)",
+                      }}
+                    >
+                      {f.verified ? "✓ VERIFIED" : "⚠ UNVERIFIED"}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: "11.5px", color: "var(--text-muted)", marginTop: "3px" }}>
+                    {f.position}
+                    {f.qty ? ` · Qty ${f.qty}` : ""}
+                    {f.years ? ` · ${f.years}` : ""}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Best match summary */}
           <div className="card" style={{ marginBottom: "16px", background: "rgba(36, 179, 63, 0.08)", borderColor: "var(--ag-green)" }}>

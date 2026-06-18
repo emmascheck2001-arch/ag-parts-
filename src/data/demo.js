@@ -102,8 +102,15 @@ export const PARTS = {
     name: "Hydraulic Pump",
     cat: "Hydraulic",
     ic: "🔧",
-    fits: "John Deere 8320R, 8345R, 8370R",
+    fits: "John Deere 8295R, 8320R, 8345R, 8370R",
     stock: 14,
+    // Where-used: every machine this part fits, and how.
+    fitment: [
+      { machine: "John Deere 8295R", years: "2011–2015", position: "Main hydraulic pump (PowrReverser)", qty: 1, verified: true },
+      { machine: "John Deere 8320R", years: "2011–2015", position: "Main hydraulic pump (PowrReverser)", qty: 1, verified: true },
+      { machine: "John Deere 8345R", years: "2011–2015", position: "Main hydraulic pump (PowrReverser)", qty: 1, verified: true },
+      { machine: "John Deere 8370R", years: "2012–2015", position: "Main hydraulic pump (PowrReverser)", qty: 1, verified: true },
+    ],
     suppliers: [
       { s: "Prairie Equipment", price: 389, ship: 25, rating: 4.8, n: 230, days: 2, stock: 14 },
       { s: "Greenline Supply", price: 412, ship: 25, rating: 4.6, n: 95, days: 1, stock: 3 },
@@ -112,11 +119,18 @@ export const PARTS = {
     ],
   },
   P606860: {
-    name: "Air Filter",
+    name: "Air Filter (Donaldson)",
     cat: "Filters",
     ic: "🔲",
-    fits: "John Deere 8320R, 8345R",
+    fits: "John Deere 8R series, S-Series combines; cross-fits multiple makes",
     stock: 40,
+    fitment: [
+      { machine: "John Deere 8320R", years: "2011–2015", position: "Primary engine air filter", qty: 1, verified: true },
+      { machine: "John Deere 8345R", years: "2011–2015", position: "Primary engine air filter", qty: 1, verified: true },
+      { machine: "John Deere S670 Combine", years: "2012–2017", position: "Primary engine air filter", qty: 1, verified: true },
+      { machine: "Case IH Magnum 340", years: "2014–2018", position: "Primary engine air filter", qty: 1, verified: false },
+      { machine: "New Holland CR8.90", years: "2014–2019", position: "Primary engine air filter", qty: 1, verified: false },
+    ],
     suppliers: [
       { s: "Prairie Equipment", price: 45.75, ship: 9, rating: 4.8, n: 230, days: 2, stock: 40 },
       { s: "Agri Parts Central", price: 49, ship: 9, rating: 4.7, n: 120, days: 2, stock: 25 },
@@ -126,8 +140,13 @@ export const PARTS = {
     name: "Serpentine Belt",
     cat: "Belts",
     ic: "➰",
-    fits: "Case IH Magnum 340",
+    fits: "Case IH Magnum 290, 310, 340",
     stock: 18,
+    fitment: [
+      { machine: "Case IH Magnum 290", years: "2014–2018", position: "Serpentine drive belt", qty: 1, verified: true },
+      { machine: "Case IH Magnum 310", years: "2014–2018", position: "Serpentine drive belt", qty: 1, verified: true },
+      { machine: "Case IH Magnum 340", years: "2014–2018", position: "Serpentine drive belt", qty: 1, verified: true },
+    ],
     suppliers: [
       { s: "Ag Valley Supply", price: 32.1, ship: 10, rating: 4.8, n: 86, days: 3, stock: 18 },
       { s: "Greenline Supply", price: 36, ship: 12, rating: 4.6, n: 95, days: 3, stock: 6 },
