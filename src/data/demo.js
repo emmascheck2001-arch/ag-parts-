@@ -162,6 +162,28 @@ export const MACHINE_PARTS = [
   { pn: "RE12345", name: "Alternator", ic: "🔋", from: 275.0 },
 ];
 
+// Reverse fitment: every part that fits a given machine, with how it's used.
+// Derived from each part's `fitment` list — the mirror of the Used-On lookup.
+export function partsForMachine(machineName) {
+  const out = [];
+  for (const [pn, part] of Object.entries(PARTS)) {
+    const fit = (part.fitment || []).find((f) => f.machine === machineName);
+    if (!fit) continue;
+    out.push({
+      pn,
+      name: part.name,
+      ic: part.ic,
+      cat: part.cat,
+      position: fit.position,
+      qty: fit.qty,
+      years: fit.years,
+      verified: fit.verified,
+      from: Math.min(...part.suppliers.map((s) => s.price)),
+    });
+  }
+  return out;
+}
+
 export const REMINDERS = [
   { ic: "🛢", nm: "Engine Oil Change", due: "Due in 25 hours" },
   { ic: "💧", nm: "Hydraulic Filter Change", due: "Due in 56 hours" },

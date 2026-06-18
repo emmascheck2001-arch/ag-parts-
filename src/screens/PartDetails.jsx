@@ -1,10 +1,12 @@
 import { TopBar } from "../components/TopBar";
 import { SupplierCard } from "../components/SupplierCard";
 import { VerifiedFit } from "../components/Badge";
-import { PARTS, SUPPLIERS_MAP, calculateDistance, USER_LOCATION } from "../data/demo";
+import { PARTS, MACHINES, SUPPLIERS_MAP, calculateDistance, USER_LOCATION } from "../data/demo";
 import { rankSuppliers, lowestTotal } from "../lib/ranking";
 
-export function PartDetails({ partNum, onBack, onBuy, onViewMap }) {
+const MACHINE_NAMES = new Set(MACHINES.map((m) => m.nm));
+
+export function PartDetails({ partNum, onBack, onBuy, onViewMap, onMachineSelect }) {
   const part = PARTS[partNum];
 
   if (!part) {
@@ -59,10 +61,18 @@ export function PartDetails({ partNum, onBack, onBuy, onViewMap }) {
               <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "6px" }}>
                 Every machine that uses part #{partNum}, and how it's fitted.
               </div>
-              {part.fitment.map((f, i) => (
-                <div key={i} style={{ borderTop: i ? "1px solid var(--border)" : "none", padding: "10px 0 8px" }}>
+              {part.fitment.map((f, i) => {
+                const tappable = MACHINE_NAMES.has(f.machine);
+                return (
+                <div
+                  key={i}
+                  onClick={tappable ? () => onMachineSelect(f.machine) : undefined}
+                  style={{ borderTop: i ? "1px solid var(--border)" : "none", padding: "10px 0 8px", cursor: tappable ? "pointer" : "default" }}
+                >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px" }}>
-                    <div style={{ fontSize: "13px", fontWeight: 600 }}>{f.machine}</div>
+                    <div style={{ fontSize: "13px", fontWeight: 600, color: tappable ? "var(--ag-green)" : "var(--text)" }}>
+                      {f.machine}{tappable ? " ›" : ""}
+                    </div>
                     <span
                       style={{
                         fontSize: "9.5px",
@@ -83,7 +93,8 @@ export function PartDetails({ partNum, onBack, onBuy, onViewMap }) {
                     {f.years ? ` · ${f.years}` : ""}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
 

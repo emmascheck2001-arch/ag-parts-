@@ -88,21 +88,23 @@ export default function App() {
       </div>
 
       {screen === 'search-results' && (
-        <SearchResults 
-          query={searchQuery} 
-          onBack={handleHome} 
+        <SearchResults
+          query={searchQuery}
+          onBack={handleHome}
           onPartSelect={handlePartSelect}
           onBuy={handleBuy}
           onViewMap={() => setScreen('map')}
+          onMachineSelect={(nm) => handleSelect('machines', nm)}
         />
       )}
 
       {screen === 'part-details' && selectedPart && (
-        <PartDetails 
-          partNum={selectedPart} 
+        <PartDetails
+          partNum={selectedPart}
           onBack={handleHome}
           onBuy={handleBuy}
           onViewMap={() => setScreen('map')}
+          onMachineSelect={(nm) => handleSelect('machines', nm)}
         />
       )}
 
