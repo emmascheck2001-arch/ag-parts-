@@ -3,6 +3,7 @@
 export const MACHINES = [
   {
     nm: "John Deere 8320R", ty: "Tractor", ic: "🚜", hp: "320 hp", img: "/machines/jd-8320r.jpg",
+    make: "John Deere", model: "8320R", year: "2011–2015",
     manuals: [
       { type: "Operator's Manual", title: "8R Series Operator's Manual", url: "https://www.deere.com/en/parts-and-service/manuals-and-training/" },
       { type: "Parts Catalog", title: "John Deere Parts Catalog", url: "https://partscatalog.deere.com/" },
@@ -11,6 +12,7 @@ export const MACHINES = [
   },
   {
     nm: "New Holland CR8.90", ty: "Combine", ic: "🌾", hp: "523 hp", img: "/machines/nh-cr890.jpg",
+    make: "New Holland", model: "CR8.90", year: "2014–2019",
     manuals: [
       { type: "Operator's Manual", title: "CR Series Operator's Manual", url: "https://www.newholland.com/en-us" },
       { type: "Parts & Service", title: "New Holland Parts & Service", url: "https://www.newholland.com/en-us" },
@@ -18,6 +20,7 @@ export const MACHINES = [
   },
   {
     nm: "Case IH Magnum 340", ty: "Tractor", ic: "🚜", hp: "340 hp", img: "/machines/caseih-magnum340.jpg",
+    make: "Case IH", model: "Magnum 340", year: "2014–2018",
     manuals: [
       { type: "Operator's Manual", title: "Magnum Operator's Manual", url: "https://www.caseih.com/northamerica/en-us/service-support" },
       { type: "Parts & Service", title: "Case IH Parts & Service", url: "https://www.caseih.com/northamerica/en-us/service-support" },

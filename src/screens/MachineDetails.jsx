@@ -14,7 +14,44 @@ export function MachineDetails({ machine, onBack, onPartSelect }) {
       <TopBar title={machine} onBack={onBack} right={machineData?.ic} />
 
       <div className="scroll">
+        {/* Machine photo */}
+        {machineData?.img && (
+          <img
+            src={machineData.img}
+            alt={machine}
+            style={{ width: "100%", height: "170px", objectFit: "cover", display: "block" }}
+          />
+        )}
+
         <div style={{ padding: "16px" }}>
+          {/* Year / Make / Model */}
+          <div className="card" style={{ marginBottom: "20px" }}>
+            <h3 style={{ fontSize: "13px", fontWeight: 700, marginBottom: "10px" }}>Machine Details</h3>
+            {[
+              ["Make", machineData?.make],
+              ["Model", machineData?.model],
+              ["Year", machineData?.year],
+              ["Type", machineData?.ty],
+              ["Engine", machineData?.hp],
+            ]
+              .filter(([, v]) => v)
+              .map(([label, value], i, arr) => (
+                <div
+                  key={label}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    fontSize: "13px",
+                    padding: "7px 0",
+                    borderBottom: i < arr.length - 1 ? "1px solid var(--border)" : "none",
+                  }}
+                >
+                  <span style={{ color: "var(--text-muted)" }}>{label}</span>
+                  <span style={{ fontWeight: 600 }}>{value}</span>
+                </div>
+              ))}
+          </div>
+
           {/* Manuals & Guides */}
           {manuals.length > 0 && (
             <div style={{ marginBottom: "20px" }}>
