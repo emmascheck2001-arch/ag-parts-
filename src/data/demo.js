@@ -3,7 +3,7 @@
 export const MACHINES = [
   {
     nm: "John Deere 8320R", ty: "Tractor", ic: "🚜", hp: "320 hp", img: "/machines/jd-8320r.jpg",
-    make: "John Deere", model: "8320R", year: "2011–2015",
+    make: "John Deere", model: "8320R", year: "2014–2018",
     manuals: [
       { type: "Operator's Manual", title: "8R Series Operator's Manual", url: "https://www.deere.com/en/parts-and-service/manuals-and-training/" },
       { type: "Parts Catalog", title: "John Deere Parts Catalog", url: "https://partscatalog.deere.com/" },
@@ -41,9 +41,9 @@ export const CATS = [
 ];
 
 export const RECENT = [
-  "RE548693 hydraulic pump",
-  "Air filter Donaldson P606860",
-  "Serpentine belt 8PK2610",
+  "RE509672 engine oil filter",
+  "RE587791 air filter",
+  "RE573817 hydraulic filter",
 ];
 
 /* User Farm Location (Demo - Des Moines area) */
@@ -100,61 +100,52 @@ export const SUPPLIERS_MAP = {
   },
 };
 
+// ── Real John Deere 8R Final Tier 4 service parts ────────────────────────────
+// Part numbers, fitment, and service intervals are taken from John Deere's
+// official "Filter Overview with Service Intervals and Capacities" for the
+// 8R FT4 series (8245R–8400R, which includes the 8320R), March 2019. Supplier
+// names, prices, and stock levels are illustrative sample data.
+const FT4_8R = [
+  "John Deere 8245R", "John Deere 8270R", "John Deere 8295R", "John Deere 8320R",
+  "John Deere 8335R", "John Deere 8345R", "John Deere 8370R", "John Deere 8400R",
+];
+const FITS_STR =
+  "John Deere 8R Final Tier 4 — 8245R, 8270R, 8295R, 8320R, 8335R, 8345R, 8370R, 8400R";
+
+// One fitment row per machine in the 8R FT4 family (these service parts fit them all).
+const fitAll = (position, qty = 1) =>
+  FT4_8R.map((m) => ({ machine: m, years: "2014–2018", position, qty, verified: true }));
+
+// Illustrative sellers spread around a base price.
+const sellers = (price, ship = 12) => [
+  { s: "Prairie Equipment", price, ship, rating: 4.8, n: 230, days: 2, stock: 22 },
+  { s: "Agri Parts Central", price: +(price * 1.07).toFixed(2), ship, rating: 4.7, n: 120, days: 2, stock: 14 },
+  { s: "JD Parts Direct", price: +(price * 1.13).toFixed(2), ship: ship + 4, rating: 4.8, n: 342, days: 1, stock: 35, oem: true },
+];
+
 export const PARTS = {
-  RE548693: {
-    name: "Hydraulic Pump",
-    cat: "Hydraulic",
-    ic: "🔧",
-    fits: "John Deere 8295R, 8320R, 8345R, 8370R",
-    stock: 14,
-    // Where-used: every machine this part fits, and how.
-    fitment: [
-      { machine: "John Deere 8295R", years: "2011–2015", position: "Main hydraulic pump (PowrReverser)", qty: 1, verified: true },
-      { machine: "John Deere 8320R", years: "2011–2015", position: "Main hydraulic pump (PowrReverser)", qty: 1, verified: true },
-      { machine: "John Deere 8345R", years: "2011–2015", position: "Main hydraulic pump (PowrReverser)", qty: 1, verified: true },
-      { machine: "John Deere 8370R", years: "2012–2015", position: "Main hydraulic pump (PowrReverser)", qty: 1, verified: true },
-    ],
-    suppliers: [
-      { s: "Prairie Equipment", price: 389, ship: 25, rating: 4.8, n: 230, days: 2, stock: 14 },
-      { s: "Greenline Supply", price: 412, ship: 25, rating: 4.6, n: 95, days: 1, stock: 3 },
-      { s: "Agri Parts Central", price: 425, ship: 28, rating: 4.7, n: 120, days: 2, stock: 8 },
-      { s: "JD Parts Direct", price: 445, ship: 30, rating: 4.8, n: 342, days: 1, stock: 12, oem: true },
-    ],
-  },
-  P606860: {
-    name: "Air Filter (Donaldson)",
-    cat: "Filters",
-    ic: "🔲",
-    fits: "John Deere 8R series, S-Series combines; cross-fits multiple makes",
-    stock: 40,
-    fitment: [
-      { machine: "John Deere 8320R", years: "2011–2015", position: "Primary engine air filter", qty: 1, verified: true },
-      { machine: "John Deere 8345R", years: "2011–2015", position: "Primary engine air filter", qty: 1, verified: true },
-      { machine: "John Deere S670 Combine", years: "2012–2017", position: "Primary engine air filter", qty: 1, verified: true },
-      { machine: "Case IH Magnum 340", years: "2014–2018", position: "Primary engine air filter", qty: 1, verified: false },
-      { machine: "New Holland CR8.90", years: "2014–2019", position: "Primary engine air filter", qty: 1, verified: false },
-    ],
-    suppliers: [
-      { s: "Prairie Equipment", price: 45.75, ship: 9, rating: 4.8, n: 230, days: 2, stock: 40 },
-      { s: "Agri Parts Central", price: 49, ship: 9, rating: 4.7, n: 120, days: 2, stock: 25 },
-    ],
-  },
-  "8PK2610": {
-    name: "Serpentine Belt",
-    cat: "Belts",
-    ic: "➰",
-    fits: "Case IH Magnum 290, 310, 340",
-    stock: 18,
-    fitment: [
-      { machine: "Case IH Magnum 290", years: "2014–2018", position: "Serpentine drive belt", qty: 1, verified: true },
-      { machine: "Case IH Magnum 310", years: "2014–2018", position: "Serpentine drive belt", qty: 1, verified: true },
-      { machine: "Case IH Magnum 340", years: "2014–2018", position: "Serpentine drive belt", qty: 1, verified: true },
-    ],
-    suppliers: [
-      { s: "Ag Valley Supply", price: 32.1, ship: 10, rating: 4.8, n: 86, days: 3, stock: 18 },
-      { s: "Greenline Supply", price: 36, ship: 12, rating: 4.6, n: 95, days: 3, stock: 6 },
-    ],
-  },
+  RE509672: { name: "Engine Oil Filter", cat: "Filters", ic: "🛢", fits: FITS_STR,
+    fitment: fitAll("Engine oil filter — change at 100 h, then every 500 h / annually"), suppliers: sellers(22.5, 9) },
+  RE539465: { name: "Primary Fuel Filter", cat: "Filters", ic: "⛽", fits: FITS_STR,
+    fitment: fitAll("Primary fuel filter — replace with final filter, 500 h / annually"), suppliers: sellers(38, 9) },
+  RE533910: { name: "Final Fuel Filter", cat: "Filters", ic: "⛽", fits: FITS_STR,
+    fitment: fitAll("Final fuel filter — replace with primary filter, 500 h / annually"), suppliers: sellers(34, 9) },
+  RE587791: { name: "Primary Air Filter", cat: "Filters", ic: "🔲", fits: FITS_STR,
+    fitment: fitAll("Primary engine air filter (TSN 110760– ) — 1000 h / annually"), suppliers: sellers(84, 14) },
+  RE587792: { name: "Secondary Air Filter", cat: "Filters", ic: "🔲", fits: FITS_STR,
+    fitment: fitAll("Secondary engine air filter (TSN 110760– ) — every 2nd primary change"), suppliers: sellers(52, 12) },
+  RE573817: { name: "Hydraulic / Transmission Oil Filter", cat: "Hydraulic", ic: "🔧", fits: FITS_STR,
+    fitment: fitAll("Hydraulic/transmission (Hy-Gard) oil filter — every 1500 h"), suppliers: sellers(58, 12) },
+  RE269061: { name: "SCV Oil Filter", cat: "Hydraulic", ic: "🔧", fits: FITS_STR,
+    fitment: fitAll("Selective Control Valve (SCV) oil filter"), suppliers: sellers(24, 9) },
+  RE284091: { name: "Cab Fresh Air Filter", cat: "Cab & Body", ic: "🚪", fits: FITS_STR,
+    fitment: fitAll("Cab fresh air filter — 1000 h / annually"), suppliers: sellers(46, 10) },
+  RE291412: { name: "Cab Recirculation Air Filter", cat: "Cab & Body", ic: "🚪", fits: FITS_STR,
+    fitment: fitAll("Cab recirculation air filter — 1000 h / annually"), suppliers: sellers(44, 10) },
+  N378886: { name: "Fuel / Water Separator Filter", cat: "Filters", ic: "💧", fits: FITS_STR,
+    fitment: fitAll("Fuel/water separator filter (if equipped)"), suppliers: sellers(29, 9) },
+  AL204884: { name: "Air Brake Air Dryer Filter", cat: "Filters", ic: "🛞", fits: FITS_STR,
+    fitment: fitAll("Trailer air brake air dryer filter (if equipped) — annually"), suppliers: sellers(68, 12) },
 };
 
 export const MACHINE_PARTS = [
