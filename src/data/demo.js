@@ -1,9 +1,28 @@
 /* Demo Data for EzParts */
 
 export const MACHINES = [
-  { nm: "John Deere 8320R", ty: "Tractor", ic: "🚜", hp: "320 hp", img: "/machines/jd-8320r.jpg" },
-  { nm: "New Holland CR8.90", ty: "Combine", ic: "🌾", hp: "523 hp", img: "/machines/nh-cr890.jpg" },
-  { nm: "Case IH Magnum 340", ty: "Tractor", ic: "🚜", hp: "340 hp", img: "/machines/caseih-magnum340.jpg" },
+  {
+    nm: "John Deere 8320R", ty: "Tractor", ic: "🚜", hp: "320 hp", img: "/machines/jd-8320r.jpg",
+    manuals: [
+      { type: "Operator's Manual", title: "8R Series Operator's Manual", url: "https://www.deere.com/en/parts-and-service/manuals-and-training/" },
+      { type: "Parts Catalog", title: "John Deere Parts Catalog", url: "https://partscatalog.deere.com/" },
+      { type: "Maintenance", title: "Service & Maintenance Schedule", url: "https://www.deere.com/en/parts-and-service/manuals-and-training/" },
+    ],
+  },
+  {
+    nm: "New Holland CR8.90", ty: "Combine", ic: "🌾", hp: "523 hp", img: "/machines/nh-cr890.jpg",
+    manuals: [
+      { type: "Operator's Manual", title: "CR Series Operator's Manual", url: "https://www.newholland.com/en-us" },
+      { type: "Parts & Service", title: "New Holland Parts & Service", url: "https://www.newholland.com/en-us" },
+    ],
+  },
+  {
+    nm: "Case IH Magnum 340", ty: "Tractor", ic: "🚜", hp: "340 hp", img: "/machines/caseih-magnum340.jpg",
+    manuals: [
+      { type: "Operator's Manual", title: "Magnum Operator's Manual", url: "https://www.caseih.com/northamerica/en-us/service-support" },
+      { type: "Parts & Service", title: "Case IH Parts & Service", url: "https://www.caseih.com/northamerica/en-us/service-support" },
+    ],
+  },
 ];
 
 export const CATS = [

@@ -24,6 +24,8 @@ export const UIIcon = {
   clock: make(<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>),
   chevron: make(<path d="m9 6 6 6-6 6" />),
   grid: make(<><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /></>),
+  doc: make(<><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5M9 13h6M9 17h6" /></>),
+  external: make(<><path d="M14 4h6v6M20 4l-9 9" /><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" /></>),
 };
 
 // Category icons keyed by category title.
