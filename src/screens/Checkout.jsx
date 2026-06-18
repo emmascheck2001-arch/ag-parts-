@@ -1,7 +1,15 @@
 import { useState } from "react";
+import { Elements } from "@stripe/react-stripe-js";
 import { TopBar } from "../components/TopBar";
+import { PaymentForm } from "../components/PaymentForm";
 import { SUPPLIERS_MAP, calculateDistance, USER_LOCATION } from "../data/demo";
 import { orderMath, money } from "../lib/marketplace";
+import { STRIPE_ENABLED, stripePromise, createPaymentIntent } from "../lib/stripe";
+
+const stripeAppearance = {
+  theme: "night",
+  variables: { colorPrimary: "#24b33f", colorBackground: "#172021" },
+};
 
 const input = {
   width: "100%",
@@ -19,6 +27,9 @@ export function Checkout({ cart, onBack, onConfirm }) {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  const [clientSecret, setClientSecret] = useState(null); // set → show card form
+  const [pendingOrder, setPendingOrder] = useState(null);
+  const [busy, setBusy] = useState(false);
 
   // The order is sold by the dealer the farmer chose. (One dealer per order.)
   const dealer = cart[0]?.supplier || null;
@@ -36,23 +47,50 @@ export function Checkout({ cart, onBack, onConfirm }) {
   const needsAddress = fulfillment === "ship";
   const ready = email && phone && (!needsAddress || address) && cart.length > 0;
 
-  const handleCheckout = () => {
-    if (!ready) return;
-    onConfirm({
-      orderId: "ORD-" + Date.now(),
-      fulfillment,
-      dealer: dealerName,
-      pickupLocation: fulfillment === "pickup" ? loc?.address : null,
-      email,
-      phone,
-      address: needsAddress ? address : null,
-      cart,
-      subtotal: m.subtotal,
-      shipping: m.shipping,
-      total: m.customerTotal,
-      platformFee: m.platformFee,
-      dealerPayout: m.dealerPayout,
-    });
+  const buildOrder = () => ({
+    orderId: "ORD-" + Date.now(),
+    fulfillment,
+    dealer: dealerName,
+    pickupLocation: fulfillment === "pickup" ? loc?.address : null,
+    email,
+    phone,
+    address: needsAddress ? address : null,
+    cart,
+    subtotal: m.subtotal,
+    shipping: m.shipping,
+    total: m.customerTotal,
+    platformFee: m.platformFee,
+    dealerPayout: m.dealerPayout,
+  });
+
+  const handleCheckout = async () => {
+    if (!ready || busy) return;
+    const order = buildOrder();
+
+    // No Stripe configured → demo confirmation (keeps the app usable).
+    if (!STRIPE_ENABLED) return onConfirm(order);
+
+    setBusy(true);
+    try {
+      const res = await createPaymentIntent({
+        amount: m.customerTotal,
+        platformFee: m.platformFee,
+        // dealerAccountId: <dealer's Connect account> once dealers are onboarded
+        metadata: { orderId: order.orderId, dealer: dealerName, fulfillment },
+      });
+      if (res.clientSecret) {
+        setPendingOrder(order);
+        setClientSecret(res.clientSecret); // shows the card form
+      } else {
+        // Backend secret key not set yet → demo confirmation.
+        onConfirm(order);
+      }
+    } catch {
+      // Fail-safe: never block the order on a payment-setup hiccup.
+      onConfirm(order);
+    } finally {
+      setBusy(false);
+    }
   };
 
   const optionCard = (id, title, sub, right) => {
@@ -166,14 +204,26 @@ export function Checkout({ cart, onBack, onConfirm }) {
             )}
           </div>
 
-          <button
-            className="btn-primary"
-            onClick={handleCheckout}
-            disabled={!ready}
-            style={{ width: "100%", padding: "14px", opacity: ready ? 1 : 0.5 }}
-          >
-            {fulfillment === "pickup" ? "Reserve for Pickup" : "Place Order"} · {money(m.customerTotal)}
-          </button>
+          {clientSecret && pendingOrder ? (
+            <Elements stripe={stripePromise} options={{ clientSecret, appearance: stripeAppearance }}>
+              <PaymentForm
+                amount={pendingOrder.total}
+                onPaid={() => onConfirm({ ...pendingOrder, paid: true })}
+                onCancel={() => { setClientSecret(null); setPendingOrder(null); }}
+              />
+            </Elements>
+          ) : (
+            <button
+              className="btn-primary"
+              onClick={handleCheckout}
+              disabled={!ready || busy}
+              style={{ width: "100%", padding: "14px", opacity: ready && !busy ? 1 : 0.5 }}
+            >
+              {busy
+                ? "Starting checkout…"
+                : `${fulfillment === "pickup" ? "Reserve for Pickup" : "Place Order"} · ${money(m.customerTotal)}`}
+            </button>
+          )}
         </div>
       </div>
     </div>
