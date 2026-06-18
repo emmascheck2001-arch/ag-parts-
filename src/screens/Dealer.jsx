@@ -110,9 +110,17 @@ export function Dealer({ onBack, onNav }) {
           )}
 
           <button
+            onClick={() => onNav && onNav("list-part")}
+            className="btn-primary"
+            style={{ width: "100%", padding: "14px", marginTop: "10px" }}
+          >
+            List your parts
+          </button>
+
+          <button
             onClick={() => onNav && onNav("dealer-dashboard")}
             className="btn-primary"
-            style={{ width: "100%", padding: "14px", marginTop: "10px", background: "transparent", border: "1px solid var(--ag-green)", color: "var(--ag-green)" }}
+            style={{ width: "100%", padding: "14px", marginTop: "8px", background: "transparent", border: "1px solid var(--ag-green)", color: "var(--ag-green)" }}
           >
             View order dashboard
           </button>

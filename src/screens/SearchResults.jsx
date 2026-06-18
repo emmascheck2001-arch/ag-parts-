@@ -1,7 +1,8 @@
 import { TopBar } from "../components/TopBar";
 import { SupplierCard } from "../components/SupplierCard";
 import { VerifiedFit } from "../components/Badge";
-import { PARTS, MACHINES, partsForMachine } from "../data/demo";
+import { MACHINES } from "../data/demo";
+import { getParts, partsForMachine } from "../lib/catalog";
 import { rankSuppliers } from "../lib/ranking";
 
 export function SearchResults({ query, onBack, onPartSelect, onBuy, onViewMap, onMachineSelect }) {
@@ -13,7 +14,7 @@ export function SearchResults({ query, onBack, onPartSelect, onBuy, onViewMap, o
   );
 
   // Parts matching the query (number, name, fitment text, or category).
-  const results = Object.entries(PARTS)
+  const results = Object.entries(getParts())
     .filter(([pn, part]) =>
       pn.toLowerCase().includes(q) ||
       part.name.toLowerCase().includes(q) ||

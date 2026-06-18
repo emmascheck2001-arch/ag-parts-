@@ -1,13 +1,14 @@
 import { TopBar } from "../components/TopBar";
 import { SupplierCard } from "../components/SupplierCard";
 import { VerifiedFit } from "../components/Badge";
-import { PARTS, MACHINES, SUPPLIERS_MAP, calculateDistance, USER_LOCATION } from "../data/demo";
+import { MACHINES, SUPPLIERS_MAP, calculateDistance, USER_LOCATION } from "../data/demo";
+import { getParts } from "../lib/catalog";
 import { rankSuppliers, lowestTotal } from "../lib/ranking";
 
 const MACHINE_NAMES = new Set(MACHINES.map((m) => m.nm));
 
 export function PartDetails({ partNum, onBack, onBuy, onViewMap, onMachineSelect }) {
-  const part = PARTS[partNum];
+  const part = getParts()[partNum];
 
   if (!part) {
     return (

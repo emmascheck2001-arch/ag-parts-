@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { TopBar } from "../components/TopBar";
-import { MACHINES, partsForMachine, resolveExactParts, hasSerialBreaks } from "../data/demo";
+import { MACHINES, resolveExactParts, hasSerialBreaks } from "../data/demo";
+import { partsForMachine } from "../lib/catalog";
 import { UIIcon } from "../components/icons";
 
 const money = (n) => "$" + (Number.isInteger(n) ? n : n.toFixed(2));

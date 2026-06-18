@@ -13,6 +13,7 @@ import { Account } from './screens/Account'
 import { Dealer } from './screens/Dealer'
 import { DealerDashboard } from './screens/DealerDashboard'
 import { Extract } from './screens/Extract'
+import { ListPart } from './screens/ListPart'
 import { BottomNav } from './components/BottomNav'
 
 export default function App() {
@@ -159,6 +160,10 @@ export default function App() {
 
       {screen === 'extract' && (
         <Extract onBack={() => setScreen('account')} />
+      )}
+
+      {screen === 'list-part' && (
+        <ListPart onBack={() => setScreen('dealer')} onNav={handleNavigation} />
       )}
 
       {/* Bottom Navigation */}
