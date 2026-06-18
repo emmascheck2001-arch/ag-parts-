@@ -9,6 +9,7 @@ import { OrderTracking } from './screens/OrderTracking'
 import { Scan } from './screens/Scan'
 import { HowItWorks } from './screens/HowItWorks'
 import { Map } from './screens/Map'
+import { Account } from './screens/Account'
 import { BottomNav } from './components/BottomNav'
 
 export default function App() {
@@ -22,7 +23,7 @@ export default function App() {
   // Navigation handlers
   const handleNavigation = (navScreen) => {
     // Map nav-tab ids to real screens (tabs without a dedicated screen fall back to home).
-    const map = { search: 'home', machines: 'home', account: 'home', orders: 'order-tracking' }
+    const map = { search: 'home', machines: 'home', orders: 'order-tracking' }
     setScreen(map[navScreen] || navScreen)
   }
 
@@ -128,8 +129,15 @@ export default function App() {
         <Map onBack={handleHome} />
       )}
 
+      {screen === 'account' && (
+        <Account onBack={handleHome} />
+      )}
+
       {/* Bottom Navigation */}
-      <BottomNav active={screen === 'order-tracking' ? 'orders' : 'home'} onNav={handleNavigation} />
+      <BottomNav
+        active={screen === 'order-tracking' ? 'orders' : screen === 'account' ? 'account' : 'home'}
+        onNav={handleNavigation}
+      />
     </div>
   )
 }
