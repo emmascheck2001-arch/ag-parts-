@@ -1,4 +1,4 @@
-/* Demo Data for PartFinder AG */
+/* Demo Data for EzParts */
 
 export const MACHINES = [
   { nm: "John Deere 8320R", ty: "Tractor", ic: "🚜", hp: "320 hp", img: "/machines/jd-8320r.jpg" },

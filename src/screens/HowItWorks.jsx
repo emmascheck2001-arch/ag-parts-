@@ -111,7 +111,7 @@ export function HowItWorks({ onBack }) {
             </div>
           </div>
 
-          {/* Why Use PartFinder */}
+          {/* Why Use EzParts */}
           <div style={{
             background: "rgba(36, 179, 63, 0.08)",
             border: "1px solid var(--ag-green-soft)",
@@ -119,7 +119,7 @@ export function HowItWorks({ onBack }) {
             padding: "16px",
           }}>
             <div style={{ fontWeight: "600", marginBottom: "12px", color: "var(--ag-green)" }}>
-              Why Choose PartFinder AG?
+              Why Choose EzParts?
             </div>
             <ul style={{ fontSize: "12px", color: "var(--text-muted)", lineHeight: "1.6" }}>
               <li>✓ Never the wrong part - Verified fitment guaranteed</li>

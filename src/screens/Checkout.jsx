@@ -144,7 +144,7 @@ export function Checkout({ cart, onBack, onConfirm }) {
               <span style={{ color: "var(--price)", fontSize: "16px" }}>{money(m.customerTotal)}</span>
             </div>
             <div style={{ fontSize: "10.5px", color: "var(--text-muted)", marginTop: "8px", lineHeight: 1.4 }}>
-              You pay {dealerName} directly. PartFinder’s fee comes from the dealer — never added to your price.
+              You pay {dealerName} directly. EzParts’ fee comes from the dealer — never added to your price.
             </div>
           </div>
 

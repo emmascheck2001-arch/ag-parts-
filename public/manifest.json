@@ -1,6 +1,6 @@
 {
-  "name": "PartFinder AG - Agricultural Parts Finder",
-  "short_name": "PartFinder AG",
+  "name": "EzParts - Agricultural Parts Finder",
+  "short_name": "EzParts",
   "description": "Find the right agricultural part at the lowest price across all suppliers",
   "start_url": "/",
   "display": "standalone",

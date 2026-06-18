@@ -25,7 +25,7 @@ export function Home({ onSelect, onSearch, onNav }) {
           {/* Header */}
           <div className="home-head">
             <div>
-              <div className="brand">PARTFINDER<span> AG</span></div>
+              <div className="brand">Ez<span>Parts</span></div>
               <div className="brand-sub">Search every supplier. Find the right part.</div>
             </div>
             <button className="icon-btn" aria-label="Notifications">
