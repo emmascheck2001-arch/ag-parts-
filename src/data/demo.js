@@ -42,6 +42,14 @@ export const MACHINES = [
       { type: "Parts Catalog", title: "John Deere Parts Catalog", url: "https://partscatalog.deere.com/" },
     ],
   },
+  {
+    nm: "John Deere S680", ty: "Combine", ic: "🌾", hp: "473 hp", img: "/machines/jd-s680.jpg",
+    make: "John Deere", model: "S680", year: "2012–2017",
+    manuals: [
+      { type: "Operator's Manual", title: "S-Series Operator's Manual", url: "https://www.deere.com/en/parts-and-service/manuals-and-training/" },
+      { type: "Parts Catalog", title: "John Deere Parts Catalog", url: "https://partscatalog.deere.com/" },
+    ],
+  },
 ];
 
 export const CATS = [
@@ -164,8 +172,12 @@ export const PARTS = {
     cross: [{ brand: "Donaldson", pn: "P580316" }, { brand: "Baldwin", pn: "HY80072" }] },
   RE269061: { name: "SCV Oil Filter", cat: "Hydraulic", ic: "🔧", fits: FITS_STR,
     fitment: fitAll("Selective Control Valve (SCV) oil filter"), suppliers: sellers(24, 9) },
-  RE284091: { name: "Cab Fresh Air Filter", cat: "Cab & Body", ic: "🚪", fits: FITS_STR,
-    fitment: fitAll("Cab fresh air filter — 1000 h / annually"), suppliers: sellers(46, 10) },
+  RE284091: { name: "Cab Fresh Air Filter", cat: "Cab & Body", ic: "🚪", fits: "John Deere 8R FT4 tractors AND S-Series combines",
+    fitment: [
+      ...fitAll("Cab fresh air filter — 1000 h / annually"),
+      { machine: "John Deere S680", years: "2012–2017", position: "Cab fresh air filter — clean/replace 50 h", qty: 1, verified: true },
+    ],
+    suppliers: sellers(46, 10) },
   RE291412: { name: "Cab Recirculation Air Filter", cat: "Cab & Body", ic: "🚪", fits: FITS_STR,
     fitment: fitAll("Cab recirculation air filter — 1000 h / annually"), suppliers: sellers(44, 10) },
   N378886: { name: "Fuel / Water Separator Filter", cat: "Filters", ic: "💧", fits: FITS_STR,
@@ -277,6 +289,67 @@ export const PARTS = {
       { machine: "John Deere 4240", years: "1977–1982", position: "Transmission/hydraulic oil filter (2WD, 25 micron)", qty: 1, verified: true },
     ],
     suppliers: sellers(24, 9) },
+
+  // ── New Holland CR8.90 combine (CNH) service parts ──────────────────────────
+  "84217229": { name: "Air Filter", cat: "Filters", ic: "🔲", fits: "New Holland CR8.90 / CR9.90 combines",
+    fitment: [
+      { machine: "New Holland CR8.90", years: "2014–2019", position: "Primary engine air filter", qty: 1, verified: true },
+    ],
+    suppliers: sellers(86, 16) },
+  "84228488": { name: "Engine Oil Filter", cat: "Filters", ic: "🛢", fits: "New Holland CR combines and CNH equipment",
+    fitment: [
+      { machine: "New Holland CR8.90", years: "2014–2019", position: "Engine oil filter", qty: 1, verified: true },
+    ],
+    suppliers: sellers(24, 10) },
+
+  // ── John Deere S680 combine service parts ───────────────────────────────────
+  // From JD's official S-Series filter overview (S550–S690). The cab filter
+  // RE284091 is shared with the 8R FT4 tractors (see its fitment below).
+  RE572785: { name: "Engine Oil Filter", cat: "Filters", ic: "🛢", fits: "John Deere S680, S690 combines",
+    fitment: [
+      { machine: "John Deere S680", years: "2012–2017", position: "Engine oil filter (Plus-50 II)", qty: 1, verified: true },
+    ],
+    suppliers: sellers(28, 12) },
+  HXE11090: { name: "Primary Air Filter", cat: "Filters", ic: "🔲", fits: "John Deere S660–S690 combines",
+    fitment: [
+      { machine: "John Deere S680", years: "2012–2017", position: "Primary engine air filter — clean/replace 400 h", qty: 1, verified: true },
+    ],
+    suppliers: sellers(96, 16) },
+  HXE11091: { name: "Secondary Air Filter", cat: "Filters", ic: "🔲", fits: "John Deere S660–S690 combines",
+    fitment: [
+      { machine: "John Deere S680", years: "2012–2017", position: "Secondary engine air filter — change with primary", qty: 1, verified: true },
+    ],
+    suppliers: sellers(58, 13) },
+  RE532952: { name: "Primary Fuel Filter (Tier 2)", cat: "Filters", ic: "⛽", fits: "John Deere S680–S690 combines (Tier 2)",
+    fitment: [
+      { machine: "John Deere S680", years: "2012–2017", position: "Primary fuel filter — every 400 h", qty: 1, verified: true },
+    ],
+    suppliers: sellers(34, 10) },
+  RE525523: { name: "Final Fuel Filter (Tier 2)", cat: "Filters", ic: "⛽", fits: "John Deere S660–S690 combines (Tier 2)",
+    fitment: [
+      { machine: "John Deere S680", years: "2012–2017", position: "Final fuel filter — every 400 h", qty: 1, verified: true },
+    ],
+    suppliers: sellers(30, 10) },
+  R502778: { name: "Fuel / Water Separator Pre-Filter", cat: "Filters", ic: "💧", fits: "John Deere S660–S690 combines",
+    fitment: [
+      { machine: "John Deere S680", years: "2012–2017", position: "Fuel/water separator pre-filter (standard)", qty: 1, verified: true },
+    ],
+    suppliers: sellers(22, 9) },
+  AXE12964: { name: "Hydraulic Reservoir Filter", cat: "Hydraulic", ic: "🔧", fits: "John Deere S680, S690 (closed center)",
+    fitment: [
+      { machine: "John Deere S680", years: "2012–2017", position: "Hydraulic filter in reservoir (closed center) — 400 h", qty: 1, verified: true },
+    ],
+    suppliers: sellers(64, 13) },
+  AN207368: { name: "Hydrostatic Charge Filter", cat: "Hydraulic", ic: "🔧", fits: "John Deere S680, S690 (closed center)",
+    fitment: [
+      { machine: "John Deere S680", years: "2012–2017", position: "Hydrostatic charge filter — every 400 h", qty: 1, verified: true },
+    ],
+    suppliers: sellers(46, 12) },
+  AH128449: { name: "ProDrive / Hydraulic Case Filter", cat: "Hydraulic", ic: "🔧", fits: "John Deere S670, S680, S690 combines",
+    fitment: [
+      { machine: "John Deere S680", years: "2012–2017", position: "ProDrive filter — first 100 h, then 400 h", qty: 1, verified: true },
+    ],
+    suppliers: sellers(52, 12) },
 };
 
 export const MACHINE_PARTS = [
