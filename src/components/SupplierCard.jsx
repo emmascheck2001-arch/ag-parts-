@@ -43,7 +43,7 @@ export function SupplierCard({ supplier, partNum, best, onBuy, distance }) {
         </span>
         <button
           className={"buy " + (best ? "" : "ghost")}
-          onClick={() => onBuy(partNum, supplier.s, supplier.price + supplier.ship)}
+          onClick={() => onBuy(partNum, supplier, supplier.price + supplier.ship)}
         >
           Buy now
         </button>
