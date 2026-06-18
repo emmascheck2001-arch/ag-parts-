@@ -33,3 +33,6 @@ coverage/
 
 # Misc
 .cache
+
+# Local Netlify folder
+.netlify

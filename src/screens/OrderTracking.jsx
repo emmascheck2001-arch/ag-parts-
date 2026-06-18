@@ -31,12 +31,14 @@ export function OrderTracking({ orders, onBack }) {
                       {money(order.total)}
                     </div>
                     <div style={{ fontSize: "11px", color: "var(--ag-green)", marginTop: "4px" }}>
-                      ✓ In Transit
+                      {order.fulfillment === "pickup" ? "✓ Ready for pickup" : "✓ In Transit"}
                     </div>
                   </div>
                 </div>
                 <div style={{ fontSize: "11px", color: "var(--text-muted)", borderTop: "1px solid var(--border)", paddingTop: "8px" }}>
                   {order.cart.length} part{order.cart.length > 1 ? "s" : ""}
+                  {order.dealer ? ` · ${order.dealer}` : ""}
+                  {order.fulfillment === "pickup" && order.pickupLocation ? ` · Pickup: ${order.pickupLocation}` : ""}
                 </div>
               </div>
             ))
