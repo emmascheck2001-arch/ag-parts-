@@ -8,6 +8,9 @@ insert into machines (make, model, type, year_from, year_to, hp, image_url) valu
 insert into machines (make, model, type, year_from, year_to, hp, image_url) values ('John Deere', '4020', 'Tractor', 1964, 1972, '96 hp', '/machines/jd-4020.jpg') on conflict (make, model) do nothing;
 insert into machines (make, model, type, year_from, year_to, hp, image_url) values ('John Deere', '4440', 'Tractor', 1977, 1982, '130 hp', '/machines/jd-4440.jpg') on conflict (make, model) do nothing;
 insert into machines (make, model, type, year_from, year_to, hp, image_url) values ('John Deere', 'S680', 'Combine', 2012, 2017, '473 hp', '/machines/jd-s680.jpg') on conflict (make, model) do nothing;
+insert into machines (make, model, type, year_from, year_to, hp, image_url) values ('John Deere', '6230', 'Tractor', 2007, 2012, '85 hp', null) on conflict (make, model) do nothing;
+insert into machines (make, model, type, year_from, year_to, hp, image_url) values ('John Deere', '6330', 'Tractor', 2007, 2012, '105 hp', null) on conflict (make, model) do nothing;
+insert into machines (make, model, type, year_from, year_to, hp, image_url) values ('John Deere', '6430', 'Tractor', 2007, 2012, '125 hp', null) on conflict (make, model) do nothing;
 insert into machines (make, model, type, year_from, year_to, hp, image_url) values ('Case IH', 'Magnum 310', null, null, null, null, null) on conflict (make, model) do nothing;
 insert into machines (make, model, type, year_from, year_to, hp, image_url) values ('New Holland', 'T8.410', null, null, null, null, null) on conflict (make, model) do nothing;
 insert into machines (make, model, type, year_from, year_to, hp, image_url) values ('John Deere', '8245R', null, null, null, null, null) on conflict (make, model) do nothing;
@@ -64,6 +67,16 @@ insert into parts (part_number, pn_norm, name, category, brand, is_oem) values (
 insert into parts (part_number, pn_norm, name, category, brand, is_oem) values ('AXE12964', 'AXE12964', 'Hydraulic Reservoir Filter', 'Hydraulic', null, true) on conflict (pn_norm) do nothing;
 insert into parts (part_number, pn_norm, name, category, brand, is_oem) values ('AN207368', 'AN207368', 'Hydrostatic Charge Filter', 'Hydraulic', null, true) on conflict (pn_norm) do nothing;
 insert into parts (part_number, pn_norm, name, category, brand, is_oem) values ('AH128449', 'AH128449', 'ProDrive / Hydraulic Case Filter', 'Hydraulic', 'John Deere', true) on conflict (pn_norm) do nothing;
+insert into parts (part_number, pn_norm, name, category, brand, is_oem) values ('RE504836', 'RE504836', 'Engine Oil Filter', 'Filters', 'John Deere', true) on conflict (pn_norm) do nothing;
+insert into parts (part_number, pn_norm, name, category, brand, is_oem) values ('AL172780', 'AL172780', 'Primary Air Filter', 'Filters', 'John Deere', true) on conflict (pn_norm) do nothing;
+insert into parts (part_number, pn_norm, name, category, brand, is_oem) values ('AL150288', 'AL150288', 'Secondary Air Filter', 'Filters', 'John Deere', true) on conflict (pn_norm) do nothing;
+insert into parts (part_number, pn_norm, name, category, brand, is_oem) values ('RE546336', 'RE546336', 'Primary Fuel Filter', 'Filters', 'John Deere', true) on conflict (pn_norm) do nothing;
+insert into parts (part_number, pn_norm, name, category, brand, is_oem) values ('RE526557', 'RE526557', 'Final Fuel Filter', 'Filters', 'John Deere', true) on conflict (pn_norm) do nothing;
+insert into parts (part_number, pn_norm, name, category, brand, is_oem) values ('AL169573', 'AL169573', 'Hydraulic Oil Filter', 'Hydraulic', 'John Deere', true) on conflict (pn_norm) do nothing;
+insert into parts (part_number, pn_norm, name, category, brand, is_oem) values ('AL221066', 'AL221066', 'Transmission Oil Filter', 'Hydraulic', 'John Deere', true) on conflict (pn_norm) do nothing;
+insert into parts (part_number, pn_norm, name, category, brand, is_oem) values ('AL225552', 'AL225552', 'Cab Air Filter (Standard)', 'Cab & Body', 'John Deere', true) on conflict (pn_norm) do nothing;
+insert into parts (part_number, pn_norm, name, category, brand, is_oem) values ('AL158986', 'AL158986', 'Cab Activated Carbon Filter Kit', 'Cab & Body', 'John Deere', true) on conflict (pn_norm) do nothing;
+insert into parts (part_number, pn_norm, name, category, brand, is_oem) values ('L114404', 'L114404', 'Front PTO Oil Filter', 'Hydraulic', null, true) on conflict (pn_norm) do nothing;
 
 -- Fitments
 insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
@@ -674,6 +687,126 @@ insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to
 select m.id, p.id, 'ProDrive filter — first 100 h, then 400 h', 1, null, null, null, true, 'seed/demo', 1
 from machines m, parts p where m.make='John Deere' and m.model='S680' and p.pn_norm='AH128449'
 on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Engine oil filter — first 100 h, then 500 h / annually (Plus-50 II)', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6230' and p.pn_norm='RE504836'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Engine oil filter — first 100 h, then 500 h / annually (Plus-50 II)', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6330' and p.pn_norm='RE504836'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Engine oil filter — first 100 h, then 500 h / annually (Plus-50 II)', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6430' and p.pn_norm='RE504836'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Primary engine air filter — clean up to 5×, replace 1500 h / 2 yr', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6230' and p.pn_norm='AL172780'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Primary engine air filter — clean up to 5×, replace 1500 h / 2 yr', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6330' and p.pn_norm='AL172780'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Primary engine air filter — clean up to 5×, replace 1500 h / 2 yr', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6430' and p.pn_norm='AL172780'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Secondary engine air filter — every 5th primary change or 1500 h', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6230' and p.pn_norm='AL150288'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Secondary engine air filter — every 5th primary change or 1500 h', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6330' and p.pn_norm='AL150288'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Secondary engine air filter — every 5th primary change or 1500 h', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6430' and p.pn_norm='AL150288'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Primary fuel filter — every 500 h', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6230' and p.pn_norm='RE546336'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Primary fuel filter — every 500 h', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6330' and p.pn_norm='RE546336'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Primary fuel filter — every 500 h', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6430' and p.pn_norm='RE546336'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Final fuel filter — every 500 h', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6230' and p.pn_norm='RE526557'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Final fuel filter — every 500 h', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6330' and p.pn_norm='RE526557'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Final fuel filter — every 500 h', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6430' and p.pn_norm='RE526557'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Hydraulic oil filter — first 100 h, then every 750 h', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6230' and p.pn_norm='AL169573'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Hydraulic oil filter — first 100 h, then every 750 h', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6330' and p.pn_norm='AL169573'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Hydraulic oil filter — first 100 h, then every 750 h', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6430' and p.pn_norm='AL169573'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Transmission oil filter — first 100 h, then every 750 h', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6230' and p.pn_norm='AL221066'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Transmission oil filter — first 100 h, then every 750 h', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6330' and p.pn_norm='AL221066'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Transmission oil filter — first 100 h, then every 750 h', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6430' and p.pn_norm='AL221066'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Cab fresh air filter — clean as req., replace 1500 h / 2 yr', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6230' and p.pn_norm='AL225552'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Cab fresh air filter — clean as req., replace 1500 h / 2 yr', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6330' and p.pn_norm='AL225552'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Cab fresh air filter — clean as req., replace 1500 h / 2 yr', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6430' and p.pn_norm='AL225552'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Cab activated-carbon filter — replace 500 h / 1 yr (never clean)', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6230' and p.pn_norm='AL158986'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Cab activated-carbon filter — replace 500 h / 1 yr (never clean)', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6330' and p.pn_norm='AL158986'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Cab activated-carbon filter — replace 500 h / 1 yr (never clean)', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6430' and p.pn_norm='AL158986'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Front PTO oil filter — every 750 h', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6230' and p.pn_norm='L114404'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Front PTO oil filter — every 750 h', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6330' and p.pn_norm='L114404'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
+insert into fitments (machine_id, part_id, position, qty, serial_from, serial_to, serial_note, verified, source, confidence)
+select m.id, p.id, 'Front PTO oil filter — every 750 h', 1, null, null, null, true, 'seed/demo', 1
+from machines m, parts p where m.make='John Deere' and m.model='6430' and p.pn_norm='L114404'
+on conflict (machine_id, part_id, serial_from, serial_to) do nothing;
 
 -- Cross-references
 insert into crossrefs (part_id, brand, equiv_number, source, confidence)
@@ -759,4 +892,19 @@ select p.id, 'Fram', 'PH47', 'seed/demo', 1 from parts p where p.pn_norm='AR4326
 on conflict (part_id, brand, equiv_number) do nothing;
 insert into crossrefs (part_id, brand, equiv_number, source, confidence)
 select p.id, 'Case', 'A57857', 'seed/demo', 1 from parts p where p.pn_norm='AR43261'
+on conflict (part_id, brand, equiv_number) do nothing;
+insert into crossrefs (part_id, brand, equiv_number, source, confidence)
+select p.id, 'Baldwin', 'B7322', 'seed/demo', 1 from parts p where p.pn_norm='RE504836'
+on conflict (part_id, brand, equiv_number) do nothing;
+insert into crossrefs (part_id, brand, equiv_number, source, confidence)
+select p.id, 'Donaldson', 'P550779', 'seed/demo', 1 from parts p where p.pn_norm='RE504836'
+on conflict (part_id, brand, equiv_number) do nothing;
+insert into crossrefs (part_id, brand, equiv_number, source, confidence)
+select p.id, 'Fleetguard', 'LF16243', 'seed/demo', 1 from parts p where p.pn_norm='RE504836'
+on conflict (part_id, brand, equiv_number) do nothing;
+insert into crossrefs (part_id, brand, equiv_number, source, confidence)
+select p.id, 'WIX', '57750', 'seed/demo', 1 from parts p where p.pn_norm='RE504836'
+on conflict (part_id, brand, equiv_number) do nothing;
+insert into crossrefs (part_id, brand, equiv_number, source, confidence)
+select p.id, 'Fram', 'PH10220', 'seed/demo', 1 from parts p where p.pn_norm='RE504836'
 on conflict (part_id, brand, equiv_number) do nothing;

@@ -54,7 +54,7 @@ const MEDIA = {
 const normPn = (pn) => String(pn || "").toUpperCase().replace(/[\s-]/g, "");
 
 // ── extract one file → fitment rows ─────────────────────────────────────────
-async function extractFile(client, path) {
+async function extractFile(client, path, model) {
   const ext = extname(path).toLowerCase();
   const mediaType = MEDIA[ext];
   const data = readFileSync(path).toString("base64");
@@ -64,7 +64,7 @@ async function extractFile(client, path) {
       : { type: "image", source: { type: "base64", media_type: mediaType, data } };
 
   const msg = await client.messages.create({
-    model: "claude-opus-4-8",
+    model,
     max_tokens: 16000, // big multi-page catalogs overflow a smaller cap -> truncated JSON
 
     output_config: { format: { type: "json_schema", schema: SCHEMA } },
@@ -140,7 +140,13 @@ async function main() {
   const dryRun = argv.includes("--dry-run");
   const limitArg = argv.indexOf("--limit");
   const limit = limitArg !== -1 ? parseInt(argv[limitArg + 1], 10) : Infinity;
-  const folder = argv.find((a) => !a.startsWith("--") && a !== String(limit)) || "catalogs";
+  const modelArg = argv.indexOf("--model");
+  // Default to Haiku 4.5 — ~5x cheaper than Opus and plenty for clean filter
+  // PDFs. Override with --model claude-opus-4-8 for dense/messy catalogs.
+  const model = modelArg !== -1 ? argv[modelArg + 1] : "claude-haiku-4-5";
+  // Values consumed by flags must not be mistaken for the folder arg.
+  const flagValues = new Set([String(limit), model]);
+  const folder = argv.find((a) => !a.startsWith("--") && !flagValues.has(a)) || "catalogs";
 
   const anthropicKey = process.env.ANTHROPIC_API_KEY;
   const url = process.env.SUPABASE_URL;
@@ -173,14 +179,14 @@ async function main() {
   const client = new Anthropic({ apiKey: anthropicKey });
   const supabase = dryRun ? null : createClient(url, svc, { auth: { persistSession: false } });
 
-  console.log(`\n📚 Ingesting ${files.length} file(s) from ${folder}/${dryRun ? "  [DRY RUN — no writes]" : ""}\n`);
+  console.log(`\n📚 Ingesting ${files.length} file(s) from ${folder}/ with ${model}${dryRun ? "  [DRY RUN — no writes]" : ""}\n`);
   const totals = { rows: 0, machines: 0, parts: 0, fitments: 0, failed: 0 };
 
   for (const path of files) {
     const label = basename(path);
     process.stdout.write(`• ${label} … `);
     try {
-      const rows = await extractFile(client, path);
+      const rows = await extractFile(client, path, model);
       totals.rows += rows.length;
 
       if (dryRun) {

@@ -50,6 +50,30 @@ export const MACHINES = [
       { type: "Parts Catalog", title: "John Deere Parts Catalog", url: "https://partscatalog.deere.com/" },
     ],
   },
+  {
+    nm: "John Deere 6230", ty: "Tractor", ic: "🚜", hp: "85 hp",
+    make: "John Deere", model: "6230", year: "2007–2012",
+    manuals: [
+      { type: "Filter Overview", title: "6030 Series Filter Overview & Capacities", url: "https://www.deere.com/assets/pdfs/common/qrg/6030-series-tractors-6230-6330-and-6430.pdf" },
+      { type: "Parts Catalog", title: "John Deere Parts Catalog", url: "https://partscatalog.deere.com/" },
+    ],
+  },
+  {
+    nm: "John Deere 6330", ty: "Tractor", ic: "🚜", hp: "105 hp",
+    make: "John Deere", model: "6330", year: "2007–2012",
+    manuals: [
+      { type: "Filter Overview", title: "6030 Series Filter Overview & Capacities", url: "https://www.deere.com/assets/pdfs/common/qrg/6030-series-tractors-6230-6330-and-6430.pdf" },
+      { type: "Parts Catalog", title: "John Deere Parts Catalog", url: "https://partscatalog.deere.com/" },
+    ],
+  },
+  {
+    nm: "John Deere 6430", ty: "Tractor", ic: "🚜", hp: "125 hp",
+    make: "John Deere", model: "6430", year: "2007–2012",
+    manuals: [
+      { type: "Filter Overview", title: "6030 Series Filter Overview & Capacities", url: "https://www.deere.com/assets/pdfs/common/qrg/6030-series-tractors-6230-6330-and-6430.pdf" },
+      { type: "Parts Catalog", title: "John Deere Parts Catalog", url: "https://partscatalog.deere.com/" },
+    ],
+  },
 ];
 
 export const CATS = [
@@ -146,6 +170,13 @@ const sellers = (price, ship = 12) => [
   { s: "Agri Parts Central", price: +(price * 1.07).toFixed(2), ship, rating: 4.7, n: 120, days: 2, stock: 14 },
   { s: "JD Parts Direct", price: +(price * 1.13).toFixed(2), ship: ship + 4, rating: 4.8, n: 342, days: 1, stock: 35, oem: true },
 ];
+
+// ── John Deere 6030 Series (6230 / 6330 / 6430) family ──────────────────────
+// One fitment row per machine in the 6030 family (these service parts fit all three).
+const JD_6030 = ["John Deere 6230", "John Deere 6330", "John Deere 6430"];
+const FITS_6030 = "John Deere 6030 Series — 6230, 6330, 6430";
+const fit6030 = (position, qty = 1) =>
+  JD_6030.map((m) => ({ machine: m, years: "2007–2012", position, qty, verified: true }));
 
 export const PARTS = {
   RE509672: { name: "Engine Oil Filter", cat: "Filters", ic: "🛢", fits: FITS_STR,
@@ -350,6 +381,32 @@ export const PARTS = {
       { machine: "John Deere S680", years: "2012–2017", position: "ProDrive filter — first 100 h, then 400 h", qty: 1, verified: true },
     ],
     suppliers: sellers(52, 12) },
+
+  // ── John Deere 6030 Series (6230 / 6330 / 6430) service parts ───────────────
+  // Source: John Deere official "Filter Overview with Service Intervals and
+  // Capacities — 6030 Series Tractors (6230, 6330, 6430)", Apr 2021 release.
+  // Real OEM part numbers. Prices/stock are illustrative sample data.
+  RE504836: { name: "Engine Oil Filter", cat: "Filters", ic: "🛢", fits: FITS_6030 + " (and many JD PowerTech tractors)",
+    fitment: fit6030("Engine oil filter — first 100 h, then 500 h / annually (Plus-50 II)"), suppliers: sellers(14.5, 8),
+    cross: [{ brand: "Baldwin", pn: "B7322" }, { brand: "Donaldson", pn: "P550779" }, { brand: "Fleetguard", pn: "LF16243" }, { brand: "WIX", pn: "57750" }, { brand: "Fram", pn: "PH10220" }] },
+  AL172780: { name: "Primary Air Filter", cat: "Filters", ic: "🔲", fits: FITS_6030,
+    fitment: fit6030("Primary engine air filter — clean up to 5×, replace 1500 h / 2 yr"), suppliers: sellers(42, 11) },
+  AL150288: { name: "Secondary Air Filter", cat: "Filters", ic: "🔲", fits: FITS_6030,
+    fitment: fit6030("Secondary engine air filter — every 5th primary change or 1500 h"), suppliers: sellers(26, 9) },
+  RE546336: { name: "Primary Fuel Filter", cat: "Filters", ic: "⛽", fits: FITS_6030,
+    fitment: fit6030("Primary fuel filter — every 500 h"), suppliers: sellers(24, 9) },
+  RE526557: { name: "Final Fuel Filter", cat: "Filters", ic: "⛽", fits: FITS_6030,
+    fitment: fit6030("Final fuel filter — every 500 h"), suppliers: sellers(20, 9) },
+  AL169573: { name: "Hydraulic Oil Filter", cat: "Hydraulic", ic: "🔧", fits: FITS_6030,
+    fitment: fit6030("Hydraulic oil filter — first 100 h, then every 750 h"), suppliers: sellers(34, 10) },
+  AL221066: { name: "Transmission Oil Filter", cat: "Hydraulic", ic: "🔧", fits: FITS_6030,
+    fitment: fit6030("Transmission oil filter — first 100 h, then every 750 h"), suppliers: sellers(38, 10) },
+  AL225552: { name: "Cab Air Filter (Standard)", cat: "Cab & Body", ic: "🚪", fits: FITS_6030,
+    fitment: fit6030("Cab fresh air filter — clean as req., replace 1500 h / 2 yr"), suppliers: sellers(28, 9) },
+  AL158986: { name: "Cab Activated Carbon Filter Kit", cat: "Cab & Body", ic: "🚪", fits: FITS_6030,
+    fitment: fit6030("Cab activated-carbon filter — replace 500 h / 1 yr (never clean)"), suppliers: sellers(46, 10) },
+  L114404: { name: "Front PTO Oil Filter", cat: "Hydraulic", ic: "🔧", fits: FITS_6030 + " (front PTO equipped)",
+    fitment: fit6030("Front PTO oil filter — every 750 h"), suppliers: sellers(30, 10) },
 };
 
 export const MACHINE_PARTS = [
