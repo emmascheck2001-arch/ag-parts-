@@ -36,3 +36,7 @@ coverage/
 
 # Local Netlify folder
 .netlify
+
+# Vendor catalog files (ingested, not committed)
+catalogs/*
+!catalogs/README.md
