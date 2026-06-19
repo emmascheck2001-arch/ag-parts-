@@ -15,6 +15,7 @@ import { DealerDashboard } from './screens/DealerDashboard'
 import { Extract } from './screens/Extract'
 import { ListPart } from './screens/ListPart'
 import { BottomNav } from './components/BottomNav'
+import { loadIndex } from './lib/index-store'
 
 export default function App() {
   const [screen, setScreen] = useState('home')
@@ -24,6 +25,8 @@ export default function App() {
   const [cart, setCart] = useState([])
   const [orders, setOrders] = useState([])
 
+  const [, setIndexTick] = useState(0)
+
   // Deep-link back from Stripe Connect onboarding (?screen=dealer).
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -31,6 +34,12 @@ export default function App() {
       setScreen('dealer')
       window.history.replaceState({}, '', window.location.pathname)
     }
+  }, [])
+
+  // Load the fitment index from Supabase once; re-render when it arrives.
+  // Falls back silently to the demo seed if Supabase is empty/unreachable.
+  useEffect(() => {
+    loadIndex().then((ok) => { if (ok) setIndexTick((t) => t + 1) })
   }, [])
 
   // Navigation handlers

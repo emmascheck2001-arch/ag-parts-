@@ -1,9 +1,11 @@
+import { useEffect } from "react";
 import { TopBar } from "../components/TopBar";
 import { SupplierCard } from "../components/SupplierCard";
 import { VerifiedFit } from "../components/Badge";
 import { MACHINES } from "../data/demo";
 import { getParts, partsForMachine } from "../lib/catalog";
 import { rankSuppliers } from "../lib/ranking";
+import { logMiss } from "../lib/index-store";
 
 export function SearchResults({ query, onBack, onPartSelect, onBuy, onViewMap, onMachineSelect }) {
   const q = (query || "").toLowerCase();
@@ -25,6 +27,11 @@ export function SearchResults({ query, onBack, onPartSelect, onBuy, onViewMap, o
 
   const handleBuyClick = (pn, supplier, total) => onBuy({ pn, supplier, total });
   const nothing = machineResults.length === 0 && results.length === 0;
+
+  // Demand signal: a search the index couldn't answer is the ingestion queue.
+  useEffect(() => {
+    if (nothing && query) logMiss(query);
+  }, [query, nothing]);
 
   // Own nothing: index dealers' listings, and point to where the rest already lives.
   const enc = encodeURIComponent((query || "") + " tractor part");

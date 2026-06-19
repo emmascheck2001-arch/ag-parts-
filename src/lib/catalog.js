@@ -2,10 +2,20 @@
 // Dealer listings add new parts, or add their supplier + machines to an
 // existing part. This is the Uber Eats model: dealers bring the "menu".
 import { PARTS as SEED_PARTS } from "../data/demo";
+import { getIndexParts } from "./index-store";
 import { listingParts } from "./listings";
 
 export function getParts() {
   const merged = { ...SEED_PARTS };
+
+  // Supabase fitment index (once loaded): add any parts the seed doesn't have.
+  const idx = getIndexParts();
+  if (idx) {
+    for (const [pn, p] of Object.entries(idx)) {
+      if (!merged[pn]) merged[pn] = p;
+    }
+  }
+
   for (const [pn, listed] of Object.entries(listingParts())) {
     const existing = merged[pn];
     if (existing) {

@@ -9,6 +9,32 @@ export function Extract({ onBack }) {
   const [busy, setBusy] = useState(false);
   const [rows, setRows] = useState(null);
   const [error, setError] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState(null);
+
+  const saveToIndex = async () => {
+    if (!rows || !rows.length) return;
+    setSaving(true);
+    setSaveMsg(null);
+    try {
+      const res = await fetch("/.netlify/functions/save-fitment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fitments: rows, source: file?.name || "extractor" }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "HTTP " + res.status);
+      if (json.configured === false) {
+        setSaveMsg("Index write not configured yet (add SUPABASE_URL + service-role key).");
+      } else {
+        setSaveMsg(`Saved to index: ${json.fitmentsWritten} fitments, ${json.partsWritten} parts, ${json.machinesWritten} machines.`);
+      }
+    } catch (e) {
+      setSaveMsg("Error: " + e.message);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const onFile = (e) => {
     const f = e.target.files?.[0];
@@ -90,6 +116,14 @@ export function Extract({ onBack }) {
               <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "10px" }}>
                 AI-extracted — verify against the source before loading into the live catalog.
               </div>
+              {rows.length > 0 && (
+                <>
+                  <button className="btn-primary" onClick={saveToIndex} disabled={saving} style={{ width: "100%", padding: "12px", marginBottom: "6px", opacity: saving ? 0.6 : 1 }}>
+                    {saving ? "Saving…" : `Save ${rows.length} rows to the index`}
+                  </button>
+                  {saveMsg && <div style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "10px" }}>{saveMsg}</div>}
+                </>
+              )}
               {rows.length === 0 && (
                 <div className="card" style={{ fontSize: "12.5px", color: "var(--text-muted)" }}>
                   No part rows found on this page.

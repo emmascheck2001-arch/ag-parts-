@@ -105,5 +105,11 @@ do $$ begin
   create policy "public read fitments"  on fitments  for select using (true);
   create policy "public read crossrefs" on crossrefs for select using (true);
 exception when duplicate_object then null; end $$;
+-- Demand log: let the app record unanswered searches (no read exposure).
+alter table search_misses enable row level security;
+do $$ begin
+  create policy "anon insert misses" on search_misses for insert with check (true);
+exception when duplicate_object then null; end $$;
+
 -- Ingestion / dealer writes use the service-role key (bypasses RLS) from a
 -- server-side function — never the anon key in the browser.
