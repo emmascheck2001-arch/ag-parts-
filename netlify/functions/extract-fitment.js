@@ -4,35 +4,7 @@
 // {configured:false} until the key is set.
 
 const Anthropic = require("@anthropic-ai/sdk");
-
-const SCHEMA = {
-  type: "object",
-  properties: {
-    fitments: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          part_number: { type: "string", description: "Exact part number as printed" },
-          part_name: { type: "string" },
-          make: { type: "string", description: "e.g. John Deere, Case IH" },
-          model: { type: "string", description: "Machine model the part fits" },
-          serial_range: { type: "string", description: "Serial/PIN applicability if shown, else empty" },
-          position: { type: "string", description: "Where/how it's used, if shown" },
-          qty: { type: "integer" },
-          category: { type: "string" },
-        },
-        required: ["part_number", "part_name", "make", "model", "serial_range", "position", "qty", "category"],
-        additionalProperties: false,
-      },
-    },
-  },
-  required: ["fitments"],
-  additionalProperties: false,
-};
-
-const PROMPT =
-  "This is an agricultural-equipment parts catalog or fitment page. Extract every part and the machine(s) it fits as structured rows. Use the EXACT part numbers shown on the page — never invent or guess a part number. Capture any serial/PIN applicability and position/usage if shown. If a field isn't on the page, return an empty string (or 1 for qty). Only include rows you can actually read.";
+const { SCHEMA, PROMPT } = require("./_extract-contract.cjs");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -53,7 +25,7 @@ exports.handler = async (event) => {
 
     const msg = await client.messages.create({
       model: "claude-opus-4-8",
-      max_tokens: 8000,
+      max_tokens: 16000,
       output_config: { format: { type: "json_schema", schema: SCHEMA } },
       messages: [{ role: "user", content: [fileBlock, { type: "text", text: PROMPT }] }],
     });
