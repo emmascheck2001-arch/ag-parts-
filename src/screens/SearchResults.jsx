@@ -2,8 +2,7 @@ import { useEffect } from "react";
 import { TopBar } from "../components/TopBar";
 import { SupplierCard } from "../components/SupplierCard";
 import { VerifiedFit } from "../components/Badge";
-import { MACHINES } from "../data/demo";
-import { getParts, partsForMachine } from "../lib/catalog";
+import { getParts, partsForMachine, getMachines } from "../lib/catalog";
 import { rankSuppliers } from "../lib/ranking";
 import { logMiss } from "../lib/index-store";
 
@@ -11,8 +10,8 @@ export function SearchResults({ query, onBack, onPartSelect, onBuy, onViewMap, o
   const q = (query || "").toLowerCase();
 
   // Machines matching the query.
-  const machineResults = MACHINES.filter(
-    (m) => m.nm.toLowerCase().includes(q) || m.ty.toLowerCase().includes(q)
+  const machineResults = getMachines().filter(
+    (m) => m.nm.toLowerCase().includes(q) || (m.ty || "").toLowerCase().includes(q)
   );
 
   // Parts matching the query (number, name, fitment text, or category).
@@ -97,8 +96,10 @@ export function SearchResults({ query, onBack, onPartSelect, onBuy, onViewMap, o
                         onClick={() => onMachineSelect && onMachineSelect(m.nm)}
                         style={{ cursor: "pointer", marginBottom: "10px", display: "flex", alignItems: "center", gap: "12px" }}
                       >
-                        {m.img && (
+                        {m.img ? (
                           <img src={m.img} alt={m.nm} loading="lazy" style={{ width: "60px", height: "44px", borderRadius: "8px", objectFit: "cover", flexShrink: 0 }} />
+                        ) : (
+                          <span style={{ fontSize: "28px", width: "60px", textAlign: "center", flexShrink: 0 }}>{m.ic || "🚜"}</span>
                         )}
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ fontSize: "14px", fontWeight: 600 }}>{m.nm}</div>

@@ -4,8 +4,25 @@
 import { supabase } from "./supabase";
 
 let indexParts = null; // null until a successful, non-empty load
+let indexMachines = null; // machines from the index, shaped like the seed list
 
 const ICONS = { Filters: "🔲", Hydraulic: "🔧", "Cab & Body": "🚪", Belts: "➰", Engine: "⚙️", Electrical: "⚡", Bearings: "⭕", Drivetrain: "🔩", Cooling: "❄️" };
+
+// Ingested machines carry only make/model (no type/icon). Derive a display
+// type + icon from the model designation. Conservative: only classify a
+// non-tractor when the name clearly signals it, else default to Tractor.
+function classifyMachine(make, model) {
+  const s = `${make} ${model}`.toLowerCase();
+  if (/forage|harvester/.test(s)) return { ty: "Forage Harvester", ic: "🌽" };
+  if (/cotton|picker|\b76\d\d\b|\b99[789]\d\b/.test(s)) return { ty: "Cotton Picker", ic: "🧺" };
+  if (/sprayer|spreader|\br4\d\d\b|\br41\d\b/.test(s)) return { ty: "Sprayer", ic: "💦" };
+  if (/combine|\bsts\b|\bcts\b|maximizer|walker|sidehill|\bx9\b|\bs[5-7]\d0\b|\bcr\d|\bcx\d/.test(s)) return { ty: "Combine", ic: "🌾" };
+  return { ty: "Tractor", ic: "🚜" };
+}
+
+export function getIndexMachines() {
+  return indexMachines;
+}
 
 // Index holds fitment, not price/stock (that's dealer content). For the demo we
 // attach a couple of sample sellers so the buy flow still works on ingested parts.
@@ -26,7 +43,7 @@ export function getIndexParts() {
 export async function loadIndex() {
   try {
     const [machinesRes, partsRes, fitmentsRes, crossRes] = await Promise.all([
-      supabase.from("machines").select("id, make, model, year_from, year_to"),
+      supabase.from("machines").select("id, make, model, type, year_from, year_to, hp, image_url"),
       supabase.from("parts").select("id, part_number, name, category"),
       supabase.from("fitments").select("part_id, machine_id, position, qty, verified"),
       supabase.from("crossrefs").select("part_id, brand, equiv_number"),
@@ -35,9 +52,24 @@ export async function loadIndex() {
     if (partsRes.error || !parts || !parts.length) return false; // empty → keep seed fallback
 
     const machineName = {};
+    const machinesList = [];
     (machinesRes.data || []).forEach((m) => {
-      machineName[m.id] = `${m.make} ${m.model}`.trim();
+      const nm = `${m.make} ${m.model}`.trim();
+      machineName[m.id] = nm;
+      const c = classifyMachine(m.make, m.model);
+      machinesList.push({
+        nm,
+        make: m.make,
+        model: m.model,
+        ty: m.type || c.ty,
+        ic: c.ic,
+        hp: m.hp || "",
+        img: m.image_url || "",
+        year: m.year_from ? `${m.year_from}–${m.year_to || ""}` : "",
+      });
     });
+    machinesList.sort((a, b) => a.nm.localeCompare(b.nm));
+    indexMachines = machinesList;
     const pnById = {};
     const built = {};
     parts.forEach((p) => {

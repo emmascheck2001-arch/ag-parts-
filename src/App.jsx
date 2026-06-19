@@ -4,6 +4,7 @@ import { SearchResults } from './screens/SearchResults'
 import { PartDetails } from './screens/PartDetails'
 import { Categories } from './screens/Categories'
 import { MachineDetails } from './screens/MachineDetails'
+import { Machines } from './screens/Machines'
 import { Checkout } from './screens/Checkout'
 import { OrderTracking } from './screens/OrderTracking'
 import { Scan } from './screens/Scan'
@@ -45,7 +46,7 @@ export default function App() {
   // Navigation handlers
   const handleNavigation = (navScreen) => {
     // Map nav-tab ids to real screens (tabs without a dedicated screen fall back to home).
-    const map = { search: 'home', machines: 'home', orders: 'order-tracking' }
+    const map = { search: 'home', machines: 'machines-list', orders: 'order-tracking' }
     setScreen(map[navScreen] || navScreen)
   }
 
@@ -121,6 +122,10 @@ export default function App() {
 
       {screen === 'categories' && (
         <Categories onBack={handleHome} onSelect={handleSelect} />
+      )}
+
+      {screen === 'machines-list' && (
+        <Machines onBack={handleHome} onSelect={handleSelect} />
       )}
 
       {screen === 'machine-details' && selectedMachine && (

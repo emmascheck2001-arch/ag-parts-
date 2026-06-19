@@ -1,9 +1,19 @@
 // The catalog the farmer searches = demo/seed data + live dealer listings.
 // Dealer listings add new parts, or add their supplier + machines to an
 // existing part. This is the Uber Eats model: dealers bring the "menu".
-import { PARTS as SEED_PARTS } from "../data/demo";
-import { getIndexParts } from "./index-store";
+import { PARTS as SEED_PARTS, MACHINES as SEED_MACHINES } from "../data/demo";
+import { getIndexParts, getIndexMachines } from "./index-store";
 import { listingParts } from "./listings";
+
+// Every machine the farmer can browse = curated seed machines (with images)
+// + machines ingested into the Supabase index. Seed entries win on name so
+// their images/specs are preserved.
+export function getMachines() {
+  const byName = {};
+  for (const m of getIndexMachines() || []) byName[m.nm] = m;
+  for (const m of SEED_MACHINES) byName[m.nm] = m; // seed overrides index
+  return Object.values(byName).sort((a, b) => a.nm.localeCompare(b.nm));
+}
 
 export function getParts() {
   const merged = { ...SEED_PARTS };

@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { TopBar } from "../components/TopBar";
-import { MACHINES, resolveExactParts, hasSerialBreaks } from "../data/demo";
-import { partsForMachine } from "../lib/catalog";
+import { resolveExactParts, hasSerialBreaks } from "../data/demo";
+import { partsForMachine, getMachines } from "../lib/catalog";
 import { UIIcon } from "../components/icons";
 
 const money = (n) => "$" + (Number.isInteger(n) ? n : n.toFixed(2));
 
 export function MachineDetails({ machine, onBack, onPartSelect }) {
-  const machineData = MACHINES.find((m) => m.nm === machine);
+  const machineData = getMachines().find((m) => m.nm === machine);
   const manuals = machineData?.manuals || [];
   const parts = partsForMachine(machine);
 
