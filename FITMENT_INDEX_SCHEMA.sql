@@ -51,7 +51,10 @@ create table if not exists fitments (
   confidence    numeric(3,2) default 1, -- 0..1 from the extractor
   last_verified timestamptz,
   created_at    timestamptz default now(),
-  unique (machine_id, part_id, serial_from, serial_to)
+  -- NULLS NOT DISTINCT (Postgres 15+) so all-serial rows (serial_from/to NULL)
+  -- dedupe correctly — otherwise on-conflict never catches them and re-runs
+  -- accumulate duplicate fitments.
+  unique nulls not distinct (machine_id, part_id, serial_from, serial_to)
 );
 
 -- ── Cross-references (OEM ↔ aftermarket equivalents) ────────────────────────
