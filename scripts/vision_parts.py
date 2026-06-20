@@ -12,9 +12,11 @@ norm = lambda s: re.sub(r'[\s-]', '', str(s).upper())
 CHUNK = 12
 
 PROMPT = ("This is a scanned parts manual for the Hagie {model}. Read the parts "
-  "tables and extract EVERY part. For each row return part_number (exactly as "
-  "printed), qty (integer, default 1), description, and assembly (the section/"
-  "diagram heading if visible, else empty). Return ONLY a JSON array: "
+  "tables and extract EVERY part. CRITICAL: transcribe each part_number EXACTLY, "
+  "character by character, as printed — do NOT guess, infer, or normalize digits; "
+  "if a character is illegible, omit that row rather than guess. For each row "
+  "return part_number, qty (integer, default 1), description, and assembly (the "
+  "section/diagram heading if visible, else empty). Return ONLY a JSON array: "
   '[{{"part_number":"...","qty":1,"description":"...","assembly":"..."}}]. '
   "No prose, no code fence. If a page has no parts table, contribute nothing.")
 
@@ -45,7 +47,7 @@ def chunks(path):
         yield base64.standard_b64encode(buf.getvalue()).decode()
 
 def extract(model, b64):
-    msg=client.messages.create(model="claude-haiku-4-5", max_tokens=16000,
+    msg=client.messages.create(model="claude-opus-4-8", max_tokens=16000,
         messages=[{"role":"user","content":[
             {"type":"document","source":{"type":"base64","media_type":"application/pdf","data":b64}},
             {"type":"text","text":PROMPT.format(model=model)}]}])
@@ -68,7 +70,7 @@ def load(model, parts, src):
     def _q(p):
         v=str(p.get('qty',1)); return int(v) if v.isdigit() else 1
     rows=[{'machine_id':mid,'part_id':idn.get(norm(p['part_number'])),'position':str(p.get('assembly') or '')[:60] or None,
-           'qty':_q(p),'verified':False,'source':'hagie-vision/'+src,'confidence':0.55} for p in items]
+           'qty':_q(p),'verified':False,'source':'hagie-vision-opus/'+src,'confidence':0.8} for p in items]
     rows=[r for r in rows if r['part_id']]
     for i in range(0,len(rows),200):
         req('POST','/rest/v1/fitments?on_conflict=machine_id,part_id,serial_from,serial_to',rows[i:i+200],'resolution=ignore-duplicates,return=minimal')
