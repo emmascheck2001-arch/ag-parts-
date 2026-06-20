@@ -2,6 +2,18 @@ import { useState } from "react";
 import { TopBar } from "../components/TopBar";
 import { MACHINES, CATS } from "../data/demo";
 import { getListings, addListing, removeListing } from "../lib/listings";
+import { getDealerAccount } from "../lib/stripe";
+
+async function saveToDb(payload) {
+  try {
+    const res = await fetch("/.netlify/functions/save-inventory", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) return { configured: false };
+    return res.json();
+  } catch { return { configured: false }; }
+}
 
 const input = {
   width: "100%", padding: "10px", marginBottom: "8px", borderRadius: "6px",
@@ -15,25 +27,31 @@ export function ListPart({ onBack, onNav }) {
   const [name, setName] = useState("");
   const [cat, setCat] = useState(CATS[0]?.t || "Filters");
   const [price, setPrice] = useState("");
+  const [ship, setShip] = useState("");
   const [stock, setStock] = useState("");
   const [machines, setMachines] = useState([]);
   const [other, setOther] = useState("");
   const [listings, setListings] = useState(getListings());
+  const [status, setStatus] = useState("");
 
   const toggleMachine = (nm) =>
     setMachines((m) => (m.includes(nm) ? m.filter((x) => x !== nm) : [...m, nm]));
 
   const ready = dealer && pn && name && price;
 
-  const submit = () => {
+  const submit = async () => {
     if (!ready) return;
     const extra = other.split(",").map((s) => s.trim()).filter(Boolean);
-    addListing({
-      dealer, pn: pn.trim(), name, cat, price, stock,
-      machines: [...machines, ...extra],
-    });
+    const allMachines = [...machines, ...extra];
+    const listing = { dealer, pn: pn.trim(), name, cat, price, ship, stock, machines: allMachines };
+    addListing(listing); // instant local UI
     setListings(getListings());
-    setPn(""); setName(""); setPrice(""); setStock(""); setMachines([]); setOther("");
+    setStatus("Saving…");
+    // Write to the real DB (dealer + inventory + fitments). Routes payouts to
+    // your Stripe account if you've onboarded.
+    const r = await saveToDb({ ...listing, days: 2, stripeAccountId: getDealerAccount() || undefined });
+    setStatus(r.configured ? `Listed to marketplace${r.fitments ? ` · ${r.fitments} machine fits` : ""} ✓` : "Saved locally (backend not configured)");
+    setPn(""); setName(""); setPrice(""); setShip(""); setStock(""); setMachines([]); setOther("");
   };
 
   const del = (id) => { removeListing(id); setListings(getListings()); };
@@ -61,6 +79,7 @@ export function ListPart({ onBack, onNav }) {
             </select>
             <div style={{ display: "flex", gap: "8px" }}>
               <input style={{ ...input, flex: 1 }} type="number" placeholder="Price ($)" value={price} onChange={(e) => setPrice(e.target.value)} />
+              <input style={{ ...input, flex: 1 }} type="number" placeholder="Ship ($)" value={ship} onChange={(e) => setShip(e.target.value)} />
               <input style={{ ...input, flex: 1 }} type="number" placeholder="In stock" value={stock} onChange={(e) => setStock(e.target.value)} />
             </div>
 
@@ -90,6 +109,7 @@ export function ListPart({ onBack, onNav }) {
             <button className="btn-primary" onClick={submit} disabled={!ready} style={{ width: "100%", padding: "12px", marginTop: "4px", opacity: ready ? 1 : 0.5 }}>
               List this part
             </button>
+            {status && <div style={{ fontSize: "11.5px", color: "var(--ag-green)", marginTop: "8px", textAlign: "center" }}>{status}</div>}
           </div>
 
           {listings.length > 0 && (

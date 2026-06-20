@@ -46,6 +46,9 @@ create index if not exists idx_inventory_pn       on inventory(pn_norm);
 create index if not exists idx_inventory_dealer   on inventory(dealer_id);
 
 -- ── Orders (so a placed order survives a refresh — today it's React state) ───
+-- Drop the empty legacy `orders` table (old app schema, wrong columns) so the
+-- definition below actually applies. Safe: confirmed 0 rows.
+drop table if exists orders cascade;
 create table if not exists orders (
   id              bigserial primary key,
   order_ref       text unique,             -- "ORD-..." shown to the user

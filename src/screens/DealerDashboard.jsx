@@ -1,6 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TopBar } from "../components/TopBar";
 import { money } from "../lib/marketplace";
+import { fetchDealerOrders } from "../lib/orders";
+
+// Normalize a DB order row into the dashboard shape.
+function fromDb(o) {
+  const items = Array.isArray(o.items) ? o.items : [];
+  return {
+    orderId: o.order_ref || ("ORD-" + o.id),
+    partName: items[0]?.partName || items[0]?.name || "Part",
+    fulfillment: o.fulfillment || "ship",
+    total: Number(o.total) || 0,
+    platformFee: Number(o.platform_fee) || 0,
+    dealerPayout: Number(o.dealer_payout) || Number(o.total) || 0,
+    customer: o.buyer_email || "Customer",
+    status: o.status === "paid" ? "new" : (o.status || "new"),
+  };
+}
 
 // A couple of seeded orders so the dashboard demonstrates the experience even
 // before any live orders exist this session.
@@ -33,6 +49,22 @@ const ACTION = { new: { ship: "Mark shipped", pickup: "Mark ready" }, shipped: {
 export function DealerDashboard({ orders = [], onBack }) {
   const initial = [...orders.map(fromOrder), ...SEED];
   const [rows, setRows] = useState(initial);
+
+  // Pull real persisted orders from the DB (survives refresh; cross-session).
+  useEffect(() => {
+    let live = true;
+    fetchDealerOrders().then((dbOrders) => {
+      if (!live || !dbOrders.length) return;
+      const seen = new Set();
+      const merged = [];
+      for (const r of [...dbOrders.map(fromDb), ...orders.map(fromOrder), ...SEED]) {
+        if (seen.has(r.orderId)) continue;
+        seen.add(r.orderId); merged.push(r);
+      }
+      setRows(merged);
+    });
+    return () => { live = false; };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const advance = (orderId) => {
     setRows((prev) =>

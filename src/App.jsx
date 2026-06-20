@@ -18,6 +18,7 @@ import { ListPart } from './screens/ListPart'
 import { BottomNav } from './components/BottomNav'
 import { loadIndex } from './lib/index-store'
 import { loadInventory } from './lib/inventory'
+import { saveOrder } from './lib/orders'
 
 export default function App() {
   const [screen, setScreen] = useState('home')
@@ -91,6 +92,7 @@ export default function App() {
     setOrders([...orders, order])
     setCart([])
     setScreen('order-tracking')
+    saveOrder(order) // persist to DB (no-op if backend unconfigured)
     alert('Order confirmed! Order ID: ' + order.orderId)
   }
 
