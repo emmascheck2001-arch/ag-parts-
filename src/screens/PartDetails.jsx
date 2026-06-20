@@ -1,14 +1,12 @@
 import { TopBar } from "../components/TopBar";
 import { SupplierCard } from "../components/SupplierCard";
-import { VerifiedFit } from "../components/Badge";
-import { MACHINES, SUPPLIERS_MAP, calculateDistance, USER_LOCATION } from "../data/demo";
-import { getParts } from "../lib/catalog";
+import { SUPPLIERS_MAP, calculateDistance, USER_LOCATION } from "../data/demo";
+import { getParts, getMachines } from "../lib/catalog";
 import { rankSuppliers, lowestTotal } from "../lib/ranking";
-
-const MACHINE_NAMES = new Set(MACHINES.map((m) => m.nm));
 
 export function PartDetails({ partNum, onBack, onBuy, onViewMap, onMachineSelect }) {
   const part = getParts()[partNum];
+  const machineNames = new Set(getMachines().map((m) => m.nm));
 
   if (!part) {
     return (
@@ -27,6 +25,8 @@ export function PartDetails({ partNum, onBack, onBuy, onViewMap, onMachineSelect
   // "Used On" detail (position · qty · years). When it's identical across every
   // machine, show it once instead of repeating it on all 8 rows.
   const fitment = part.fitment || [];
+  const verifiedCount = fitment.filter((f) => f.verified).length;
+  const allVerified = fitment.length > 0 && verifiedCount === fitment.length;
   const fitDetail = (f) =>
     `${f.position || ""}${f.qty ? ` · Qty ${f.qty}` : ""}${f.years ? ` · ${f.years}` : ""}`;
   const sameDetail = fitment.length > 1 && fitment.every((f) => fitDetail(f) === fitDetail(fitment[0]));
@@ -52,8 +52,16 @@ export function PartDetails({ partNum, onBack, onBuy, onViewMap, onMachineSelect
             <div style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "8px" }}>
               Category: <strong>{part.cat}</strong>
             </div>
-            <div style={{ marginBottom: "8px" }}>
-              <VerifiedFit />
+            <div style={{
+              marginBottom: "8px", fontSize: "11.5px", fontWeight: 700,
+              display: "inline-flex", alignItems: "center", gap: "6px",
+              padding: "4px 9px", borderRadius: "999px",
+              color: allVerified ? "var(--ag-green)" : "var(--star)",
+              background: allVerified ? "var(--ag-green-soft)" : "rgba(245,180,40,0.12)",
+            }}>
+              {allVerified
+                ? "✓ Verified fit"
+                : "⚠ Unverified — confirm this part # against your machine's serial before ordering"}
             </div>
             <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
               <strong>Fits:</strong> {part.fits}
@@ -75,7 +83,7 @@ export function PartDetails({ partNum, onBack, onBuy, onViewMap, onMachineSelect
               )}
 
               {fitment.map((f, i) => {
-                const tappable = MACHINE_NAMES.has(f.machine);
+                const tappable = machineNames.has(f.machine);
                 return (
                   <div
                     key={i}
