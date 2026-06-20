@@ -47,7 +47,7 @@ After 1–5: a farmer can find a part → buy it → the dealer is paid → EzPa
 ---
 
 ## ⚠️ Before real customers (Tier 2 — trust/compliance)
-- **Auth hardening** — sign-in/up is built and the dealer area is gated, but the service-role functions (`get-orders`, `save-inventory`) still **bypass RLS** — they don't yet verify the caller's token, so they aren't dealer-scoped. Before launch: pass the user's access token to these functions and check it server-side so a dealer only reads/writes their own orders+inventory.
+- **Auth scoping — DONE.** `get-orders` and `save-inventory` now verify the caller's Supabase token (`_auth.cjs`): a dealer only reads their own orders, and listings are forced to the signed-in dealership. (Once auth is enabled, consider rejecting `save-inventory` with no token instead of the demo fallback.)
 - **Data verification** — everything is `verified=false`; the 5 scanned Hagie models are OCR'd (lower confidence). Wrong part = returns/liability. Add a review pass.
 - **Sales tax** (Stripe Tax), **returns/refunds** flow, **ToS + liability disclaimer**, and the **data-provenance/IP** rule (don't ingest scraped licensed catalogs).
 

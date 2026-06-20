@@ -3,11 +3,18 @@ import { TopBar } from "../components/TopBar";
 import { MACHINES, CATS } from "../data/demo";
 import { getListings, addListing, removeListing } from "../lib/listings";
 import { getDealerAccount } from "../lib/stripe";
+import { supabase } from "../lib/supabase";
 
 async function saveToDb(payload) {
   try {
+    let auth = {};
+    try {
+      const { data } = await supabase.auth.getSession();
+      const token = data?.session?.access_token;
+      if (token) auth = { Authorization: "Bearer " + token };
+    } catch { /* ignore */ }
     const res = await fetch("/.netlify/functions/save-inventory", {
-      method: "POST", headers: { "Content-Type": "application/json" },
+      method: "POST", headers: { "Content-Type": "application/json", ...auth },
       body: JSON.stringify(payload),
     });
     if (!res.ok) return { configured: false };

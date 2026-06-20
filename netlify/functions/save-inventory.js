@@ -3,6 +3,7 @@
 // stock), and fitments for the machines the dealer tagged. Service-role key,
 // server-side only. Returns {configured:false} until SUPABASE_* are set.
 const { createClient } = require("@supabase/supabase-js");
+const { getCaller } = require("./_auth.cjs");
 const normPn = (pn) => String(pn || "").toUpperCase().replace(/[\s-]/g, "");
 
 exports.handler = async (event) => {
@@ -14,7 +15,11 @@ exports.handler = async (event) => {
   try {
     const b = JSON.parse(event.body || "{}");
     const pn = (b.pn || "").trim();
-    const dealerName = (b.dealer || "").trim();
+    // If a dealer is signed in, listings are forced to THEIR dealership — a
+    // dealer can't list under another's name. (No token → falls back to the
+    // posted name for demo/testing; require auth before production.)
+    const caller = await getCaller(event);
+    const dealerName = (caller && caller.role === "dealer" && caller.dealerName) ? caller.dealerName : (b.dealer || "").trim();
     if (!pn || !dealerName) return { statusCode: 400, body: JSON.stringify({ error: "dealer and pn required" }) };
 
     // 1) Dealer (set stripe account / contact if provided)

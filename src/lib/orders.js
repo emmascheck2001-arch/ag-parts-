@@ -2,6 +2,16 @@
 // serverless function so it survives refresh and the dealer can see it. Safe
 // no-op (returns null) when the backend isn't configured — the app keeps its
 // in-memory copy either way.
+import { supabase } from "./supabase";
+
+async function authHeader() {
+  try {
+    const { data } = await supabase.auth.getSession();
+    const token = data?.session?.access_token;
+    return token ? { Authorization: "Bearer " + token } : {};
+  } catch { return {}; }
+}
+
 export async function saveOrder(order) {
   try {
     const res = await fetch("/.netlify/functions/save-order", {
@@ -17,11 +27,11 @@ export async function saveOrder(order) {
   }
 }
 
-// Dealer's orders (service-role read via function). NOTE: not auth-scoped yet —
-// gate behind dealer auth before production (see GO-LIVE.md).
-export async function fetchDealerOrders(dealerId) {
+// The signed-in dealer's orders. Scoped server-side by the caller's auth token,
+// so the dealer only gets their own (empty if not a signed-in dealer).
+export async function fetchDealerOrders() {
   try {
-    const res = await fetch("/.netlify/functions/get-orders?dealerId=" + encodeURIComponent(dealerId || ""));
+    const res = await fetch("/.netlify/functions/get-orders", { headers: await authHeader() });
     if (!res.ok) return [];
     const j = await res.json();
     return j.orders || [];
