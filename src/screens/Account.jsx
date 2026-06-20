@@ -19,13 +19,38 @@ function Section({ title, children }) {
   );
 }
 
-export function Account({ onBack, onNav }) {
+export function Account({ onBack, onNav, session, profile, onSignIn, onSignOut }) {
+  const user = session?.user;
   return (
     <div className="screen active">
       <TopBar title="Account & Info" onBack={onBack} />
 
       <div className="scroll">
         <div style={{ padding: "16px" }}>
+          {/* Auth status */}
+          <div className="card" style={{ marginBottom: "14px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "10px" }}>
+            {user ? (
+              <>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: "13px", fontWeight: 700 }}>{profile?.dealer_name || user.email}</div>
+                  <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>
+                    {profile?.role === "dealer" ? "Dealer account" : "Signed in"} · {user.email}
+                  </div>
+                </div>
+                <button onClick={onSignOut} style={{ background: "none", border: "1px solid var(--border)", borderRadius: "8px", padding: "8px 12px", fontSize: "12px", fontWeight: 600, color: "var(--text)", cursor: "pointer", flexShrink: 0 }}>
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <>
+                <div style={{ fontSize: "12.5px", color: "var(--text-muted)" }}>Browsing as guest</div>
+                <button onClick={onSignIn} className="btn-primary" style={{ padding: "8px 14px", fontSize: "12px", flexShrink: 0 }}>
+                  Sign in
+                </button>
+              </>
+            )}
+          </div>
+
           {/* Dealer call-to-action */}
           <button
             onClick={() => onNav && onNav("dealer")}

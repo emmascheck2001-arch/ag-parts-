@@ -21,8 +21,8 @@ const input = {
   color: "var(--text)", fontSize: "13px",
 };
 
-export function ListPart({ onBack, onNav }) {
-  const [dealer, setDealer] = useState("");
+export function ListPart({ onBack, onNav, dealerName = "" }) {
+  const [dealer, setDealer] = useState(dealerName);
   const [pn, setPn] = useState("");
   const [name, setName] = useState("");
   const [cat, setCat] = useState(CATS[0]?.t || "Filters");

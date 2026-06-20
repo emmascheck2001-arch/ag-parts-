@@ -19,6 +19,8 @@ import { BottomNav } from './components/BottomNav'
 import { loadIndex } from './lib/index-store'
 import { loadInventory } from './lib/inventory'
 import { saveOrder } from './lib/orders'
+import { Auth } from './screens/Auth'
+import { getSession, onAuthChange, getProfile, signOut } from './lib/auth'
 
 export default function App() {
   const [screen, setScreen] = useState('home')
@@ -29,6 +31,23 @@ export default function App() {
   const [orders, setOrders] = useState([])
 
   const [, setIndexTick] = useState(0)
+  const [session, setSession] = useState(null)
+  const [profile, setProfile] = useState(null)
+  const [authTarget, setAuthTarget] = useState(null) // screen to go to after sign-in
+
+  // Track auth session + profile (farmers stay guests; dealers sign in).
+  useEffect(() => {
+    getSession().then((s) => {
+      setSession(s)
+      if (s?.user?.id) getProfile(s.user.id).then(setProfile)
+    })
+    const unsub = onAuthChange((s) => {
+      setSession(s)
+      if (s?.user?.id) getProfile(s.user.id).then(setProfile)
+      else setProfile(null)
+    })
+    return unsub
+  }, [])
 
   // Deep-link back from Stripe Connect onboarding (?screen=dealer).
   useEffect(() => {
@@ -50,7 +69,15 @@ export default function App() {
   const handleNavigation = (navScreen) => {
     // Map nav-tab ids to real screens (tabs without a dedicated screen fall back to home).
     const map = { search: 'home', machines: 'machines-list', orders: 'order-tracking' }
-    setScreen(map[navScreen] || navScreen)
+    const target = map[navScreen] || navScreen
+    // Dealer area requires sign-in (farmers stay guests).
+    const DEALER_SCREENS = ['dealer', 'dealer-dashboard', 'list-part']
+    if (DEALER_SCREENS.includes(target) && !session) {
+      setAuthTarget(target)
+      setScreen('auth')
+      return
+    }
+    setScreen(target)
   }
 
   const handleHome = () => {
@@ -164,8 +191,24 @@ export default function App() {
         <Map onBack={handleHome} />
       )}
 
+      {screen === 'auth' && (
+        <Auth
+          onBack={() => setScreen('account')}
+          reason={authTarget ? 'Sign in to access the dealer area.' : undefined}
+          onAuthed={() => { const t = authTarget; setAuthTarget(null); setScreen(t || 'account') }}
+          onGuest={handleHome}
+        />
+      )}
+
       {screen === 'account' && (
-        <Account onBack={handleHome} onNav={handleNavigation} />
+        <Account
+          onBack={handleHome}
+          onNav={handleNavigation}
+          session={session}
+          profile={profile}
+          onSignIn={() => { setAuthTarget(null); setScreen('auth') }}
+          onSignOut={async () => { await signOut(); setSession(null); setProfile(null) }}
+        />
       )}
 
       {screen === 'dealer' && (
@@ -181,7 +224,7 @@ export default function App() {
       )}
 
       {screen === 'list-part' && (
-        <ListPart onBack={() => setScreen('dealer')} onNav={handleNavigation} />
+        <ListPart onBack={() => setScreen('dealer')} onNav={handleNavigation} dealerName={profile?.dealer_name || ''} />
       )}
 
       {/* Bottom Navigation */}

@@ -9,6 +9,7 @@ What's code-complete vs. what only **you** can flip to take real money. Work top
 - **Supply side** — `dealers` + `inventory` tables; "List a Part" writes real inventory (`save-inventory`); each seller carries its Stripe account.
 - **Take-rate** — 8% platform fee (`PLATFORM_FEE_RATE` in `src/lib/marketplace.js`), applied as a Stripe Connect `application_fee` routed to the selling dealer.
 - **Orders** — persisted to DB on checkout (`save-order`); payment confirmed authoritatively by `stripe-webhook`; dealer sees them in the Dealer Dashboard (`get-orders`).
+- **Auth** — Supabase Auth (`src/lib/auth.js`, `Auth.jsx`): farmers stay guests, dealers sign in; the dealer area is gated; Account shows sign-in/out. Needs its schema + provider enabled (step 1b).
 
 ---
 
@@ -18,6 +19,10 @@ What's code-complete vs. what only **you** can flip to take real money. Work top
 Run each file's contents:
 - `FITMENT_SETUP.sql` (if the fitment tables aren't already there) — fitment brain.
 - `DEALER_INVENTORY_SCHEMA.sql` — dealers, inventory, orders. *(Drops the empty legacy `orders` table first — safe, it's empty.)*
+
+### 1b. Enable auth  (Supabase)
+- Run `AUTH_SCHEMA.sql` (the `profiles` table + RLS).
+- Supabase → Authentication → Providers → enable **Email**. For low-friction dealer testing, turn **off** "Confirm email" under Authentication → Settings (turn back on for production).
 
 ### 2. (Optional) Seed demo supply so the store isn't empty
 ```
@@ -41,8 +46,8 @@ After 1–5: a farmer can find a part → buy it → the dealer is paid → EzPa
 
 ---
 
-## ⚠️ Before real customers (Tier 2 — trust/compliance, still TODO)
-- **Auth** — Supabase Auth for farmers + dealers. Today `get-orders` is **not** auth-scoped (any caller can read orders) and dealers can't manage only-their inventory. Gate these before launch.
+## ⚠️ Before real customers (Tier 2 — trust/compliance)
+- **Auth hardening** — sign-in/up is built and the dealer area is gated, but the service-role functions (`get-orders`, `save-inventory`) still **bypass RLS** — they don't yet verify the caller's token, so they aren't dealer-scoped. Before launch: pass the user's access token to these functions and check it server-side so a dealer only reads/writes their own orders+inventory.
 - **Data verification** — everything is `verified=false`; the 5 scanned Hagie models are OCR'd (lower confidence). Wrong part = returns/liability. Add a review pass.
 - **Sales tax** (Stripe Tax), **returns/refunds** flow, **ToS + liability disclaimer**, and the **data-provenance/IP** rule (don't ingest scraped licensed catalogs).
 
