@@ -17,6 +17,7 @@ import { Extract } from './screens/Extract'
 import { ListPart } from './screens/ListPart'
 import { BottomNav } from './components/BottomNav'
 import { loadIndex } from './lib/index-store'
+import { loadInventory } from './lib/inventory'
 
 export default function App() {
   const [screen, setScreen] = useState('home')
@@ -41,6 +42,7 @@ export default function App() {
   // Falls back silently to the demo seed if Supabase is empty/unreachable.
   useEffect(() => {
     loadIndex().then((ok) => { if (ok) setIndexTick((t) => t + 1) })
+    loadInventory().then((ok) => { if (ok) setIndexTick((t) => t + 1) })
   }, [])
 
   // Navigation handlers

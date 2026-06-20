@@ -4,6 +4,9 @@
 import { PARTS as SEED_PARTS, MACHINES as SEED_MACHINES } from "../data/demo";
 import { getIndexParts, getIndexMachines } from "./index-store";
 import { listingParts } from "./listings";
+import { getInventorySuppliers } from "./inventory";
+
+const pnNorm = (pn) => String(pn || "").toUpperCase().replace(/[\s-]/g, "");
 
 // Every machine the farmer can browse = curated seed machines (with images)
 // + machines ingested into the Supabase index. Seed entries win on name so
@@ -38,6 +41,20 @@ export function getParts() {
       };
     } else {
       merged[pn] = listed;
+    }
+  }
+
+  // Real dealer inventory (Supabase): the true sellers. Each carries its
+  // dealer's Stripe account, so these are the suppliers checkout routes payment
+  // to. Real dealers are listed FIRST (ahead of any demo/sample sellers).
+  const inv = getInventorySuppliers();
+  if (inv) {
+    for (const [pn, part] of Object.entries(merged)) {
+      const real = inv[pnNorm(pn)];
+      if (real && real.length) {
+        const demo = (part.suppliers || []).filter((s) => !s.dealerAccountId);
+        merged[pn] = { ...part, suppliers: [...real, ...demo], hasRealDealer: true };
+      }
     }
   }
   return merged;

@@ -75,10 +75,14 @@ export function Checkout({ cart, onBack, onConfirm }) {
       const res = await createPaymentIntent({
         amount: m.customerTotal,
         platformFee: m.platformFee,
-        // In the demo, the onboarded dealer (stored in the browser) receives the
-        // payout; in production this comes from the chosen dealer's record.
-        dealerAccountId: getDealerAccount() || undefined,
-        metadata: { orderId: order.orderId, dealer: dealerName, fulfillment },
+        // The chosen dealer's real Stripe Connect account (from inventory) gets
+        // the payout and EzParts keeps the fee. Falls back to the browser-stored
+        // demo account, then to a plain charge, so the rail still works in demo.
+        dealerAccountId: dealer?.dealerAccountId || getDealerAccount() || undefined,
+        metadata: {
+          orderId: order.orderId, dealer: dealerName, fulfillment,
+          dealerId: dealer?.dealerId != null ? String(dealer.dealerId) : "",
+        },
       });
       if (res.clientSecret) {
         setPendingOrder(order);
