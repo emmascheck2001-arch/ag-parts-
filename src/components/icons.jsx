@@ -52,4 +52,10 @@ export const CatIcon = {
   Cooling: make(<><path d="M12 2v20M4.5 6l15 12M19.5 6l-15 12" /><path d="M12 6 9.5 8M12 6l2.5 2M12 18l-2.5-2M12 18l2.5-2M6 9 6.3 12 4 13M18 9l-.3 3 2.3 1M6 15l.3-3M18 15l-.3-3" /></>),
   // Cab & Body — tractor cab silhouette
   "Cab & Body": make(<><path d="M5 20v-7l2.5-6h7L17 13v7" /><path d="M5 13h12M11 7v6M5 20h12" /></>),
+  // Blades — angled mower blade with a center mounting hole
+  Blades: make(<><path d="M4 17 17 5a2.2 2.2 0 0 1 3 3L7 20a2.2 2.2 0 0 1-3-3Z" /><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" /></>),
+  // Fluids — oil bottle / jug
+  Fluids: make(<><path d="M10 3h4v2.5l1.4 1.2A3 3 0 0 1 16.4 9v8a3 3 0 0 1-3 3h-2.8a3 3 0 0 1-3-3V9a3 3 0 0 1 1-2.3L10 5.5Z" /><path d="M7.6 12h8.8" /></>),
+  // Other — grid of tiles
+  Other: make(<><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /></>),
 };

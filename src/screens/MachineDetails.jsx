@@ -3,9 +3,9 @@ import { TopBar } from "../components/TopBar";
 import { PartCard } from "../components/PartCard";
 import { resolveExactParts, hasSerialBreaks } from "../data/demo";
 import { machineParts, serviceKit, getMachines } from "../lib/catalog";
-import { CATEGORIES, categoryIcon } from "../lib/categories";
+import { CATEGORIES } from "../lib/categories";
 import { inFleet, toggleFleet } from "../lib/fleet";
-import { UIIcon } from "../components/icons";
+import { UIIcon, CatIcon } from "../components/icons";
 
 const money = (n) => "$" + (Number.isInteger(n) ? n : n.toFixed(2));
 const input = {
@@ -130,17 +130,18 @@ export function MachineDetails({ machine, onBack, onPartSelect, onBuy }) {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 20 }}>
                 {CATEGORIES.map((c) => {
                   const n = counts[c.key] || 0;
+                  const Ic = CatIcon[c.key] || CatIcon.Other;
                   return (
                     <button
                       key={c.key}
                       onClick={() => n && setCat(c.key)}
                       style={{
                         background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12,
-                        padding: "14px 8px", cursor: n ? "pointer" : "default", opacity: n ? 1 : 0.4,
-                        display: "flex", flexDirection: "column", alignItems: "center", gap: 6, color: "var(--text)",
+                        padding: "16px 8px", cursor: n ? "pointer" : "default", opacity: n ? 1 : 0.4,
+                        display: "flex", flexDirection: "column", alignItems: "center", gap: 8, color: "var(--text)",
                       }}
                     >
-                      <span style={{ fontSize: 26 }}>{c.ic}</span>
+                      <Ic width="26" height="26" style={{ color: "var(--ag-green)" }} />
                       <span style={{ fontSize: 12, fontWeight: 600 }}>{c.key}</span>
                       <span style={{ fontSize: 10.5, color: "var(--text-muted)" }}>{n} part{n === 1 ? "" : "s"}</span>
                     </button>
@@ -235,8 +236,8 @@ export function MachineDetails({ machine, onBack, onPartSelect, onBuy }) {
                   </button>
                 )}
               </div>
-              <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 2 }}>
-                {cat ? `${categoryIcon(cat)} ${cat}` : `Results for "${q}"`}
+              <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 2, display: "flex", alignItems: "center", gap: 8 }}>
+                {cat ? (() => { const Ic = CatIcon[cat] || CatIcon.Other; return <><Ic width="20" height="20" style={{ color: "var(--ag-green)" }} /> {cat}</>; })() : `Results for "${q}"`}
               </h3>
               <div style={{ fontSize: 11.5, color: "var(--ag-green)", marginBottom: 12 }}>
                 ✓ {shown.length} part{shown.length === 1 ? "" : "s"} confirmed to fit {machine}

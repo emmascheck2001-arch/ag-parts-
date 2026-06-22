@@ -1,5 +1,5 @@
 import { TIER } from "../lib/fit-confidence";
-import { categoryIcon } from "../lib/categories";
+import { CatIcon } from "./icons";
 
 const money = (n) => (n == null ? "—" : "$" + (Number.isInteger(n) ? n : n.toFixed(2)));
 
@@ -10,6 +10,7 @@ const money = (n) => (n == null ? "—" : "$" + (Number.isInteger(n) ? n : n.toF
 export function PartCard({ part, machineName, onSelect, onOrder }) {
   const sup = part.bestSupplier;
   const tier = TIER[part.fit?.tier || (part.fit?.verified ? "oem" : "review")];
+  const Ic = CatIcon[part.cat] || CatIcon.Other;
 
   const order = (e) => {
     e.stopPropagation();
@@ -24,9 +25,11 @@ export function PartCard({ part, machineName, onSelect, onOrder }) {
         <div style={{
           width: 60, height: 60, flexShrink: 0, borderRadius: 10, overflow: "hidden",
           background: "var(--surface)", border: "1px solid var(--border)",
-          display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28,
+          display: "flex", alignItems: "center", justifyContent: "center",
         }}>
-          {part.image ? <img src={part.image} alt={part.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : (part.ic || categoryIcon(part.cat))}
+          {part.image
+            ? <img src={part.image} alt={part.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            : <Ic width="28" height="28" style={{ color: "var(--ag-green)" }} />}
         </div>
 
         <div style={{ flex: 1, minWidth: 0 }}>
