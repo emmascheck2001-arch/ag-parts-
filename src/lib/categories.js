@@ -1,29 +1,48 @@
-// The 9 clean browse categories the storefront uses, mapped from the messy raw
-// categories/names in the index (e.g. "Filter", "Air Filter", "Hose", "Hardware"
-// all collapse into the right bucket). Order matters: first match wins, so
-// "Engine Oil Filter" lands in Filters, not Engine or Fluids.
+// The 9 clean browse categories, mapped from the messy raw categories/names in
+// the index. Two concerns are kept separate:
+//   • CATEGORIES   = DISPLAY order for the grid (what the user sees)
+//   • MATCH        = PRIORITY order for classification (resolves overlaps, e.g.
+//                    Engine is checked before Hydraulic so "EXHAUST MANIFOLD"
+//                    and "CYLINDER HEAD" land in Engine, not Hydraulic)
 
+// Display order + icon key (icons come from CatIcon by the same key).
 export const CATEGORIES = [
-  { key: "Filters", ic: "🧫", match: /filter|filtration|element/i },
-  { key: "Belts", ic: "➰", match: /\bbelt|v-belt|serpentine|pulley/i },
-  { key: "Bearings", ic: "⭕", match: /bearing|bushing|race|seal kit/i },
-  { key: "Blades", ic: "🔪", match: /blade|knife|knives|cutting|sickle|guard|mower deck|mulch/i },
-  { key: "Hydraulic", ic: "🔧", match: /hydraulic|hydro|hose|fitting|coupler|cylinder|\bvalve\b|spool|manifold/i },
-  { key: "Electrical", ic: "⚡", match: /electric|sensor|switch|harness|wire|lamp|light|bulb|battery|fuse|relay|solenoid|alternator|starter|gauge/i },
-  { key: "Engine", ic: "⚙️", match: /engine|piston|gasket|injector|turbo|crank|cam|cylinder head|manifold|water pump|fuel pump|thermostat|radiator|cooling|exhaust|muffler/i },
-  { key: "Fluids", ic: "🛢️", match: /\boil\b|fluid|grease|lubric|coolant|antifreeze|\bdef\b|hydraulic oil|gear oil/i },
-  { key: "Other", ic: "🧩", match: /.*/ },
+  { key: "Filters", ic: "🧫" },
+  { key: "Belts", ic: "➰" },
+  { key: "Bearings", ic: "⭕" },
+  { key: "Blades", ic: "🔪" },
+  { key: "Hydraulic", ic: "🔧" },
+  { key: "Electrical", ic: "⚡" },
+  { key: "Engine", ic: "⚙️" },
+  { key: "Fluids", ic: "🛢️" },
+  { key: "Other", ic: "🧩" },
+];
+
+// Classification rules in PRIORITY order (first match wins). Electrical + Engine
+// are checked BEFORE Blades so "BLADE TYPE FUSE" → Electrical and "FAN, 6 BLADE"
+// → Engine instead of Blades; Engine before Hydraulic so "EXHAUST"/"CYLINDER
+// HEAD" win over Hydraulic's "cylinder".
+const MATCH = [
+  ["Filters", /filter|filtration|air cleaner element/i],
+  ["Belts", /\bbelt|v-belt|serpentine|\bpulley|sheave/i],
+  ["Bearings", /bearing|bushing|\brace\b|seal kit/i],
+  // electrical incl. gauge-wire entries like "16GA RED-…" and blade-type fuses
+  ["Electrical", /electric|sensor|switch|harness|\bwire|\b\d{1,2}\s?ga\b|lamp|\blight|bulb|battery|fuse|relay|solenoid|alternator|starter|gauge|terminal|connector/i],
+  // engine incl. cooling fans
+  ["Engine", /engine|piston|crankshaft|camshaft|cylinder head|head gasket|gasket|injector|turbo|\bexhaust|muffler|water pump|fuel pump|thermostat|radiator|intercooler|\bfan\b|flywheel|oil pan|valve cover/i],
+  // cutting parts only — exclude wiper blades / decals; "guard"/"fuse"/"fan" handled above
+  ["Blades", /^(?!.*\b(?:wiper|decal)\b).*(?:\bblade|knife|knives|sickle|\bmulch|mower deck|cutterbar|cutter bar|gator)/i],
+  // hydraulics + plumbing fittings
+  ["Hydraulic", /hydraulic|hydro|hydrostatic|\bhose\b|fitting|coupler|coupling|\belbow\b|\btee\b|adapter|nipple|\bunion\b|cylinder|\bvalve\b|spool|manifold|orifice/i],
+  ["Fluids", /\boil\b|fluid|grease|lubric|coolant|antifreeze|\bdef\b|gear lube/i],
 ];
 
 const ICON_BY_KEY = Object.fromEntries(CATEGORIES.map((c) => [c.key, c.ic]));
 
-// Resolve one part to its clean category key. Looks at raw category + name.
+// Resolve one part to its clean category key (raw category + name).
 export function categoryOf(part) {
   const hay = `${part.cat || part.category || ""} ${part.name || ""}`;
-  for (const c of CATEGORIES) {
-    if (c.key === "Other") continue;
-    if (c.match.test(hay)) return c.key;
-  }
+  for (const [key, re] of MATCH) if (re.test(hay)) return key;
   return "Other";
 }
 
