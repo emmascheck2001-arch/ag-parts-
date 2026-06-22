@@ -18,6 +18,7 @@ import { ListPart } from './screens/ListPart'
 import { BottomNav } from './components/BottomNav'
 import { loadIndex } from './lib/index-store'
 import { loadInventory } from './lib/inventory'
+import { loadDiagrams } from './lib/diagrams'
 import { saveOrder } from './lib/orders'
 import { Auth } from './screens/Auth'
 import { getSession, onAuthChange, getProfile, signOut } from './lib/auth'
@@ -63,6 +64,7 @@ export default function App() {
   useEffect(() => {
     loadIndex().then((ok) => { if (ok) setIndexTick((t) => t + 1) })
     loadInventory().then((ok) => { if (ok) setIndexTick((t) => t + 1) })
+    loadDiagrams().then((ok) => { if (ok) setIndexTick((t) => t + 1) })
   }, [])
 
   // Navigation handlers
@@ -107,8 +109,9 @@ export default function App() {
   }
 
   const handleBuy = (item) => {
-    setCart([...cart, { ...item, partName: item.partName || 'Part' }])
-    setScreen('checkout')
+    // Functional update so batch adds (e.g. a service kit) accumulate correctly.
+    setCart((c) => [...c, { ...item, partName: item.partName || 'Part' }])
+    if (!item.silent) setScreen('checkout') // silent = add to cart without jumping to checkout
   }
 
   const handleCheckout = (orderData) => {
@@ -160,10 +163,11 @@ export default function App() {
       )}
 
       {screen === 'machine-details' && selectedMachine && (
-        <MachineDetails 
-          machine={selectedMachine} 
+        <MachineDetails
+          machine={selectedMachine}
           onBack={handleHome}
           onPartSelect={handlePartSelect}
+          onBuy={handleBuy}
         />
       )}
 

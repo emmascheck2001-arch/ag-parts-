@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { TopBar } from "../components/TopBar";
 import { SupplierCard } from "../components/SupplierCard";
-import { VerifiedFit } from "../components/Badge";
 import { getParts, partsForMachine, getMachines } from "../lib/catalog";
 import { rankSuppliers } from "../lib/ranking";
+import { TIER, partTier } from "../lib/fit-confidence";
 import { logMiss } from "../lib/index-store";
 
 export function SearchResults({ query, onBack, onPartSelect, onBuy, onViewMap, onMachineSelect }) {
@@ -135,7 +135,15 @@ export function SearchResults({ query, onBack, onPartSelect, onBuy, onViewMap, o
                             <div>
                               <div style={{ fontSize: "16px", fontWeight: "600" }}>{part.ic} {part.name}</div>
                               <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "4px" }}>{part.pn}</div>
-                              <div style={{ marginTop: "8px" }}><VerifiedFit /></div>
+                              {(() => {
+                                const t = TIER[partTier(part.fitment)];
+                                return (
+                                  <div style={{ marginTop: "8px", display: "inline-flex", fontSize: "10.5px", fontWeight: 700,
+                                    padding: "3px 8px", borderRadius: "999px", color: t.color, background: t.soft }}>
+                                    {t.ok ? "✓ OEM-verified fit" : t.row === "⚠ Scan" ? "⚠ Scanned manual — verify #" : "⚠ Unverified — verify #"}
+                                  </div>
+                                );
+                              })()}
                             </div>
                           </div>
                           <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "8px" }}>Fits: {part.fits}</div>

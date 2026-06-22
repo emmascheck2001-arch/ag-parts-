@@ -2,6 +2,7 @@
 // in-app catalog. If Supabase is empty/unreachable, callers fall back to the
 // demo.js seed — so the app never breaks during/after migration.
 import { supabase } from "./supabase";
+import { fitTier } from "./fit-confidence";
 
 let indexParts = null; // null until a successful, non-empty load
 let indexMachines = null; // machines from the index, shaped like the seed list
@@ -40,16 +41,37 @@ export function getIndexParts() {
   return indexParts;
 }
 
+// Supabase/PostgREST caps every response at 1000 rows. Our catalog is far
+// bigger (10k+ parts, 30k+ fitments), so we page through in 1000-row chunks
+// until a short page signals the end — otherwise most machines look empty.
+async function fetchAll(table, columns) {
+  const PAGE = 1000;
+  const out = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabase
+      .from(table)
+      .select(columns)
+      .range(from, from + PAGE - 1);
+    if (error) throw error;
+    if (!data || !data.length) break;
+    out.push(...data);
+    if (data.length < PAGE) break;
+  }
+  return out;
+}
+
 export async function loadIndex() {
   try {
-    const [machinesRes, partsRes, fitmentsRes, crossRes] = await Promise.all([
-      supabase.from("machines").select("id, make, model, type, year_from, year_to, hp, image_url"),
-      supabase.from("parts").select("id, part_number, name, category"),
-      supabase.from("fitments").select("part_id, machine_id, position, qty, verified"),
-      supabase.from("crossrefs").select("part_id, brand, equiv_number"),
+    const [machinesData, parts, fitmentsData, crossData] = await Promise.all([
+      fetchAll("machines", "id, make, model, type, year_from, year_to, hp, image_url"),
+      fetchAll("parts", "id, part_number, name, category, brand, is_oem"),
+      fetchAll("fitments", "part_id, machine_id, position, qty, verified, source, confidence"),
+      fetchAll("crossrefs", "part_id, brand, equiv_number"),
     ]);
-    const parts = partsRes.data;
-    if (partsRes.error || !parts || !parts.length) return false; // empty → keep seed fallback
+    if (!parts || !parts.length) return false; // empty → keep seed fallback
+    const machinesRes = { data: machinesData };
+    const fitmentsRes = { data: fitmentsData };
+    const crossRes = { data: crossData };
 
     const machineName = {};
     const machinesList = [];
@@ -78,6 +100,8 @@ export async function loadIndex() {
         name: p.name || p.part_number,
         cat: p.category || "Other",
         ic: ICONS[p.category] || "🧩",
+        brand: p.brand || "",
+        isOem: p.is_oem !== false, // default to OEM unless explicitly aftermarket
         fits: "",
         fitment: [],
         suppliers: [],
@@ -88,7 +112,10 @@ export async function loadIndex() {
       const pn = pnById[f.part_id];
       const nm = machineName[f.machine_id];
       if (!pn || !nm || !built[pn]) return;
-      built[pn].fitment.push({ machine: nm, years: "", position: f.position, qty: f.qty || 1, verified: !!f.verified });
+      built[pn].fitment.push({
+        machine: nm, years: "", position: f.position, qty: f.qty || 1,
+        verified: !!f.verified, tier: fitTier(f.source, !!f.verified),
+      });
     });
     (crossRes.data || []).forEach((c) => {
       const pn = pnById[c.part_id];

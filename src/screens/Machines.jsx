@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { TopBar } from "../components/TopBar";
-import { getMachines, partsForMachine } from "../lib/catalog";
+import { getMachines, machinePartCounts } from "../lib/catalog";
 
 // Browse every machine in the fitment index (seed + ingested). This is the
 // screen that makes ingested machines discoverable — the storefront's full
-// machine list, searchable by make/model.
+// machine list, searchable by make/model. Machines with nothing catalogued yet
+// are hidden so the storefront never shows a dead-end "0 parts" page.
 export function Machines({ onBack, onSelect }) {
   const [q, setQ] = useState("");
-  const all = getMachines();
+  const counts = machinePartCounts();
+  const all = getMachines().filter((m) => counts[m.nm] > 0);
   const query = q.trim().toLowerCase();
   const machines = query
     ? all.filter((m) => m.nm.toLowerCase().includes(query) || (m.ty || "").toLowerCase().includes(query))
@@ -33,7 +35,7 @@ export function Machines({ onBack, onSelect }) {
 
           <div className="recent-list">
             {machines.map((m) => {
-              const count = partsForMachine(m.nm).length;
+              const count = counts[m.nm] || 0;
               return (
                 <button
                   key={m.nm}

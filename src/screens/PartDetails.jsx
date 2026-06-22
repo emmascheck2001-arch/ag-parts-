@@ -3,6 +3,8 @@ import { SupplierCard } from "../components/SupplierCard";
 import { SUPPLIERS_MAP, calculateDistance, USER_LOCATION } from "../data/demo";
 import { getParts, getMachines } from "../lib/catalog";
 import { rankSuppliers, lowestTotal } from "../lib/ranking";
+import { TIER, partTier } from "../lib/fit-confidence";
+import { diagramForPart } from "../lib/diagrams";
 
 export function PartDetails({ partNum, onBack, onBuy, onViewMap, onMachineSelect }) {
   const part = getParts()[partNum];
@@ -25,8 +27,8 @@ export function PartDetails({ partNum, onBack, onBuy, onViewMap, onMachineSelect
   // "Used On" detail (position · qty · years). When it's identical across every
   // machine, show it once instead of repeating it on all 8 rows.
   const fitment = part.fitment || [];
-  const verifiedCount = fitment.filter((f) => f.verified).length;
-  const allVerified = fitment.length > 0 && verifiedCount === fitment.length;
+  const overall = TIER[partTier(fitment)];
+  const diagram = diagramForPart(partNum);
   const fitDetail = (f) =>
     `${f.position || ""}${f.qty ? ` · Qty ${f.qty}` : ""}${f.years ? ` · ${f.years}` : ""}`;
   const sameDetail = fitment.length > 1 && fitment.every((f) => fitDetail(f) === fitDetail(fitment[0]));
@@ -56,12 +58,9 @@ export function PartDetails({ partNum, onBack, onBuy, onViewMap, onMachineSelect
               marginBottom: "8px", fontSize: "11.5px", fontWeight: 700,
               display: "inline-flex", alignItems: "center", gap: "6px",
               padding: "4px 9px", borderRadius: "999px",
-              color: allVerified ? "var(--ag-green)" : "var(--star)",
-              background: allVerified ? "var(--ag-green-soft)" : "rgba(245,180,40,0.12)",
+              color: overall.color, background: overall.soft,
             }}>
-              {allVerified
-                ? "✓ Verified fit"
-                : "⚠ Unverified — confirm this part # against your machine's serial before ordering"}
+              {overall.badge}
             </div>
             <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
               <strong>Fits:</strong> {part.fits}
@@ -109,20 +108,41 @@ export function PartDetails({ partNum, onBack, onBuy, onViewMap, onMachineSelect
                         </div>
                       )}
                     </div>
-                    <span
-                      style={{
-                        fontSize: "9.5px",
-                        fontWeight: 700,
-                        whiteSpace: "nowrap",
-                        color: f.verified ? "var(--ag-green)" : "var(--star)",
-                      }}
-                      title={f.verified ? "Verified fit" : "Unverified"}
-                    >
-                      {f.verified ? "✓" : "⚠"}
-                    </span>
+                    {(() => {
+                      const t = TIER[f.tier || (f.verified ? "oem" : "review")];
+                      return (
+                        <span
+                          style={{ fontSize: "9.5px", fontWeight: 700, whiteSpace: "nowrap", color: t.color }}
+                          title={t.badge}
+                        >
+                          {t.row}
+                        </span>
+                      );
+                    })()}
                   </div>
                 );
               })}
+            </div>
+          )}
+
+          {/* Parts diagram — the exploded assembly this part appears on */}
+          {diagram && (
+            <div className="card" style={{ marginBottom: "16px" }}>
+              <h3 style={{ fontSize: "13px", fontWeight: 700, marginBottom: "4px" }}>Parts Diagram</h3>
+              <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "8px", lineHeight: 1.4 }}>
+                Find <strong>#{partNum}</strong> on this assembly — from the {diagram.title} (p.{diagram.page}).
+              </div>
+              <a href={diagram.img} target="_blank" rel="noreferrer" style={{ display: "block" }}>
+                <img
+                  src={diagram.img}
+                  alt={`Parts diagram p.${diagram.page}`}
+                  loading="lazy"
+                  style={{ width: "100%", borderRadius: "8px", border: "1px solid var(--border)", background: "#fff" }}
+                />
+              </a>
+              <div style={{ fontSize: "10px", color: "var(--text-muted)", marginTop: "6px" }}>
+                Tap to open full size · part numbers are called out on the diagram.
+              </div>
             </div>
           )}
 

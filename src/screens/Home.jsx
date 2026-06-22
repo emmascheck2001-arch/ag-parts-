@@ -1,10 +1,18 @@
 import { useState, useRef } from "react";
-import { MACHINES, CATS, RECENT } from "../data/demo";
+import { CATS, RECENT } from "../data/demo";
 import { UIIcon, CatIcon } from "../components/icons";
+import { getMachines } from "../lib/catalog";
+import { getFleet } from "../lib/fleet";
 
 export function Home({ onSelect, onSearch, onNav }) {
   const [search, setSearch] = useState("");
   const inputRef = useRef(null);
+
+  // "My Machines" = the user's saved fleet if any, else the real catalogued
+  // machines — so every tile leads to a populated parts page (no dead demo links).
+  const allMachines = getMachines();
+  const fleet = getFleet().map((nm) => allMachines.find((m) => m.nm === nm)).filter(Boolean);
+  const myMachines = (fleet.length ? fleet : allMachines).slice(0, 6);
 
   const handleSearch = () => {
     if (search.trim()) onSearch(search);
@@ -14,7 +22,7 @@ export function Home({ onSelect, onSearch, onNav }) {
 
   const actions = [
     { ic: "camera", t: "Scan Part", s: "Use camera", on: () => onNav("scan") },
-    { ic: "tractor", t: "Search by Machine", s: "Find parts", on: focusSearch },
+    { ic: "tractor", t: "Search by Machine", s: "Browse machines", on: () => onNav("machines") },
     { ic: "keypad", t: "Enter Part Number", s: "Manual search", on: focusSearch },
   ];
 
@@ -68,9 +76,11 @@ export function Home({ onSelect, onSearch, onNav }) {
             <button className="link" onClick={() => onNav("machines")}>View all</button>
           </div>
           <div className="machines-row">
-            {MACHINES.map((m) => (
+            {myMachines.map((m) => (
               <button key={m.nm} className="machine-tile" onClick={() => onSelect("machines", m.nm)}>
-                <img src={m.img} alt={m.nm} loading="lazy" />
+                {m.img
+                  ? <img src={m.img} alt={m.nm} loading="lazy" />
+                  : <div style={{ display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, background: "var(--surface)", width: "100%", aspectRatio: "16/10" }}>{m.ic || "🚜"}</div>}
                 <div className="machine-tile-name">{m.nm}</div>
                 <div className="machine-tile-type">{m.ty}</div>
               </button>
