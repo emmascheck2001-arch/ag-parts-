@@ -6,21 +6,27 @@ import { rankSuppliers } from "../lib/ranking";
 import { TIER, partTier } from "../lib/fit-confidence";
 import { logMiss } from "../lib/index-store";
 
-export function SearchResults({ query, onBack, onPartSelect, onBuy, onViewMap, onMachineSelect }) {
+export function SearchResults({ query, machine, onBack, onChangeMachine, onPartSelect, onBuy, onViewMap, onMachineSelect }) {
   const q = (query || "").toLowerCase();
 
-  // Machines matching the query.
-  const machineResults = getMachines().filter(
+  // When scoped to a machine, only show machines/parts that fit it.
+  const fitsMachine = (part) => !machine || (part.fitment || []).some((f) => f.machine === machine);
+
+  // Machines matching the query (hidden when a machine is already chosen).
+  const machineResults = machine ? [] : getMachines().filter(
     (m) => m.nm.toLowerCase().includes(q) || (m.ty || "").toLowerCase().includes(q)
   );
 
-  // Parts matching the query (number, name, fitment text, or category).
+  // Parts matching the query (number, name, fitment text, or category), scoped
+  // to the chosen machine so a farmer never sees a part that doesn't fit.
   const results = Object.entries(getParts())
     .filter(([pn, part]) =>
-      pn.toLowerCase().includes(q) ||
-      part.name.toLowerCase().includes(q) ||
-      part.fits.toLowerCase().includes(q) ||
-      (part.cat || "").toLowerCase().includes(q)
+      fitsMachine(part) && (
+        pn.toLowerCase().includes(q) ||
+        part.name.toLowerCase().includes(q) ||
+        part.fits.toLowerCase().includes(q) ||
+        (part.cat || "").toLowerCase().includes(q)
+      )
     )
     .map(([pn, part]) => ({ pn, ...part }));
 
@@ -71,11 +77,31 @@ export function SearchResults({ query, onBack, onPartSelect, onBuy, onViewMap, o
 
       <div className="scroll">
         <div style={{ padding: "16px" }}>
+          {/* Machine scope banner */}
+          <div
+            onClick={onChangeMachine}
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8,
+              padding: "10px 12px", marginBottom: 14, borderRadius: 8, cursor: "pointer",
+              border: "1px solid " + (machine ? "var(--ag-green)" : "var(--border)"),
+              background: machine ? "var(--ag-green-soft)" : "var(--surface)",
+            }}
+          >
+            <span style={{ fontSize: 12.5, color: machine ? "var(--ag-green)" : "var(--text-muted)", fontWeight: 600 }}>
+              {machine ? `✓ Showing parts that fit ${machine}` : "Searching all machines — pick yours to confirm fit"}
+            </span>
+            <span style={{ fontSize: 11.5, color: "var(--ag-green)", fontWeight: 700, whiteSpace: "nowrap" }}>Change ›</span>
+          </div>
+
           {nothing ? (
             <>
               <div style={{ textAlign: "center", padding: "28px 20px 16px", color: "var(--text-muted)" }}>
                 <div style={{ fontSize: "40px", marginBottom: "12px" }}>🔍</div>
-                <div>No dealer has listed “{query}” yet — but you can still find it:</div>
+                <div>
+                  {machine
+                    ? `No “${query}” parts found that fit ${machine}. Try “Change” above to search all machines, or find it on the web:`
+                    : `No dealer has listed “${query}” yet — but you can still find it:`}
+                </div>
               </div>
               {externalSearch}
             </>
@@ -136,7 +162,8 @@ export function SearchResults({ query, onBack, onPartSelect, onBuy, onViewMap, o
                               <div style={{ fontSize: "16px", fontWeight: "600" }}>{part.ic} {part.name}</div>
                               <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "4px" }}>{part.pn}</div>
                               {(() => {
-                                const t = TIER[partTier(part.fitment)];
+                                const fit = machine ? (part.fitment || []).filter((f) => f.machine === machine) : part.fitment;
+                                const t = TIER[partTier(fit)];
                                 return (
                                   <div style={{ marginTop: "8px", display: "inline-flex", fontSize: "10.5px", fontWeight: 700,
                                     padding: "3px 8px", borderRadius: "999px", color: t.color, background: t.soft }}>

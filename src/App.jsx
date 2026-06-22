@@ -5,6 +5,7 @@ import { PartDetails } from './screens/PartDetails'
 import { Categories } from './screens/Categories'
 import { MachineDetails } from './screens/MachineDetails'
 import { Machines } from './screens/Machines'
+import { PickMachine } from './screens/PickMachine'
 import { Checkout } from './screens/Checkout'
 import { OrderTracking } from './screens/OrderTracking'
 import { Scan } from './screens/Scan'
@@ -26,6 +27,7 @@ import { getSession, onAuthChange, getProfile, signOut } from './lib/auth'
 export default function App() {
   const [screen, setScreen] = useState('home')
   const [searchQuery, setSearchQuery] = useState('')
+  const [searchMachine, setSearchMachine] = useState(null) // machine to scope a search to
   const [selectedPart, setSelectedPart] = useState(null)
   const [selectedMachine, setSelectedMachine] = useState(null)
   const [cart, setCart] = useState([])
@@ -87,7 +89,14 @@ export default function App() {
   }
 
   const handleSearch = (query) => {
+    // Searching from the home screen first asks which machine the part is for,
+    // so results are scoped to parts that actually fit it (never the wrong part).
     setSearchQuery(query)
+    setScreen('pick-machine')
+  }
+
+  const handlePickSearchMachine = (machineName) => {
+    setSearchMachine(machineName) // null = search all machines
     setScreen('search-results')
   }
 
@@ -133,10 +142,20 @@ export default function App() {
         <Home onSelect={handleSelect} onSearch={handleSearch} onNav={handleNavigation} />
       </div>
 
+      {screen === 'pick-machine' && (
+        <PickMachine
+          query={searchQuery}
+          onPick={handlePickSearchMachine}
+          onBack={handleHome}
+        />
+      )}
+
       {screen === 'search-results' && (
         <SearchResults
           query={searchQuery}
+          machine={searchMachine}
           onBack={handleHome}
+          onChangeMachine={() => setScreen('pick-machine')}
           onPartSelect={handlePartSelect}
           onBuy={handleBuy}
           onViewMap={() => setScreen('map')}
