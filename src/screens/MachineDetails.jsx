@@ -68,8 +68,10 @@ export function MachineDetails({ machine, onBack, onPartSelect, onBuy }) {
     } else if (cat) {
       list = list.filter((p) => p.cat === cat);
     }
+    // Catalog parts are OEM (from the makers' manuals); aftermarket options are
+    // documented as cross-references, so "Aftermkt" = parts with a cross-ref alt.
     if (oem === "oem") list = list.filter((p) => p.isOem);
-    if (oem === "aftermarket") list = list.filter((p) => !p.isOem);
+    if (oem === "aftermarket") list = list.filter((p) => (p.cross || []).length > 0);
     if (stockOnly) list = list.filter((p) => p.inStock);
     if (supplier !== "all") list = list.filter((p) => p.suppliers.some((s) => s.s === supplier));
     const by = {
@@ -267,7 +269,11 @@ export function MachineDetails({ machine, onBack, onPartSelect, onBuy }) {
               </div>
 
               {shown.length === 0 ? (
-                <div className="card" style={{ fontSize: 12.5, color: "var(--text-muted)" }}>No matching parts for this machine.</div>
+                <div className="card" style={{ fontSize: 12.5, color: "var(--text-muted)" }}>
+                  {oem === "aftermarket"
+                    ? "No aftermarket cross-references documented for these parts yet — they're all OEM."
+                    : "No matching parts for this machine."}
+                </div>
               ) : (
                 <>
                   {shown.slice(0, limit).map((p) => (

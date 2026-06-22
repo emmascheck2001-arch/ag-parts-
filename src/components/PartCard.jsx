@@ -41,6 +41,11 @@ export function PartCard({ part, machineName, onSelect, onOrder }) {
             <span style={{ fontSize: 9.5, fontWeight: 700, padding: "2px 6px", borderRadius: 4, color: "var(--text-muted)", background: "var(--surface)" }}>
               {part.isOem ? "OEM" : "Aftermarket"}
             </span>
+            {(part.cross || []).length > 0 && (
+              <span style={{ fontSize: 9.5, fontWeight: 700, padding: "2px 6px", borderRadius: 4, color: "var(--ag-green)", background: "var(--ag-green-soft)" }}>
+                {part.cross.length} aftermkt alt
+              </span>
+            )}
             {part.hasRealDealer && (
               <span style={{ fontSize: 9.5, fontWeight: 700, padding: "2px 6px", borderRadius: 4, color: "var(--ag-green)", background: "var(--ag-green-soft)" }}>
                 Dealer stock
