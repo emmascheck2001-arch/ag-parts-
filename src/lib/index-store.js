@@ -136,19 +136,20 @@ export async function loadIndex() {
 // Log a search the index couldn't answer — the ingestion queue + demand signal.
 // Pass { email, machine } to capture a farmer asking to be notified, so unmet
 // demand becomes a contactable lead instead of leaking off-platform.
+//
+// Writes go through the save-lead function (service role), not the browser's
+// anon key: anon can insert but not upsert/update this table, and exposing that
+// would leak every farmer's email. Fails silently if the backend isn't set up.
 export async function logMiss(query, meta = {}) {
   const qy = (query || "").trim();
   if (!qy) return;
-  const row = { query: qy };
-  if (meta.email) row.notify_email = meta.email.trim();
-  if (meta.machine) row.machine = meta.machine;
   try {
-    // With contact info, let the latest write win (update); a bare repeat miss
-    // can be ignored if the query already exists.
-    await supabase
-      .from("search_misses")
-      .upsert(row, { onConflict: "query", ignoreDuplicates: !meta.email });
+    await fetch("/.netlify/functions/save-lead", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: qy, email: meta.email, machine: meta.machine }),
+    });
   } catch {
-    /* ignore */
+    /* ignore — demand logging is best-effort */
   }
 }
