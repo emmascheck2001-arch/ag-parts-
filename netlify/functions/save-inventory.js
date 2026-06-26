@@ -4,6 +4,7 @@
 // server-side only. Returns {configured:false} until SUPABASE_* are set.
 const { createClient } = require("@supabase/supabase-js");
 const { getCaller } = require("./_auth.cjs");
+const { sendEmail } = require("./_email.cjs");
 const normPn = (pn) => String(pn || "").toUpperCase().replace(/[\s-]/g, "");
 
 exports.handler = async (event) => {
@@ -63,7 +64,34 @@ exports.handler = async (event) => {
       }
     }
 
-    return { statusCode: 200, body: JSON.stringify({ configured: true, dealerId, partId, fitments }) };
+    // Demand loop: a farmer who searched for this part and left an email now
+    // gets told it's available. Match by part number or name, only those not yet
+    // notified, then stamp notified_at so we never email twice. Best-effort.
+    let notified = 0;
+    try {
+      const term = pn;
+      const { data: waiting } = await supabase
+        .from("search_misses")
+        .select("id, query, notify_email")
+        .not("notify_email", "is", null)
+        .is("notified_at", null)
+        .or(`query.ilike.%${term}%,query.ilike.%${b.name || term}%`);
+      for (const w of waiting || []) {
+        const r = await sendEmail({
+          to: w.notify_email,
+          subject: `The part you wanted is now on EzParts`,
+          html: `<p>Good news — a dealer just listed <strong>${b.name || pn} (${pn})</strong>,
+            which matches your search “${w.query}”.</p>
+            <p>Open EzParts and search “${pn}” to see it and order.</p>`,
+        });
+        if (r.sent) {
+          await supabase.from("search_misses").update({ notified_at: new Date().toISOString() }).eq("id", w.id);
+          notified++;
+        }
+      }
+    } catch { /* best-effort */ }
+
+    return { statusCode: 200, body: JSON.stringify({ configured: true, dealerId, partId, fitments, notified }) };
   } catch (err) {
     return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
   }

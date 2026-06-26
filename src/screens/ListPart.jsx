@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TopBar } from "../components/TopBar";
 import { MACHINES, CATS } from "../data/demo";
 import { getListings, addListing, removeListing } from "../lib/listings";
+import { fetchMyListings, deleteMyListing } from "../lib/dealer-inventory";
 import { getDealerAccount } from "../lib/stripe";
 import { supabase } from "../lib/supabase";
 
@@ -44,6 +45,20 @@ export function ListPart({ onBack, onNav, dealerName = "" }) {
   const [statusOk, setStatusOk] = useState(true);
   const [editingId, setEditingId] = useState(null); // id of the listing being edited
   const [error, setError] = useState("");
+
+  // Show the dealer's REAL persisted listings (from the DB) merged with any
+  // local-only drafts not yet saved. DB is the source of truth → survives a
+  // browser wipe and shows up on any device the dealer signs in on.
+  const refresh = async () => {
+    const db = await fetchMyListings();
+    if (!db.length) { setListings(getListings()); return; }
+    const seen = new Set(db.map((l) => (l.pn || "").toUpperCase().replace(/[\s-]/g, "")));
+    const localOnly = getListings().filter(
+      (l) => !seen.has((l.pn || "").toUpperCase().replace(/[\s-]/g, ""))
+    );
+    setListings([...db, ...localOnly]);
+  };
+  useEffect(() => { refresh(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleMachine = (nm) =>
     setMachines((m) => (m.includes(nm) ? m.filter((x) => x !== nm) : [...m, nm]));
@@ -97,6 +112,7 @@ export function ListPart({ onBack, onNav, dealerName = "" }) {
     if (r.configured) {
       setStatusOk(true);
       setStatus(`${editingId ? "Updated" : "Listed"} to marketplace${r.fitments ? ` · ${r.fitments} machine fits` : ""} ✓`);
+      refresh(); // pull the authoritative DB copy back in
     } else {
       // Honest warning — the part is NOT live on the marketplace yet.
       setStatusOk(false);
@@ -105,10 +121,11 @@ export function ListPart({ onBack, onNav, dealerName = "" }) {
     resetForm();
   };
 
-  const del = (id) => {
-    removeListing(id);
-    setListings(getListings());
-    if (editingId === id) resetForm();
+  const del = async (l) => {
+    if (l.fromDb) await deleteMyListing(l.pn); // remove from the live marketplace
+    else removeListing(l.id);                  // local-only draft
+    await refresh();
+    if (editingId === l.id) resetForm();
   };
 
   return (
@@ -204,7 +221,7 @@ export function ListPart({ onBack, onNav, dealerName = "" }) {
                     <button onClick={() => startEdit(l)} style={{ background: "none", border: "none", color: "var(--ag-green)", fontSize: "12px", fontWeight: 600, cursor: "pointer" }}>
                       Edit
                     </button>
-                    <button onClick={() => del(l.id)} style={{ background: "none", border: "none", color: "var(--danger)", fontSize: "12px", cursor: "pointer" }}>
+                    <button onClick={() => del(l)} style={{ background: "none", border: "none", color: "var(--danger)", fontSize: "12px", cursor: "pointer" }}>
                       Remove
                     </button>
                   </div>

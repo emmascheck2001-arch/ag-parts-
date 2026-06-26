@@ -25,6 +25,7 @@ import { saveOrder } from './lib/orders'
 import { Auth } from './screens/Auth'
 import { getSession, onAuthChange, getProfile, signOut } from './lib/auth'
 import { getRecent, addRecent, clearRecent } from './lib/recent-searches'
+import { initLocation } from './lib/geo'
 
 // A single token of letters/digits/dashes, length >= 4, containing at least one
 // digit (e.g. RE509672, AT63771, 87300041) — a part number, not a phrase.
@@ -77,6 +78,7 @@ export default function App() {
     loadIndex().then((ok) => { if (ok) setIndexTick((t) => t + 1) })
     loadInventory().then((ok) => { if (ok) setIndexTick((t) => t + 1) })
     loadDiagrams().then((ok) => { if (ok) setIndexTick((t) => t + 1) })
+    initLocation().then((changed) => { if (changed) setIndexTick((t) => t + 1) }) // real "near me"
   }, [])
 
   // Navigation handlers
