@@ -36,32 +36,80 @@ export function ListPart({ onBack, onNav, dealerName = "" }) {
   const [price, setPrice] = useState("");
   const [ship, setShip] = useState("");
   const [stock, setStock] = useState("");
+  const [cond, setCond] = useState("New");
   const [machines, setMachines] = useState([]);
   const [other, setOther] = useState("");
   const [listings, setListings] = useState(getListings());
   const [status, setStatus] = useState("");
+  const [statusOk, setStatusOk] = useState(true);
+  const [editingId, setEditingId] = useState(null); // id of the listing being edited
+  const [error, setError] = useState("");
 
   const toggleMachine = (nm) =>
     setMachines((m) => (m.includes(nm) ? m.filter((x) => x !== nm) : [...m, nm]));
 
+  // Validate the numeric fields before listing — no $0/negative prices reaching
+  // the marketplace, no negative stock/shipping.
+  const priceNum = parseFloat(price);
+  const shipNum = ship === "" ? 0 : parseFloat(ship);
+  const stockNum = stock === "" ? 0 : parseFloat(stock);
+  const validationError = () => {
+    if (!dealer.trim()) return "Add your dealership name.";
+    if (!pn.trim()) return "Add a part number.";
+    if (!name.trim()) return "Add a part name.";
+    if (!(priceNum > 0)) return "Price must be greater than $0.";
+    if (shipNum < 0) return "Shipping can't be negative.";
+    if (stockNum < 0) return "Stock can't be negative.";
+    return "";
+  };
   const ready = dealer && pn && name && price;
 
+  const resetForm = () => {
+    setPn(""); setName(""); setPrice(""); setShip(""); setStock(""); setCond("New");
+    setMachines([]); setOther(""); setEditingId(null);
+  };
+
+  const startEdit = (l) => {
+    setEditingId(l.id);
+    setDealer(l.dealer || dealerName);
+    setPn(l.pn || ""); setName(l.name || ""); setCat(l.cat || CATS[0]?.t || "Filters");
+    setPrice(String(l.price ?? "")); setShip(String(l.ship ?? "")); setStock(String(l.stock ?? ""));
+    setCond(l.cond || "New"); setMachines(l.machines || []); setOther("");
+    setError(""); setStatus("");
+    window?.scrollTo?.(0, 0);
+  };
+
   const submit = async () => {
-    if (!ready) return;
+    const v = validationError();
+    if (v) { setError(v); return; }
+    setError("");
     const extra = other.split(",").map((s) => s.trim()).filter(Boolean);
     const allMachines = [...machines, ...extra];
-    const listing = { dealer, pn: pn.trim(), name, cat, price, ship, stock, machines: allMachines };
+    const listing = { dealer, pn: pn.trim(), name, cat, cond, price, ship, stock, machines: allMachines };
+    // Editing replaces the old listing; new listings are appended.
+    if (editingId) removeListing(editingId);
     addListing(listing); // instant local UI
     setListings(getListings());
-    setStatus("Saving…");
+    setStatus("Saving…"); setStatusOk(true);
     // Write to the real DB (dealer + inventory + fitments). Routes payouts to
     // your Stripe account if you've onboarded.
     const r = await saveToDb({ ...listing, days: 2, stripeAccountId: getDealerAccount() || undefined });
-    setStatus(r.configured ? `Listed to marketplace${r.fitments ? ` · ${r.fitments} machine fits` : ""} ✓` : "Saved locally (backend not configured)");
-    setPn(""); setName(""); setPrice(""); setShip(""); setStock(""); setMachines([]); setOther("");
+    if (r.configured) {
+      setStatusOk(true);
+      setStatus(`${editingId ? "Updated" : "Listed"} to marketplace${r.fitments ? ` · ${r.fitments} machine fits` : ""} ✓`);
+    } else {
+      // Honest warning — the part is NOT live on the marketplace yet.
+      setStatusOk(false);
+      setStatus("⚠ Saved on this device only — not live on the marketplace yet (backend not connected).");
+    }
+    resetForm();
   };
 
-  const del = (id) => { removeListing(id); setListings(getListings()); };
+  const del = (id) => {
+    removeListing(id);
+    setListings(getListings());
+    if (editingId === id) resetForm();
+  };
 
   return (
     <div className="screen active">
@@ -81,13 +129,18 @@ export function ListPart({ onBack, onNav, dealerName = "" }) {
             <input style={input} placeholder="Your dealership name" value={dealer} onChange={(e) => setDealer(e.target.value)} />
             <input style={input} placeholder="Part number (e.g. RE509672)" value={pn} onChange={(e) => setPn(e.target.value)} />
             <input style={input} placeholder="Part name (e.g. Engine Oil Filter)" value={name} onChange={(e) => setName(e.target.value)} />
-            <select style={input} value={cat} onChange={(e) => setCat(e.target.value)}>
-              {CATS.map((c) => <option key={c.t} value={c.t}>{c.t}</option>)}
-            </select>
             <div style={{ display: "flex", gap: "8px" }}>
-              <input style={{ ...input, flex: 1 }} type="number" placeholder="Price ($)" value={price} onChange={(e) => setPrice(e.target.value)} />
-              <input style={{ ...input, flex: 1 }} type="number" placeholder="Ship ($)" value={ship} onChange={(e) => setShip(e.target.value)} />
-              <input style={{ ...input, flex: 1 }} type="number" placeholder="In stock" value={stock} onChange={(e) => setStock(e.target.value)} />
+              <select style={{ ...input, flex: 1 }} value={cat} onChange={(e) => setCat(e.target.value)}>
+                {CATS.map((c) => <option key={c.t} value={c.t}>{c.t}</option>)}
+              </select>
+              <select style={{ ...input, flex: 1 }} value={cond} onChange={(e) => setCond(e.target.value)}>
+                {["New", "Used", "Reman", "OEM Surplus"].map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <input style={{ ...input, flex: 1 }} type="number" min="0" step="0.01" placeholder="Price ($)" value={price} onChange={(e) => setPrice(e.target.value)} />
+              <input style={{ ...input, flex: 1 }} type="number" min="0" step="0.01" placeholder="Ship ($)" value={ship} onChange={(e) => setShip(e.target.value)} />
+              <input style={{ ...input, flex: 1 }} type="number" min="0" step="1" placeholder="In stock" value={stock} onChange={(e) => setStock(e.target.value)} />
             </div>
 
             <div style={{ fontSize: "12px", fontWeight: 600, margin: "6px 0 6px" }}>Fits which machines?</div>
@@ -113,10 +166,22 @@ export function ListPart({ onBack, onNav, dealerName = "" }) {
             </div>
             <input style={input} placeholder="Other machines (comma separated)" value={other} onChange={(e) => setOther(e.target.value)} />
 
+            {error && (
+              <div style={{ fontSize: "11.5px", color: "var(--danger)", marginTop: "4px", marginBottom: "4px", textAlign: "center" }}>{error}</div>
+            )}
             <button className="btn-primary" onClick={submit} disabled={!ready} style={{ width: "100%", padding: "12px", marginTop: "4px", opacity: ready ? 1 : 0.5 }}>
-              List this part
+              {editingId ? "Save changes" : "List this part"}
             </button>
-            {status && <div style={{ fontSize: "11.5px", color: "var(--ag-green)", marginTop: "8px", textAlign: "center" }}>{status}</div>}
+            {editingId && (
+              <button onClick={resetForm} style={{ width: "100%", padding: "10px", marginTop: "6px", background: "none", border: "none", color: "var(--text-muted)", fontSize: "12px", cursor: "pointer" }}>
+                Cancel edit
+              </button>
+            )}
+            {status && (
+              <div style={{ fontSize: "11.5px", color: statusOk ? "var(--ag-green)" : "var(--star)", marginTop: "8px", textAlign: "center", lineHeight: 1.4 }}>
+                {status}
+              </div>
+            )}
           </div>
 
           {listings.length > 0 && (
@@ -127,7 +192,7 @@ export function ListPart({ onBack, onNav, dealerName = "" }) {
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: "13px", fontWeight: 600 }}>{l.pn} — {l.name}</div>
                     <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>
-                      ${l.price}{l.stock ? ` · ${l.stock} in stock` : ""} · {l.dealer}
+                      ${l.price}{l.cond ? ` · ${l.cond}` : ""}{l.stock ? ` · ${l.stock} in stock` : ""} · {l.dealer}
                     </div>
                     {l.machines?.length > 0 && (
                       <div style={{ fontSize: "11px", color: "var(--ag-green)", marginTop: "2px" }}>
@@ -135,9 +200,14 @@ export function ListPart({ onBack, onNav, dealerName = "" }) {
                       </div>
                     )}
                   </div>
-                  <button onClick={() => del(l.id)} style={{ background: "none", border: "none", color: "var(--danger)", fontSize: "12px", cursor: "pointer", flexShrink: 0 }}>
-                    Remove
-                  </button>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px", flexShrink: 0, alignItems: "flex-end" }}>
+                    <button onClick={() => startEdit(l)} style={{ background: "none", border: "none", color: "var(--ag-green)", fontSize: "12px", fontWeight: 600, cursor: "pointer" }}>
+                      Edit
+                    </button>
+                    <button onClick={() => del(l.id)} style={{ background: "none", border: "none", color: "var(--danger)", fontSize: "12px", cursor: "pointer" }}>
+                      Remove
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

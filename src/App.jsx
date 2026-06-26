@@ -23,6 +23,14 @@ import { loadDiagrams } from './lib/diagrams'
 import { saveOrder } from './lib/orders'
 import { Auth } from './screens/Auth'
 import { getSession, onAuthChange, getProfile, signOut } from './lib/auth'
+import { getRecent, addRecent, clearRecent } from './lib/recent-searches'
+
+// A single token of letters/digits/dashes, length >= 4, containing at least one
+// digit (e.g. RE509672, AT63771, 87300041) — a part number, not a phrase.
+function looksLikePartNumber(query) {
+  const q = (query || '').trim()
+  return /^[A-Za-z0-9-]{4,}$/.test(q) && /\d/.test(q)
+}
 
 export default function App() {
   const [screen, setScreen] = useState('home')
@@ -32,6 +40,7 @@ export default function App() {
   const [selectedMachine, setSelectedMachine] = useState(null)
   const [cart, setCart] = useState([])
   const [orders, setOrders] = useState([])
+  const [recent, setRecent] = useState(getRecent())
 
   const [, setIndexTick] = useState(0)
   const [session, setSession] = useState(null)
@@ -89,10 +98,18 @@ export default function App() {
   }
 
   const handleSearch = (query) => {
-    // Searching from the home screen first asks which machine the part is for,
-    // so results are scoped to parts that actually fit it (never the wrong part).
     setSearchQuery(query)
-    setScreen('pick-machine')
+    if (query && query.trim()) setRecent(addRecent(query)) // remember real searches
+
+    // A part number is globally unique — asking "which machine?" is pure friction.
+    // If the query is a single part-number-shaped token, go straight to results
+    // (all machines). Otherwise ask which machine so results are scoped to fit.
+    if (looksLikePartNumber(query)) {
+      setSearchMachine(null)
+      setScreen('search-results')
+    } else {
+      setScreen('pick-machine')
+    }
   }
 
   const handlePickSearchMachine = (machineName) => {
@@ -118,28 +135,61 @@ export default function App() {
   }
 
   const handleBuy = (item) => {
-    // Functional update so batch adds (e.g. a service kit) accumulate correctly.
-    setCart((c) => [...c, { ...item, partName: item.partName || 'Part' }])
+    setCart((c) => {
+      // One order = one dealer (checkout pays a single dealer). If this part is
+      // from a different dealer than what's already in the cart, start fresh.
+      const cartDealer = c[0]?.supplier?.s
+      const itemDealer = item.supplier?.s
+      const base = cartDealer && itemDealer && cartDealer !== itemDealer ? [] : c
+      // Same part + same dealer already in cart → bump quantity instead of duplicating.
+      const i = base.findIndex(
+        (x) => x.pn === item.pn && x.supplier?.s === itemDealer
+      )
+      if (i >= 0) {
+        const next = [...base]
+        next[i] = { ...next[i], qty: (next[i].qty || 1) + (item.qty || 1) }
+        return next
+      }
+      return [...base, { ...item, qty: item.qty || 1, partName: item.partName || 'Part' }]
+    })
     if (!item.silent) setScreen('checkout') // silent = add to cart without jumping to checkout
+  }
+
+  const updateCartQty = (index, qty) => {
+    setCart((c) =>
+      qty <= 0
+        ? c.filter((_, i) => i !== index)
+        : c.map((item, i) => (i === index ? { ...item, qty } : item))
+    )
   }
 
   const handleCheckout = (orderData) => {
     const order = {
       ...orderData,
       createdAt: new Date().toISOString(),
+      // `paid` is only ever true after a real Stripe charge (PaymentForm.onPaid).
+      // Every other path is an unpaid, dealer-confirmed order — never claim paid.
+      paid: orderData.paid === true,
     }
     setOrders([...orders, order])
     setCart([])
     setScreen('order-tracking')
     saveOrder(order) // persist to DB (no-op if backend unconfigured)
-    alert('Order confirmed! Order ID: ' + order.orderId)
+    // No blocking alert, no false "confirmed/paid" claim — OrderTracking shows
+    // the real status (order placed, dealer to confirm).
   }
 
   return (
     <div className="phone">
       {/* All Screens */}
       <div style={{ display: screen === 'home' ? 'flex' : 'none', flexDirection: 'column', flex: 1, minHeight: 0, paddingBottom: '74px' }}>
-        <Home onSelect={handleSelect} onSearch={handleSearch} onNav={handleNavigation} />
+        <Home
+          onSelect={handleSelect}
+          onSearch={handleSearch}
+          onNav={handleNavigation}
+          recent={recent}
+          onClearRecent={() => setRecent(clearRecent())}
+        />
       </div>
 
       {screen === 'pick-machine' && (
@@ -191,10 +241,11 @@ export default function App() {
       )}
 
       {screen === 'checkout' && (
-        <Checkout 
-          cart={cart} 
+        <Checkout
+          cart={cart}
           onBack={handleHome}
           onConfirm={handleCheckout}
+          onQty={updateCartQty}
         />
       )}
 
@@ -203,7 +254,10 @@ export default function App() {
       )}
 
       {screen === 'scan' && (
-        <Scan onBack={handleHome} />
+        <Scan
+          onBack={handleHome}
+          onDetected={(pn) => { setSearchQuery(pn); setSearchMachine(null); setScreen('search-results') }}
+        />
       )}
 
       {screen === 'help' && (

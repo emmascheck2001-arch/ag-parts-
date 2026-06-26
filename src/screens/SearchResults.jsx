@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { TopBar } from "../components/TopBar";
+import { NotifyMe } from "../components/NotifyMe";
 import { SupplierCard } from "../components/SupplierCard";
 import { getParts, partsForMachine, getMachines } from "../lib/catalog";
 import { rankSuppliers } from "../lib/ranking";
@@ -46,10 +47,12 @@ export function SearchResults({ query, machine, onBack, onChangeMachine, onPartS
     { label: "Amazon", url: "https://www.amazon.com/s?k=" + enc },
   ];
   const externalSearch = (
-    <div className="card" style={{ marginTop: "8px" }}>
-      <h3 style={{ fontSize: "13px", fontWeight: 700, marginBottom: "4px" }}>Search the web for “{query}”</h3>
+    <div className="card" style={{ marginTop: "8px", opacity: 0.9 }}>
+      <h3 style={{ fontSize: "12px", fontWeight: 700, marginBottom: "4px", color: "var(--text-muted)" }}>
+        Need it right now? Check elsewhere
+      </h3>
       <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "10px", lineHeight: 1.4 }}>
-        Not listed by a dealer yet? Find it anywhere — EzParts indexes dealers and points you to the rest.
+        While we line up a dealer, you can also look on:
       </div>
       <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
         {webSources.map((s) => (
@@ -99,10 +102,11 @@ export function SearchResults({ query, machine, onBack, onChangeMachine, onPartS
                 <div style={{ fontSize: "40px", marginBottom: "12px" }}>🔍</div>
                 <div>
                   {machine
-                    ? `No “${query}” parts found that fit ${machine}. Try “Change” above to search all machines, or find it on the web:`
-                    : `No dealer has listed “${query}” yet — but you can still find it:`}
+                    ? `No “${query}” parts found that fit ${machine} yet. Try “Change” above to search all machines — or have us notify you when it's listed.`
+                    : `No dealer has listed “${query}” yet. Be the first to know when one does.`}
                 </div>
               </div>
+              <NotifyMe query={query} machine={machine} />
               {externalSearch}
             </>
           ) : (

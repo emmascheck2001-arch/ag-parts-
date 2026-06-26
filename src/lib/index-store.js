@@ -134,11 +134,20 @@ export async function loadIndex() {
 }
 
 // Log a search the index couldn't answer — the ingestion queue + demand signal.
-export async function logMiss(query) {
+// Pass { email, machine } to capture a farmer asking to be notified, so unmet
+// demand becomes a contactable lead instead of leaking off-platform.
+export async function logMiss(query, meta = {}) {
   const qy = (query || "").trim();
   if (!qy) return;
+  const row = { query: qy };
+  if (meta.email) row.notify_email = meta.email.trim();
+  if (meta.machine) row.machine = meta.machine;
   try {
-    await supabase.from("search_misses").upsert({ query: qy }, { onConflict: "query", ignoreDuplicates: true });
+    // With contact info, let the latest write win (update); a bare repeat miss
+    // can be ignored if the query already exists.
+    await supabase
+      .from("search_misses")
+      .upsert(row, { onConflict: "query", ignoreDuplicates: !meta.email });
   } catch {
     /* ignore */
   }

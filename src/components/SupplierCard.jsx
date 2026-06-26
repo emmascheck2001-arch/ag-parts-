@@ -14,6 +14,11 @@ export function SupplierCard({ supplier, partNum, best, onBuy, distance }) {
           <div className="s1">
             {supplier.s}
             {supplier.oem && <span className="oem-tag">OEM</span>}
+            {supplier.cond && supplier.cond !== "New" && (
+              <span style={{ marginLeft: "6px", fontSize: "10px", fontWeight: 700, color: "var(--star)", border: "1px solid var(--star)", borderRadius: "999px", padding: "1px 6px" }}>
+                {supplier.cond}
+              </span>
+            )}
           </div>
           <div className="rate">
             <span className="stars">{stars(supplier.rating)}</span> {supplier.rating} ({supplier.n})

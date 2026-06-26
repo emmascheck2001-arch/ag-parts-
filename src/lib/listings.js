@@ -58,6 +58,7 @@ export function listingParts() {
       n: 1,
       days: Number(l.days) || 2,
       stock: Number(l.stock) || 1,
+      cond: l.cond || "New",
     });
     for (const m of l.machines || []) {
       if (!part.fitment.find((f) => f.machine === m)) {

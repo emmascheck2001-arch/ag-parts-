@@ -1,10 +1,10 @@
 import { useState, useRef } from "react";
-import { CATS, RECENT } from "../data/demo";
+import { CATS } from "../data/demo";
 import { UIIcon, CatIcon } from "../components/icons";
 import { getMachines } from "../lib/catalog";
 import { getFleet } from "../lib/fleet";
 
-export function Home({ onSelect, onSearch, onNav }) {
+export function Home({ onSelect, onSearch, onNav, recent = [], onClearRecent }) {
   const [search, setSearch] = useState("");
   const inputRef = useRef(null);
 
@@ -36,7 +36,7 @@ export function Home({ onSelect, onSearch, onNav }) {
               <div className="brand">Ez<span>Parts</span></div>
               <div className="brand-sub">Search every supplier. Find the right part.</div>
             </div>
-            <button className="icon-btn" aria-label="Notifications">
+            <button className="icon-btn" aria-label="Orders" onClick={() => onNav("orders")}>
               <UIIcon.bell width="22" height="22" />
             </button>
           </div>
@@ -110,20 +110,24 @@ export function Home({ onSelect, onSearch, onNav }) {
             </div>
           </button>
 
-          {/* Recent Searches */}
-          <div className="section-head">
-            <h3>Recent Searches</h3>
-            <button className="link" onClick={() => onSearch("")}>Clear all</button>
-          </div>
-          <div className="recent-list">
-            {RECENT.map((item, i) => (
-              <button key={i} className="recent-row" onClick={() => onSearch(item)}>
-                <UIIcon.clock width="18" height="18" className="recent-clock" />
-                <span className="recent-text">{item}</span>
-                <UIIcon.chevron width="18" height="18" className="recent-chev" />
-              </button>
-            ))}
-          </div>
+          {/* Recent Searches — real, persisted searches; hidden when empty */}
+          {recent.length > 0 && (
+            <>
+              <div className="section-head">
+                <h3>Recent Searches</h3>
+                <button className="link" onClick={() => onClearRecent && onClearRecent()}>Clear all</button>
+              </div>
+              <div className="recent-list">
+                {recent.map((item, i) => (
+                  <button key={i} className="recent-row" onClick={() => onSearch(item)}>
+                    <UIIcon.clock width="18" height="18" className="recent-clock" />
+                    <span className="recent-text">{item}</span>
+                    <UIIcon.chevron width="18" height="18" className="recent-chev" />
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -18,12 +18,6 @@ function fromDb(o) {
   };
 }
 
-// A couple of seeded orders so the dashboard demonstrates the experience even
-// before any live orders exist this session.
-const SEED = [
-  { orderId: "ORD-10231", partName: "Hydraulic Pump", fulfillment: "ship", total: 414, platformFee: 31.12, dealerPayout: 382.88, customer: "J. Miller", status: "new" },
-  { orderId: "ORD-10228", partName: "Air Filter", fulfillment: "pickup", total: 45.75, platformFee: 3.66, dealerPayout: 42.09, customer: "S. Boe", status: "ready" },
-];
 
 // Normalize a live session order into the dashboard shape.
 function fromOrder(o) {
@@ -47,8 +41,7 @@ const LABEL = { new: "New", shipped: "Shipped", ready: "Ready for pickup", deliv
 const ACTION = { new: { ship: "Mark shipped", pickup: "Mark ready" }, shipped: { ship: "Mark delivered" }, ready: { pickup: "Mark picked up" } };
 
 export function DealerDashboard({ orders = [], onBack }) {
-  const initial = [...orders.map(fromOrder), ...SEED];
-  const [rows, setRows] = useState(initial);
+  const [rows, setRows] = useState(orders.map(fromOrder));
 
   // Pull real persisted orders from the DB (survives refresh; cross-session).
   useEffect(() => {
@@ -57,7 +50,7 @@ export function DealerDashboard({ orders = [], onBack }) {
       if (!live || !dbOrders.length) return;
       const seen = new Set();
       const merged = [];
-      for (const r of [...dbOrders.map(fromDb), ...orders.map(fromOrder), ...SEED]) {
+      for (const r of [...dbOrders.map(fromDb), ...orders.map(fromOrder)]) {
         if (seen.has(r.orderId)) continue;
         seen.add(r.orderId); merged.push(r);
       }
@@ -110,6 +103,15 @@ export function DealerDashboard({ orders = [], onBack }) {
 
           {/* Orders */}
           <h3 style={{ fontSize: "13px", fontWeight: 700, marginBottom: "10px" }}>Incoming orders</h3>
+          {rows.length === 0 && (
+            <div className="card" style={{ textAlign: "center", padding: "28px 16px", color: "var(--text-muted)" }}>
+              <div style={{ fontSize: "32px", marginBottom: "8px" }}>📭</div>
+              <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text)" }}>No orders yet</div>
+              <div style={{ fontSize: "11.5px", marginTop: "4px", lineHeight: 1.4 }}>
+                When a farmer buys a part you've listed, it shows up here — with your payout after the EzParts fee.
+              </div>
+            </div>
+          )}
           {rows.map((r) => {
             const action = ACTION[r.status]?.[r.fulfillment];
             const done = isDone(r);

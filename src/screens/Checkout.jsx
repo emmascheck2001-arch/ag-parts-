@@ -22,7 +22,19 @@ const input = {
   fontSize: "12px",
 };
 
-export function Checkout({ cart, onBack, onConfirm }) {
+const qtyBtn = {
+  width: "24px",
+  height: "24px",
+  borderRadius: "6px",
+  border: "1px solid var(--border)",
+  background: "var(--surface)",
+  color: "var(--text)",
+  fontSize: "15px",
+  lineHeight: 1,
+  cursor: "pointer",
+};
+
+export function Checkout({ cart, onBack, onConfirm, onQty }) {
   const [fulfillment, setFulfillment] = useState("ship"); // 'ship' | 'pickup'
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -39,7 +51,7 @@ export function Checkout({ cart, onBack, onConfirm }) {
     ? calculateDistance(USER_LOCATION.lat, USER_LOCATION.lng, loc.lat, loc.lng)
     : null;
 
-  const partSubtotal = cart.reduce((sum, item) => sum + (item.supplier?.price ?? 0), 0);
+  const partSubtotal = cart.reduce((sum, item) => sum + (item.supplier?.price ?? 0) * (item.qty || 1), 0);
   const shipCost = dealer?.ship ?? 0;
   const shipDays = dealer?.days ?? 2;
   const m = orderMath({ partSubtotal, shipping: shipCost, fulfillment });
@@ -173,12 +185,25 @@ export function Checkout({ cart, onBack, onConfirm }) {
           {/* Order summary */}
           <div className="card" style={{ margin: "16px 0" }}>
             <h3 style={{ fontSize: "13px", fontWeight: 700, marginBottom: "12px" }}>Order Summary</h3>
-            {cart.map((item, i) => (
-              <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", marginBottom: "8px" }}>
-                <span>{item.partName || "Part"} ×1</span>
-                <span style={{ fontWeight: 600 }}>{money(item.supplier?.price ?? 0)}</span>
-              </div>
-            ))}
+            {cart.map((item, i) => {
+              const qty = item.qty || 1;
+              const lineTotal = (item.supplier?.price ?? 0) * qty;
+              return (
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "12px", marginBottom: "8px", gap: "8px" }}>
+                  <span style={{ flex: 1, minWidth: 0 }}>{item.partName || "Part"}</span>
+                  {onQty ? (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+                      <button onClick={() => onQty(i, qty - 1)} aria-label="Decrease quantity" style={qtyBtn}>−</button>
+                      <span style={{ minWidth: "16px", textAlign: "center", fontWeight: 600 }}>{qty}</span>
+                      <button onClick={() => onQty(i, qty + 1)} aria-label="Increase quantity" style={qtyBtn}>+</button>
+                    </span>
+                  ) : (
+                    <span>×{qty}</span>
+                  )}
+                  <span style={{ fontWeight: 600, minWidth: "56px", textAlign: "right" }}>{money(lineTotal)}</span>
+                </div>
+              );
+            })}
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "var(--text-muted)", marginTop: "4px" }}>
               <span>{fulfillment === "pickup" ? "Pickup" : "Shipping"}</span>
               <span>{fulfillment === "pickup" ? "FREE" : money(m.shipping)}</span>
