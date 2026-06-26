@@ -114,13 +114,15 @@ export function machineParts(machineName) {
   return out;
 }
 
-// A machine's service/maintenance kit = its filters grouped (oil/fuel/air/hyd),
-// so a farmer can one-click order a whole service interval instead of hunting
-// each filter. Returns the filter parts for the machine.
+// A machine's service/maintenance kit = its routine wear/consumable parts
+// (filters, belts, fluids, blades), so a farmer can one-click order a whole
+// service interval instead of hunting each part. Grouped by category, then name.
+const SERVICE_CATEGORIES = ["Filters", "Belts", "Fluids", "Blades"];
 export function serviceKit(machineName) {
+  const order = Object.fromEntries(SERVICE_CATEGORIES.map((c, i) => [c, i]));
   return machineParts(machineName)
-    .filter((p) => p.cat === "Filters")
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .filter((p) => SERVICE_CATEGORIES.includes(p.cat))
+    .sort((a, b) => (order[a.cat] - order[b.cat]) || a.name.localeCompare(b.name));
 }
 
 // Every part that fits a given machine (seed + dealer-listed), with the "how".

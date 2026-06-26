@@ -7,6 +7,7 @@ import { MachineDetails } from './screens/MachineDetails'
 import { Machines } from './screens/Machines'
 import { PickMachine } from './screens/PickMachine'
 import { Checkout } from './screens/Checkout'
+import { Cart } from './screens/Cart'
 import { OrderTracking } from './screens/OrderTracking'
 import { Scan } from './screens/Scan'
 import { HowItWorks } from './screens/HowItWorks'
@@ -152,7 +153,7 @@ export default function App() {
       }
       return [...base, { ...item, qty: item.qty || 1, partName: item.partName || 'Part' }]
     })
-    if (!item.silent) setScreen('checkout') // silent = add to cart without jumping to checkout
+    if (!item.silent) setScreen('cart') // review the cart first; silent = add without navigating
   }
 
   const updateCartQty = (index, qty) => {
@@ -243,9 +244,19 @@ export default function App() {
       {screen === 'checkout' && (
         <Checkout
           cart={cart}
-          onBack={handleHome}
+          onBack={() => setScreen('cart')}
           onConfirm={handleCheckout}
           onQty={updateCartQty}
+        />
+      )}
+
+      {screen === 'cart' && (
+        <Cart
+          cart={cart}
+          onQty={updateCartQty}
+          onCheckout={() => setScreen('checkout')}
+          onBack={handleHome}
+          onContinue={handleHome}
         />
       )}
 
@@ -306,7 +317,14 @@ export default function App() {
 
       {/* Bottom Navigation */}
       <BottomNav
-        active={screen === 'order-tracking' ? 'orders' : screen === 'account' ? 'account' : 'home'}
+        active={
+          screen === 'order-tracking' ? 'orders'
+            : screen === 'account' ? 'account'
+            : screen === 'cart' ? 'cart'
+            : screen === 'machines-list' ? 'machines'
+            : 'home'
+        }
+        cartCount={cart.reduce((s, it) => s + (it.qty || 1), 0)}
         onNav={handleNavigation}
       />
     </div>

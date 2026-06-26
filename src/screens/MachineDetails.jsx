@@ -173,9 +173,9 @@ export function MachineDetails({ machine, onBack, onPartSelect, onBuy }) {
               {/* Maintenance / service kit */}
               {kit.length > 0 && (
                 <div className="card" style={{ marginBottom: 20, borderColor: "var(--ag-green)" }}>
-                  <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>🧰 Service Kit ({kit.length} filters)</h3>
+                  <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>🧰 Service Kit ({kit.length} part{kit.length === 1 ? "" : "s"})</h3>
                   <div style={{ fontSize: 11.5, color: "var(--text-muted)", lineHeight: 1.5, marginBottom: 10 }}>
-                    All the filters for a service interval on this machine — order the set in one tap.
+                    Routine maintenance parts for this machine — filters, belts, fluids and blades. Order the set in one tap, from one dealer.
                   </div>
                   <div style={{ fontSize: 12, marginBottom: 10 }}>
                     {kit.map((p) => (
