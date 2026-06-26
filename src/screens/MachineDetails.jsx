@@ -84,12 +84,33 @@ export function MachineDetails({ machine, onBack, onPartSelect, onBuy }) {
   }, [allParts, browsing, cat, query, oem, stockOnly, supplier, sort]);
 
   const addKitToCart = () => {
-    const orderable = kit.filter((p) => p.bestSupplier);
-    orderable.forEach((p, i) => {
+    const orderable = kit.filter((p) => p.suppliers?.length);
+    if (!orderable.length) return;
+
+    // One order = one dealer, so the whole kit must come from a single dealer.
+    // Pick the dealer that can supply the MOST kit parts (tiebreak: cheapest
+    // combined price for the parts they cover).
+    const byDealer = {};
+    for (const p of orderable) {
+      for (const s of p.suppliers) {
+        const d = (byDealer[s.s] ||= { parts: {}, count: 0, total: 0 });
+        const cur = d.parts[p.pn];
+        if (!cur) { d.parts[p.pn] = s; d.count++; d.total += s.price || 0; }
+        else if ((s.price || 0) < (cur.price || 0)) { d.total += (s.price || 0) - (cur.price || 0); d.parts[p.pn] = s; }
+      }
+    }
+    const chosen = Object.values(byDealer).sort(
+      (a, b) => b.count - a.count || a.total - b.total
+    )[0];
+    if (!chosen) return;
+
+    const items = orderable.filter((p) => chosen.parts[p.pn]);
+    items.forEach((p, i) => {
+      const sup = chosen.parts[p.pn];
       onBuy?.({
-        pn: p.pn, supplier: p.bestSupplier,
-        total: (p.bestSupplier.price || 0) + (p.bestSupplier.ship || 0),
-        partName: p.name, silent: i < orderable.length - 1, // last one opens checkout with full cart
+        pn: p.pn, supplier: sup,
+        total: (sup.price || 0) + (sup.ship || 0),
+        partName: p.name, silent: i < items.length - 1, // last one opens checkout with full cart
       });
     });
   };
