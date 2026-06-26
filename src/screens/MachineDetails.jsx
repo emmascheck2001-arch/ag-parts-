@@ -4,7 +4,7 @@ import { PartCard } from "../components/PartCard";
 import { resolveExactParts, hasSerialBreaks } from "../data/demo";
 import { machineParts, serviceKit, getMachines } from "../lib/catalog";
 import { CATEGORIES } from "../lib/categories";
-import { inFleet, toggleFleet } from "../lib/fleet";
+import { inFleet, toggleFleet, getHours, setHours, serviceStatus, SERVICE_INTERVAL } from "../lib/fleet";
 import { UIIcon, CatIcon } from "../components/icons";
 
 const money = (n) => "$" + (Number.isInteger(n) ? n : n.toFixed(2));
@@ -33,6 +33,11 @@ export function MachineDetails({ machine, onBack, onPartSelect, onBuy }) {
   const [serial, setSerial] = useState("");
   const [result, setResult] = useState(null);
   const runSerial = () => setResult(resolveExactParts(machine, serial));
+
+  // Engine-hours maintenance reminder (recurring demand).
+  const [hours, setHoursState] = useState(getHours(machine) ?? "");
+  const svc = serviceStatus(hours);
+  const saveHours = (v) => { setHoursState(v); setHours(machine, v === "" ? null : Number(v)); };
 
   // Reset the render cap whenever the result set changes.
   useEffect(() => { setLimit(30); }, [cat, q, sort, oem, stockOnly, supplier]);
@@ -168,6 +173,34 @@ export function MachineDetails({ machine, onBack, onPartSelect, onBuy }) {
                     </button>
                   );
                 })}
+              </div>
+
+              {/* Engine-hours maintenance reminder */}
+              <div className="card" style={{ marginBottom: 16, borderColor: svc?.due ? "var(--star)" : "var(--border)", background: svc?.due ? "rgba(245,180,40,0.10)" : "var(--surface)" }}>
+                <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>🛠️ Maintenance tracker</h3>
+                <div style={{ fontSize: 11.5, color: "var(--text-muted)", lineHeight: 1.5, marginBottom: 10 }}>
+                  Enter your engine hours and we'll tell you when service is due (every {SERVICE_INTERVAL} hrs) — and have the kit ready.
+                </div>
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <input
+                    type="number" min="0" inputMode="numeric" value={hours}
+                    onChange={(e) => saveHours(e.target.value)}
+                    placeholder="Current engine hours"
+                    style={{ ...input, marginBottom: 0, flex: 1 }}
+                  />
+                </div>
+                {svc && (
+                  <div style={{ fontSize: 12.5, marginTop: 10, fontWeight: 600, color: svc.due ? "var(--star)" : "var(--ag-green)" }}>
+                    {svc.due
+                      ? (svc.until === 0 ? "⚠ Service is due now." : `⚠ Service due soon — ${svc.until} hrs to go.`)
+                      : `✓ Next service in ${svc.until} hrs.`}
+                  </div>
+                )}
+                {svc?.due && kit.length > 0 && (
+                  <button className="btn-primary" onClick={addKitToCart} style={{ width: "100%", padding: 11, marginTop: 10, fontWeight: 700 }}>
+                    Order the service kit now
+                  </button>
+                )}
               </div>
 
               {/* Maintenance / service kit */}

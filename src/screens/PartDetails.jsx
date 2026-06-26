@@ -1,8 +1,9 @@
+import { useState } from "react";
 import { TopBar } from "../components/TopBar";
 import { SupplierCard } from "../components/SupplierCard";
 import { FitGuarantee } from "../components/FitGuarantee";
 import { SUPPLIERS_MAP, calculateDistance, USER_LOCATION } from "../data/demo";
-import { getParts, getMachines } from "../lib/catalog";
+import { getParts, getMachines, serviceKit } from "../lib/catalog";
 import { rankSuppliers, lowestTotal, supplierDistance } from "../lib/ranking";
 import { TIER, partTier } from "../lib/fit-confidence";
 import { diagramForPart } from "../lib/diagrams";
@@ -10,6 +11,7 @@ import { diagramForPart } from "../lib/diagrams";
 export function PartDetails({ partNum, onBack, onBuy, onViewMap, onMachineSelect }) {
   const part = getParts()[partNum];
   const machineNames = new Set(getMachines().map((m) => m.nm));
+  const [added, setAdded] = useState({}); // pn -> true, for cross-sell "Added ✓" state
 
   if (!part) {
     return (
@@ -46,6 +48,17 @@ export function PartDetails({ partNum, onBack, onBuy, onViewMap, onMachineSelect
     .map((s) => ({ ...s, distance: s.distance ?? supplierDistance(s) }))
     .filter((s) => (s.stock || 0) > 0 && s.distance != null && s.distance <= NEARBY_MILES)
     .sort((a, b) => a.distance - b.distance)[0] || null;
+
+  // "While you're at it" — other routine parts that fit the same machine, so a
+  // farmer doing one job grabs the rest of the service in the same order (AOV).
+  const relMachine = (fitment.find((f) => machineNames.has(f.machine)) || {}).machine;
+  const related = (relMachine ? serviceKit(relMachine) : [])
+    .filter((p) => p.pn !== partNum && p.bestSupplier)
+    .slice(0, 4);
+  const addRelated = (p) => {
+    onBuy({ pn: p.pn, supplier: p.bestSupplier, total: (p.bestSupplier.price || 0) + (p.bestSupplier.ship || 0), partName: p.name, silent: true });
+    setAdded((a) => ({ ...a, [p.pn]: true }));
+  };
 
   return (
     <div className="screen active">
@@ -235,6 +248,40 @@ export function PartDetails({ partNum, onBack, onBuy, onViewMap, onMachineSelect
               );
             })}
           </div>
+
+          {/* While you're at it — other service parts for the same machine */}
+          {related.length > 0 && (
+            <div className="card" style={{ marginBottom: "16px" }}>
+              <h3 style={{ fontSize: "13px", fontWeight: 700, marginBottom: "4px" }}>
+                While you're at it
+              </h3>
+              <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "10px", lineHeight: 1.4 }}>
+                Other routine parts that fit your {relMachine} — add them to this order and do the whole service at once.
+              </div>
+              {related.map((p) => (
+                <div key={p.pn} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px", padding: "8px 0", borderTop: "1px solid var(--border)" }}>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: "13px", fontWeight: 600 }}>{p.name}</div>
+                    <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>
+                      {p.pn}{p.from != null ? ` · from $${Number(p.from).toFixed(2)}` : ""}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => addRelated(p)}
+                    disabled={added[p.pn]}
+                    style={{
+                      flexShrink: 0, fontSize: "12px", fontWeight: 700, padding: "7px 12px", borderRadius: "8px", cursor: added[p.pn] ? "default" : "pointer",
+                      border: "1px solid var(--ag-green)",
+                      background: added[p.pn] ? "var(--ag-green-soft)" : "transparent",
+                      color: "var(--ag-green)",
+                    }}
+                  >
+                    {added[p.pn] ? "✓ Added" : "+ Add"}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Cross-references — equivalent aftermarket part numbers */}
           {part.cross?.length > 0 && (

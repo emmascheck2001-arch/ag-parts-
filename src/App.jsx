@@ -158,6 +158,12 @@ export default function App() {
     if (!item.silent) setScreen('cart') // review the cart first; silent = add without navigating
   }
 
+  const handleReorder = (order) => {
+    // Re-add a past order's items (one dealer per order) and open the cart.
+    ;(order.cart || []).forEach((it) => handleBuy({ ...it, silent: true }))
+    setScreen('cart')
+  }
+
   const updateCartQty = (index, qty) => {
     setCart((c) =>
       qty <= 0
@@ -263,7 +269,7 @@ export default function App() {
       )}
 
       {screen === 'order-tracking' && (
-        <OrderTracking orders={orders} onBack={handleHome} />
+        <OrderTracking orders={orders} onBack={handleHome} onReorder={handleReorder} />
       )}
 
       {screen === 'scan' && (

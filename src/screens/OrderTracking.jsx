@@ -2,7 +2,7 @@ import { TopBar } from "../components/TopBar";
 
 const money = (n) => "$" + (Number.isInteger(n) ? n : n.toFixed(2));
 
-export function OrderTracking({ orders, onBack }) {
+export function OrderTracking({ orders, onBack, onReorder }) {
   return (
     <div className="screen active">
       <TopBar title="Order Tracking" onBack={onBack} />
@@ -50,6 +50,18 @@ export function OrderTracking({ orders, onBack }) {
                   {order.dealer ? ` · ${order.dealer}` : ""}
                   {order.fulfillment === "pickup" && order.pickupLocation ? ` · Pickup: ${order.pickupLocation}` : ""}
                 </div>
+                {onReorder && order.cart?.length > 0 && (
+                  <button
+                    onClick={() => onReorder(order)}
+                    style={{
+                      marginTop: "10px", width: "100%", padding: "9px", borderRadius: "8px", cursor: "pointer",
+                      border: "1px solid var(--ag-green)", background: "transparent",
+                      color: "var(--ag-green)", fontSize: "12px", fontWeight: 700,
+                    }}
+                  >
+                    🔁 Reorder these parts
+                  </button>
+                )}
               </div>
             ))
           )}
