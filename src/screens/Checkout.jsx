@@ -215,6 +215,9 @@ export function Checkout({ cart, onBack, onConfirm, onQty }) {
             <div style={{ fontSize: "10.5px", color: "var(--text-muted)", marginTop: "8px", lineHeight: 1.4 }}>
               You pay {dealerName} directly. EzParts’ fee comes from the dealer — never added to your price.
             </div>
+            <div style={{ fontSize: "10.5px", color: "var(--ag-green)", fontWeight: 600, marginTop: "6px", lineHeight: 1.4 }}>
+              🛡️ OEM-verified parts are covered by the EzParts fit guarantee — if it doesn’t fit, return it free.
+            </div>
           </div>
 
           {/* Contact / address */}

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { TopBar } from "../components/TopBar";
 import { NotifyMe } from "../components/NotifyMe";
+import { FitGuarantee } from "../components/FitGuarantee";
 import { SupplierCard } from "../components/SupplierCard";
 import { getParts, partsForMachine, getMachines } from "../lib/catalog";
 import { rankSuppliers } from "../lib/ranking";
@@ -169,9 +170,12 @@ export function SearchResults({ query, machine, onBack, onChangeMachine, onPartS
                                 const fit = machine ? (part.fitment || []).filter((f) => f.machine === machine) : part.fitment;
                                 const t = TIER[partTier(fit)];
                                 return (
-                                  <div style={{ marginTop: "8px", display: "inline-flex", fontSize: "10.5px", fontWeight: 700,
-                                    padding: "3px 8px", borderRadius: "999px", color: t.color, background: t.soft }}>
-                                    {t.ok ? "✓ OEM-verified fit" : t.row === "⚠ Scan" ? "⚠ Scanned manual — verify #" : "⚠ Unverified — verify #"}
+                                  <div style={{ marginTop: "8px", display: "flex", flexWrap: "wrap", gap: "6px", alignItems: "center" }}>
+                                    <span style={{ display: "inline-flex", fontSize: "10.5px", fontWeight: 700,
+                                      padding: "3px 8px", borderRadius: "999px", color: t.color, background: t.soft }}>
+                                      {t.ok ? "✓ OEM-verified fit" : t.row === "⚠ Scan" ? "⚠ Scanned manual — verify #" : "⚠ Unverified — verify #"}
+                                    </span>
+                                    <FitGuarantee ok={t.ok} compact />
                                   </div>
                                 );
                               })()}

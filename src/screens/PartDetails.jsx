@@ -1,8 +1,9 @@
 import { TopBar } from "../components/TopBar";
 import { SupplierCard } from "../components/SupplierCard";
+import { FitGuarantee } from "../components/FitGuarantee";
 import { SUPPLIERS_MAP, calculateDistance, USER_LOCATION } from "../data/demo";
 import { getParts, getMachines } from "../lib/catalog";
-import { rankSuppliers, lowestTotal } from "../lib/ranking";
+import { rankSuppliers, lowestTotal, supplierDistance } from "../lib/ranking";
 import { TIER, partTier } from "../lib/fit-confidence";
 import { diagramForPart } from "../lib/diagrams";
 
@@ -37,6 +38,15 @@ export function PartDetails({ partNum, onBack, onBuy, onViewMap, onMachineSelect
     onBuy({ pn, supplier, total, partName: part.name });
   };
 
+  // "In stock near you today" — the harvest-clock hero. Closest in-stock dealer
+  // within driving range that can hand it over today (real distance from the
+  // device's location). Only surfaces when there genuinely is one.
+  const NEARBY_MILES = 75;
+  const nearbyPickup = sorted
+    .map((s) => ({ ...s, distance: s.distance ?? supplierDistance(s) }))
+    .filter((s) => (s.stock || 0) > 0 && s.distance != null && s.distance <= NEARBY_MILES)
+    .sort((a, b) => a.distance - b.distance)[0] || null;
+
   return (
     <div className="screen active">
       <TopBar title={part.name} onBack={onBack} right={part.ic} />
@@ -66,6 +76,26 @@ export function PartDetails({ partNum, onBack, onBuy, onViewMap, onMachineSelect
               <strong>Fits:</strong> {part.fits}
             </div>
           </div>
+
+          {/* In stock near you today — the harvest-clock hero */}
+          {nearbyPickup && (
+            <div
+              className="card"
+              onClick={onViewMap}
+              style={{ marginBottom: "16px", borderColor: "var(--ag-green)", background: "var(--ag-green-soft)", cursor: onViewMap ? "pointer" : "default" }}
+            >
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--ag-green)" }}>
+                🏁 In stock near you — pick up today
+              </div>
+              <div style={{ fontSize: "12px", color: "var(--text)", marginTop: "6px", lineHeight: 1.45 }}>
+                <strong>{nearbyPickup.s}</strong> has it in stock, {nearbyPickup.distance} mi away.
+                Skip shipping — grab it and get back to the field.
+              </div>
+            </div>
+          )}
+
+          {/* Fit guarantee — only where it's OEM-verified (our moat) */}
+          <FitGuarantee ok={overall.ok} />
 
           {/* Used On — where this part fits */}
           {fitment.length > 0 && (
