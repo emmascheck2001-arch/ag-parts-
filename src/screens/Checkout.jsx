@@ -63,6 +63,9 @@ export function Checkout({ cart, onBack, onConfirm, onQty }) {
     orderId: "ORD-" + Date.now(),
     fulfillment,
     dealer: dealerName,
+    // Real dealers carry an id (from Supabase inventory) — without it the order
+    // never reaches the dealer's dashboard or their alert email.
+    dealerId: dealer?.dealerId ?? null,
     pickupLocation: fulfillment === "pickup" ? loc?.address : null,
     email,
     phone,

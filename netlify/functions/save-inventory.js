@@ -69,13 +69,18 @@ exports.handler = async (event) => {
     // notified, then stamp notified_at so we never email twice. Best-effort.
     let notified = 0;
     try {
-      const term = pn;
+      // Match by part number, plus the part name with commas/parens stripped —
+      // those characters are PostgREST .or() delimiters and would break the query
+      // (e.g. a name like "Fan, 6 Blade").
+      const safeName = (b.name || "").replace(/[(),]/g, " ").replace(/\s+/g, " ").trim();
+      const ors = [`query.ilike.%${pn}%`];
+      if (safeName) ors.push(`query.ilike.%${safeName}%`);
       const { data: waiting } = await supabase
         .from("search_misses")
         .select("id, query, notify_email")
         .not("notify_email", "is", null)
         .is("notified_at", null)
-        .or(`query.ilike.%${term}%,query.ilike.%${b.name || term}%`);
+        .or(ors.join(","));
       for (const w of waiting || []) {
         const r = await sendEmail({
           to: w.notify_email,

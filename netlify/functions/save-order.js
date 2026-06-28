@@ -73,6 +73,14 @@ exports.handler = async (event) => {
     const o = JSON.parse(event.body || "{}");
     if (!o.orderId) return { statusCode: 400, body: JSON.stringify({ error: "orderId required" }) };
 
+    // Fallback: derive the dealer id from the cart if the client didn't send it,
+    // so the order still reaches the dealer's dashboard + alert email.
+    if (o.dealerId == null) {
+      const items = o.cart || o.items || [];
+      const withId = items.find((it) => it.supplier?.dealerId != null);
+      if (withId) o.dealerId = withId.supplier.dealerId;
+    }
+
     // New order? (so stock is only decremented once, not on re-save)
     const { data: existing } = await supabase
       .from("orders").select("id").eq("order_ref", o.orderId).maybeSingle();

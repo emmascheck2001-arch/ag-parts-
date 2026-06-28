@@ -56,7 +56,11 @@ export function PartDetails({ partNum, onBack, onBuy, onViewMap, onMachineSelect
     .filter((p) => p.pn !== partNum && p.bestSupplier)
     .slice(0, 4);
   const addRelated = (p) => {
-    onBuy({ pn: p.pn, supplier: p.bestSupplier, total: (p.bestSupplier.price || 0) + (p.bestSupplier.ship || 0), partName: p.name, silent: true });
+    // Add from the SAME dealer as the part being viewed when possible, so the
+    // one-order-one-dealer cart doesn't silently drop the cross-sell add.
+    const sameDealer = (p.suppliers || []).find((s) => s.s === sorted[0]?.s);
+    const sup = sameDealer || p.bestSupplier;
+    onBuy({ pn: p.pn, supplier: sup, total: (sup.price || 0) + (sup.ship || 0), partName: p.name, silent: true });
     setAdded((a) => ({ ...a, [p.pn]: true }));
   };
 
