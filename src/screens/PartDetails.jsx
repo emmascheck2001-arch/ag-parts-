@@ -77,6 +77,15 @@ export function PartDetails({ partNum, onBack, onBuy, onViewMap, onMachineSelect
             </div>
             <div style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "8px" }}>
               Part #: <strong>{partNum}</strong>
+              {" "}
+              <a
+                href={`https://www.google.com/search?q=${encodeURIComponent(partNum + " " + (part.brand ? part.brand + " " : "") + part.name + " part")}`}
+                target="_blank"
+                rel="noreferrer"
+                style={{ color: "var(--ag-green)", fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap" }}
+              >
+                🔎 find #{partNum} online ›
+              </a>
             </div>
             <div style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "8px" }}>
               Category: <strong>{part.cat}</strong>

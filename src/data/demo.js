@@ -14,16 +14,16 @@ export const MACHINES = [
     nm: "New Holland CR8.90", ty: "Combine", ic: "🌾", hp: "523 hp", img: "/machines/nh-cr890.jpg",
     make: "New Holland", model: "CR8.90", year: "2014–2019",
     manuals: [
-      { type: "Operator's Manual", title: "CR Series Operator's Manual", url: "https://www.newholland.com/en-us" },
-      { type: "Parts & Service", title: "New Holland Parts & Service", url: "https://www.newholland.com/en-us" },
+      { type: "Operator's Manual", title: "CR Series Operator's Manual", url: "https://www.google.com/search?q=New+Holland+CR8.90+operator+manual" },
+      { type: "Parts & Service", title: "New Holland CR8.90 Parts Lookup", url: "https://www.google.com/search?q=New+Holland+CR8.90+parts" },
     ],
   },
   {
     nm: "Case IH Magnum 340", ty: "Tractor", ic: "🚜", hp: "340 hp", img: "/machines/caseih-magnum340.jpg",
     make: "Case IH", model: "Magnum 340", year: "2014–2018",
     manuals: [
-      { type: "Operator's Manual", title: "Magnum Operator's Manual", url: "https://www.caseih.com/northamerica/en-us/service-support" },
-      { type: "Parts & Service", title: "Case IH Parts & Service", url: "https://www.caseih.com/northamerica/en-us/service-support" },
+      { type: "Operator's Manual", title: "Magnum Operator's Manual", url: "https://www.google.com/search?q=Case+IH+Magnum+340+operator+manual" },
+      { type: "Parts & Service", title: "Case IH Magnum 340 Parts Lookup", url: "https://www.google.com/search?q=Case+IH+Magnum+340+parts" },
     ],
   },
   {
