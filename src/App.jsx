@@ -12,7 +12,8 @@ import { HowItWorks } from './screens/HowItWorks'
 import { BottomNav } from './components/BottomNav'
 import { loadMachines } from './lib/db'
 import { loadDiagrams } from './lib/diagrams'
-import { getRecent, addRecent, clearRecent } from './lib/recent-searches'
+import { getRecent, addRecent } from './lib/recent-searches'
+import { getVerifiedFleet, removeVerifiedMachine, saveVerifiedMachine } from './lib/fleet'
 
 // A single token of letters/digits/dashes, length >= 4, containing at least one
 // digit (e.g. RE509672, 125138) — a part number, not a phrase.
@@ -31,6 +32,14 @@ export default function App() {
   const [selectedMachine, setSelectedMachine] = useState(null)
   const [selectedPilotModel, setSelectedPilotModel] = useState(() => {
     try { return localStorage.getItem('ezparts_active_verified_machine') || null } catch { return null }
+  })
+  const [verifiedFleet, setVerifiedFleet] = useState(() => {
+    const current = getVerifiedFleet()
+    let activeModelId = null
+    try { activeModelId = localStorage.getItem('ezparts_active_verified_machine') } catch { /* ignore */ }
+    return activeModelId && !current.some((machine) => machine.modelId === activeModelId)
+      ? saveVerifiedMachine(activeModelId)
+      : current
   })
   const [pilotInitialQuery, setPilotInitialQuery] = useState('')
   const [scanContext, setScanContext] = useState(null)
@@ -74,6 +83,7 @@ export default function App() {
     if (type === 'machines') { setSelectedMachine(value); setScreen('machine-details') }
     else if (type === 'pilot-machine') {
       setSelectedPilotModel(value)
+      setVerifiedFleet(saveVerifiedMachine(value))
       setPilotInitialQuery('')
       try { localStorage.setItem('ezparts_active_verified_machine', value) } catch { /* ignore */ }
       setScreen('pilot-catalog')
@@ -88,6 +98,7 @@ export default function App() {
   }
   const handlePilotSearch = (modelId, query) => {
     setSelectedPilotModel(modelId)
+    setVerifiedFleet(saveVerifiedMachine(modelId))
     setPilotInitialQuery(query)
     if (query && query.trim()) setRecent(addRecent(query))
     try { localStorage.setItem('ezparts_active_verified_machine', modelId) } catch { /* ignore */ }
@@ -95,6 +106,7 @@ export default function App() {
   }
   const handlePilotScan = (modelId, machineName = modelId) => {
     setSelectedPilotModel(modelId)
+    setVerifiedFleet(saveVerifiedMachine(modelId))
     setScanContext({ type: 'pilot', modelId, machineName })
     setPilotInitialQuery('')
     try { localStorage.setItem('ezparts_active_verified_machine', modelId) } catch { /* ignore */ }
@@ -105,19 +117,23 @@ export default function App() {
     setScanContext({ type: 'legacy', machineName })
     setScreen('scan')
   }
+  const handleRemovePilotMachine = (modelId) => {
+    setVerifiedFleet(removeVerifiedMachine(modelId))
+    if (selectedPilotModel === modelId) {
+      setSelectedPilotModel(null)
+      try { localStorage.removeItem('ezparts_active_verified_machine') } catch { /* ignore */ }
+    }
+  }
 
   return (
     <div className="phone">
       <div style={{ display: screen === 'home' ? 'flex' : 'none', flexDirection: 'column', flex: 1, minHeight: 0, paddingBottom: '74px' }}>
         <Home
           onSelect={handleSelect}
-          onSearch={handleSearch}
           onNav={handleNavigation}
-          recent={recent}
-          onClearRecent={() => setRecent(clearRecent())}
           activePilotModel={selectedPilotModel}
-          onPilotSearch={handlePilotSearch}
-          onPilotScan={handlePilotScan}
+          verifiedFleet={verifiedFleet}
+          onRemovePilotMachine={handleRemovePilotMachine}
         />
       </div>
 

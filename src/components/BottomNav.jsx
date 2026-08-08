@@ -17,8 +17,8 @@ const NavIcon = {
 export function BottomNav({ active, onNav, cartCount = 0 }) {
   // Search-engine only — no cart/orders/account (dealer/marketplace) tabs.
   const tabs = [
-    { id: "home", label: "Find" },
-    { id: "machines", label: "Machines" },
+    { id: "home", label: "My Machines" },
+    { id: "machines", label: "Add Machine" },
     { id: "help", label: "Help" },
   ];
 

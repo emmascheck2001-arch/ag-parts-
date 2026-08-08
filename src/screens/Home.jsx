@@ -1,21 +1,20 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { UIIcon } from "../components/icons";
 import { loadPilotCatalog } from "../lib/pilot-catalog";
 
+const PAGE_SIZE = 40;
 
 export function Home({
   onSelect,
-  onSearch,
   onNav,
-  recent = [],
-  onClearRecent,
   activePilotModel,
-  onPilotSearch,
-  onPilotScan,
+  verifiedFleet = [],
+  onRemovePilotMachine,
 }) {
   const [pilotCatalog, setPilotCatalog] = useState(null);
   const [search, setSearch] = useState("");
-  const inputRef = useRef(null);
+  const [machineType, setMachineType] = useState("all");
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   useEffect(() => {
     let live = true;
@@ -23,130 +22,141 @@ export function Home({
     return () => { live = false; };
   }, []);
 
-  const machines = pilotCatalog?.machines || [];
-  const activeMachine = useMemo(
-    () => machines.find((machine) => machine.id === activePilotModel) || null,
-    [machines, activePilotModel],
+  const savedMachines = useMemo(() => {
+    if (!pilotCatalog) return [];
+    const machinesById = new Map(pilotCatalog.machines.map((machine) => [machine.id, machine]));
+    return verifiedFleet
+      .map((saved) => ({ ...saved, machine: machinesById.get(saved.modelId) }))
+      .filter((saved) => saved.machine)
+      .sort((a, b) => {
+        if (a.modelId === activePilotModel) return -1;
+        if (b.modelId === activePilotModel) return 1;
+        return String(b.lastUsedAt || "").localeCompare(String(a.lastUsedAt || ""));
+      });
+  }, [activePilotModel, pilotCatalog, verifiedFleet]);
+
+  const machineTypes = useMemo(
+    () => [...new Set(savedMachines.map((saved) => saved.machine.machineType))].sort(),
+    [savedMachines],
   );
 
-  const submitSearch = () => {
-    const value = search.trim();
-    if (!value) {
-      inputRef.current?.focus();
-      return;
-    }
-    if (activeMachine) onPilotSearch(activeMachine.id, value);
-    else onSearch(value);
-  };
+  const filteredMachines = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return savedMachines.filter((saved) => {
+      const matchesType = machineType === "all" || saved.machine.machineType === machineType;
+      const text = `${saved.nickname} ${saved.location} ${saved.machine.displayName} ${saved.machine.manufacturer} ${saved.machine.machineType}`.toLowerCase();
+      return matchesType && (!query || text.includes(query));
+    });
+  }, [machineType, savedMachines, search]);
+
+  useEffect(() => setVisibleCount(PAGE_SIZE), [machineType, search]);
 
   return (
-    <div className="screen active fast-home">
+    <div className="screen active fleet-home">
       <div className="scroll">
-        <main className="home fast-home__inner">
-          <header className="home-head fast-home__head">
+        <main className="home fleet-home__inner">
+          <header className="home-head fleet-home__head">
             <div>
               <div className="brand">Ez<span>Parts</span></div>
-              <div className="brand-sub">Pick your machine. Find the exact part.</div>
+              <div className="brand-sub">Your equipment. The correct part.</div>
             </div>
-            <span className="fast-home__verified">Verified catalogs</span>
+            <button className="fleet-add" onClick={() => onNav("machines")}>
+              <span aria-hidden="true">＋</span> Add machine
+            </button>
           </header>
 
-          {activeMachine ? (
-            <section className="fast-machine-hero" aria-label="Selected machine">
-              <div className="fast-step"><span>1</span> Your machine</div>
-              <div className="fast-machine-hero__title">
-                <div className="fast-machine-icon"><UIIcon.tractor width="30" height="30" /></div>
-                <div>
-                  <h1>{activeMachine.displayName}</h1>
-                  <p>{activeMachine.machineType} · {activeMachine.partCount.toLocaleString()} verified parts</p>
-                </div>
-                <button onClick={() => document.getElementById("verified-machine-picker")?.scrollIntoView({ behavior: "smooth" })}>Change</button>
-              </div>
-
-              <div className="fast-step fast-step--second"><span>2</span> What part do you need?</div>
-              <div className="fast-part-search">
-                <UIIcon.search width="20" height="20" />
-                <input
-                  ref={inputRef}
-                  type="search"
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                  onKeyDown={(event) => event.key === "Enter" && submitSearch()}
-                  placeholder="Part name or OEM number"
-                  aria-label={`Search ${activeMachine.displayName}`}
-                />
-                <button onClick={submitSearch}>Find</button>
-              </div>
-              <div className="fast-actions">
-                <button className="fast-action fast-action--primary" onClick={() => onPilotScan(activeMachine.id, activeMachine.displayName)}>
-                  <UIIcon.camera width="23" height="23" />
-                  <span><strong>Use a picture</strong><small>Photograph the part or tag</small></span>
-                </button>
-                <button className="fast-action" onClick={() => onSelect("pilot-machine", activeMachine.id)}>
-                  <UIIcon.grid width="23" height="23" />
-                  <span><strong>Browse assemblies</strong><small>Manual diagrams and parts</small></span>
-                </button>
-              </div>
-            </section>
-          ) : (
-            <section className="fast-welcome">
-              <span className="fast-welcome__eyebrow">Start here</span>
-              <h1>Which machine are you working on?</h1>
-              <p>Choose it once. Every search and picture will stay scoped to that machine.</p>
-            </section>
-          )}
-
-          <section id="verified-machine-picker" className="fast-picker">
-            <div className="section-head">
-              <div>
-                <span className="fast-section-label">{activeMachine ? "Change machine" : "Step 1"}</span>
-                <h2>{activeMachine ? "Verified machine bank" : "Pick a verified machine"}</h2>
-              </div>
+          <section className="fleet-title">
+            <span className="pilot-kicker">Farm equipment</span>
+            <div>
+              <h1>My Machines</h1>
+              <strong>{savedMachines.length.toLocaleString()}</strong>
             </div>
-            <div className="fast-machine-list">
-              {machines.map((machine) => {
-                const selected = machine.id === activeMachine?.id;
-                return (
-                  <button
-                    key={machine.id}
-                    className={`fast-machine-row${selected ? " selected" : ""}`}
-                    onClick={() => onSelect("pilot-machine", machine.id)}
-                  >
-                    <span className="fast-machine-row__icon"><UIIcon.tractor width="24" height="24" /></span>
-                    <span className="fast-machine-row__main">
-                      <strong>{machine.displayName}</strong>
-                      <small>{machine.machineType} · {machine.assemblyCount} assemblies</small>
-                    </span>
-                    <span className="fast-machine-row__count">{machine.partCount.toLocaleString()}<small>parts</small></span>
-                    <span className="pilot-arrow">›</span>
-                  </button>
-                );
-              })}
-              {!pilotCatalog && <div className="fast-loading">Loading verified machines…</div>}
-            </div>
-            <button className="fast-all-machines" onClick={() => onNav("machines")}>
-              <span>Need another machine?</span><strong>Open the full machine bank ›</strong>
-            </button>
+            <p>Choose the exact machine first. Every part search, picture, and assembly stays inside that machine.</p>
           </section>
 
-          {recent.length > 0 && activeMachine && (
-            <section className="fast-recents">
-              <div className="section-head">
-                <h3>Recent searches</h3>
-                <button className="link" onClick={() => onClearRecent?.()}>Clear</button>
-              </div>
-              <div className="recent-list">
-                {recent.slice(0, 4).map((item) => (
-                  <button key={item} className="recent-row" onClick={() => onPilotSearch(activeMachine.id, item)}>
-                    <UIIcon.clock width="18" height="18" className="recent-clock" />
-                    <span className="recent-text">{item}</span>
-                    <UIIcon.chevron width="18" height="18" className="recent-chev" />
-                  </button>
-                ))}
-              </div>
-            </section>
-          )}
+          {savedMachines.length > 0 ? (
+            <>
+              <section className="fleet-tools" aria-label="Filter your machines">
+                <label className="fleet-search">
+                  <UIIcon.search width="19" height="19" />
+                  <span className="sr-only">Search your machines</span>
+                  <input
+                    type="search"
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                    placeholder="Search model, type, nickname, or location"
+                  />
+                  {search && <button onClick={() => setSearch("")} aria-label="Clear machine search">×</button>}
+                </label>
+                {machineTypes.length > 1 && (
+                  <label className="fleet-type-filter">
+                    <span className="sr-only">Filter by machine type</span>
+                    <select value={machineType} onChange={(event) => setMachineType(event.target.value)}>
+                      <option value="all">All machine types</option>
+                      {machineTypes.map((type) => <option key={type} value={type}>{type}</option>)}
+                    </select>
+                  </label>
+                )}
+              </section>
 
+              <div className="fleet-result-head" aria-live="polite">
+                <span>{filteredMachines.length.toLocaleString()} machine{filteredMachines.length === 1 ? "" : "s"}</span>
+                <small>Recently used first</small>
+              </div>
+
+              <section className="fleet-machine-list" aria-label="Your saved machines">
+                {filteredMachines.slice(0, visibleCount).map((saved) => {
+                  const machine = saved.machine;
+                  const isRecent = machine.id === activePilotModel;
+                  return (
+                    <article key={machine.id} className="fleet-machine-row">
+                      <button className="fleet-machine-row__open" onClick={() => onSelect("pilot-machine", machine.id)}>
+                        <span className="fast-machine-row__icon"><UIIcon.tractor width="24" height="24" /></span>
+                        <span className="fleet-machine-row__main">
+                          <span className="fleet-machine-row__name">
+                            <strong>{saved.nickname || machine.displayName}</strong>
+                            {isRecent && <em>Recent</em>}
+                          </span>
+                          {saved.nickname && <small>{machine.displayName}</small>}
+                          <small>{machine.machineType}{saved.location ? ` · ${saved.location}` : ""}</small>
+                          <span>{machine.partCount.toLocaleString()} verified parts · {machine.assemblyCount} assemblies</span>
+                        </span>
+                        <span className="pilot-arrow" aria-hidden="true">›</span>
+                      </button>
+                      <button
+                        className="fleet-machine-row__remove"
+                        onClick={() => onRemovePilotMachine(machine.id)}
+                        aria-label={`Remove ${machine.displayName} from My Machines`}
+                        title="Remove from My Machines"
+                      >×</button>
+                    </article>
+                  );
+                })}
+              </section>
+
+              {filteredMachines.length === 0 && (
+                <div className="fleet-empty fleet-empty--search">
+                  <strong>No saved machines match that search.</strong>
+                  <button onClick={() => { setSearch(""); setMachineType("all"); }}>Clear filters</button>
+                </div>
+              )}
+
+              {filteredMachines.length > visibleCount && (
+                <button className="fleet-show-more" onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}>
+                  Show {Math.min(PAGE_SIZE, filteredMachines.length - visibleCount)} more machines
+                </button>
+              )}
+            </>
+          ) : pilotCatalog ? (
+            <section className="fleet-empty">
+              <span className="fleet-empty__icon"><UIIcon.tractor width="34" height="34" /></span>
+              <h2>Add your first machine</h2>
+              <p>Your saved equipment will appear here. EZPARTS will ask you to choose one before searching for a part.</p>
+              <button onClick={() => onNav("machines")}>＋ Add a machine</button>
+            </section>
+          ) : (
+            <div className="fast-loading">Loading your machines…</div>
+          )}
         </main>
       </div>
     </div>

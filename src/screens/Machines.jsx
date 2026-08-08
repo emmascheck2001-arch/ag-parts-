@@ -26,7 +26,7 @@ export function Machines({ onBack, onSelect }) {
 
   return (
     <div className="screen active">
-      <TopBar title="All Machines" onBack={onBack} />
+      <TopBar title="Add a Machine" onBack={onBack} />
       <div className="scroll">
         <div className="home" style={{ paddingTop: 12 }}>
           <div className="searchbar">
@@ -39,13 +39,13 @@ export function Machines({ onBack, onSelect }) {
           </div>
 
           <div className="section-head">
-            <h3>Verified pilot catalogs</h3>
+            <h3>Verified machines</h3>
           </div>
 
           <div className="pilot-machine-grid">
             {pilots.map((machine) => (
               <button key={machine.id} className="pilot-machine-card" onClick={() => onSelect("pilot-machine", machine.id)}>
-                <span className="pilot-machine-check">✓ Source verified</span>
+                <span className="pilot-machine-check">＋ Add to My Machines</span>
                 <strong>{machine.displayName}</strong>
                 <small>{machine.machineType}</small>
                 <span>{machine.partCount.toLocaleString()} unique parts · {machine.assemblyCount} assemblies</span>

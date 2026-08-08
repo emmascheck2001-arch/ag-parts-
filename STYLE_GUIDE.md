@@ -75,6 +75,25 @@ Rules:
 
 ## 5. Navigation hierarchy
 
+The farmer-facing entry flow is:
+
+```text
+My Machines
+→ selected machine workspace
+→ search by name/part number, use a picture, or browse assemblies
+→ verified part and source diagram
+```
+
+`My Machines` is the home dashboard, not the global machine catalog. It must
+remain searchable and incrementally rendered for farms with hundreds of saved
+machines. Recently used equipment appears first. Adding a machine is a separate
+action. The focused search/photo/assembly controls appear only after the farmer
+selects a machine, and changing machines returns to the dashboard.
+
+Saved-machine identity must use the stable model or owned-equipment ID whenever
+available. A display name alone is insufficient when a farmer owns multiple
+units of the same model or when variants and serial ranges differ.
+
 The target catalog navigation is:
 
 ```text

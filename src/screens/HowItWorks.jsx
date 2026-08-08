@@ -5,8 +5,8 @@ import { UIIcon } from "../components/icons";
 const steps = [
   {
     number: "1",
-    title: "Pick your machine",
-    description: "Every search stays inside that machine so unrelated parts do not get mixed in.",
+    title: "Choose from My Machines",
+    description: "Save your farm equipment once, then pick the exact unit before every part search.",
     icon: UIIcon.tractor,
   },
   {
@@ -30,8 +30,8 @@ export function HowItWorks({ onBack }) {
       <div className="scroll">
         <div className="help-fast">
           <span className="pilot-kicker">Fewest clicks possible</span>
-          <h2>Machine → part → answer</h2>
-          <p className="help-fast__intro">The catalog hierarchy stays organized behind the screen. You only make the decisions needed to reach the correct part.</p>
+          <h2>My Machines → part → answer</h2>
+          <p className="help-fast__intro">Your home screen holds your equipment. After you choose a machine, the catalog hierarchy stays organized behind the screen and every result remains machine-specific.</p>
 
           <div className="help-fast__steps">
             {steps.map((step) => {

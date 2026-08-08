@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { TopBar } from "../components/TopBar";
+import { UIIcon } from "../components/icons";
 import { expandPilotQuery, loadPilotCatalog } from "../lib/pilot-catalog";
 
 const Arrow = () => <span className="pilot-arrow">›</span>;
@@ -16,7 +17,10 @@ export function PilotCatalog({ modelId, initialQuery = "", onBack, onScan }) {
   const [assemblyId, setAssemblyId] = useState(null);
   const [partId, setPartId] = useState(null);
   const [query, setQuery] = useState("");
+  const [searchRequest, setSearchRequest] = useState("");
+  const [showAssemblies, setShowAssemblies] = useState(false);
   const [limit, setLimit] = useState(80);
+  const searchInputRef = useRef(null);
 
   useEffect(() => {
     let live = true;
@@ -28,6 +32,8 @@ export function PilotCatalog({ modelId, initialQuery = "", onBack, onScan }) {
 
   useEffect(() => {
     setQuery(initialQuery || "");
+    setSearchRequest(initialQuery || "");
+    setShowAssemblies(false);
     setPartId(null);
     setAssemblyId(null);
     setSubsystemId(null);
@@ -67,7 +73,7 @@ export function PilotCatalog({ modelId, initialQuery = "", onBack, onScan }) {
   const currentAssembly = view.assemblies.get(assemblyId);
   const currentPart = index.parts.get(partId);
   const currentNumber = index.numbersByPart.get(partId);
-  const terms = expandPilotQuery(query);
+  const terms = expandPilotQuery(searchRequest);
 
   const resetBelow = (level) => {
     if (level === "machine") setSystemId(null);
@@ -75,6 +81,8 @@ export function PilotCatalog({ modelId, initialQuery = "", onBack, onScan }) {
     if (["machine", "system", "subsystem"].includes(level)) setAssemblyId(null);
     setPartId(null);
     setQuery("");
+    setSearchRequest("");
+    setShowAssemblies(true);
   };
 
   const openPart = (assemblyValue, occurrence) => {
@@ -83,6 +91,7 @@ export function PilotCatalog({ modelId, initialQuery = "", onBack, onScan }) {
     setAssemblyId(assemblyValue.assembly.id);
     setPartId(occurrence.partId);
     setQuery("");
+    setSearchRequest("");
   };
 
   const openAssembly = (assemblyValue) => {
@@ -91,6 +100,21 @@ export function PilotCatalog({ modelId, initialQuery = "", onBack, onScan }) {
     setAssemblyId(assemblyValue.assembly.id);
     setPartId(null);
     setQuery("");
+    setSearchRequest("");
+  };
+
+  const submitSearch = () => {
+    const value = query.trim();
+    if (!value) {
+      searchInputRef.current?.focus();
+      return;
+    }
+    setSearchRequest(value);
+    setShowAssemblies(false);
+    setPartId(null);
+    setAssemblyId(null);
+    setSubsystemId(null);
+    setSystemId(null);
   };
 
   const groupedParts = (assemblyValue) => {
@@ -121,6 +145,7 @@ export function PilotCatalog({ modelId, initialQuery = "", onBack, onScan }) {
       setAssemblyId(null);
       setSubsystemId(null);
       setSystemId(null);
+      setShowAssemblies(true);
       return;
     }
     onBack();
@@ -131,6 +156,8 @@ export function PilotCatalog({ modelId, initialQuery = "", onBack, onScan }) {
   if (currentSubsystem) title = currentSubsystem.name;
   if (currentAssembly) title = currentAssembly.assembly.name;
   if (currentPart) title = currentNumber.number;
+
+  const isMachineLanding = !partId && !currentAssembly && !searchRequest && !showAssemblies;
 
   return (
     <div className="screen active pilot-catalog">
@@ -145,15 +172,34 @@ export function PilotCatalog({ modelId, initialQuery = "", onBack, onScan }) {
             {currentSubsystem && <><span>›</span><button onClick={() => resetBelow("machine")}>{currentSubsystem.name}</button></>}
           </div>
 
-          {!partId && (
+          {isMachineLanding ? (
+            <MachineWorkspace
+              machine={view.machine}
+              query={query}
+              searchInputRef={searchInputRef}
+              onQuery={setQuery}
+              onSearch={submitSearch}
+              onScan={() => onScan(view.machine.displayName)}
+              onBrowse={() => { setQuery(""); setSearchRequest(""); setShowAssemblies(true); }}
+              onChangeMachine={onBack}
+            />
+          ) : !partId && (
             <div className="pilot-findbar">
               <div className="pilot-search">
-                <span>⌕</span>
-                <input value={query} onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Part name or OEM number" aria-label={`Search ${view.machine.displayName}`} autoFocus={Boolean(initialQuery)} />
-                {query && <button onClick={() => setQuery("")}>Clear</button>}
+                <UIIcon.search width="20" height="20" />
+                <input
+                  ref={searchInputRef}
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  onKeyDown={(event) => event.key === "Enter" && submitSearch()}
+                  placeholder="Part name or OEM number"
+                  aria-label={`Search ${view.machine.displayName}`}
+                  autoFocus={Boolean(initialQuery)}
+                />
+                {query && <button onClick={() => { setQuery(""); setSearchRequest(""); }}>Clear</button>}
               </div>
-              <button className="pilot-scan" onClick={() => onScan(view.machine.displayName)}><span>⌾</span><strong>Use a picture</strong></button>
+              <button className="pilot-find-button" onClick={submitSearch}>Find</button>
+              <button className="pilot-scan" onClick={() => onScan(view.machine.displayName)}><UIIcon.camera width="20" height="20" /><strong>Picture</strong></button>
             </div>
           )}
 
@@ -176,13 +222,52 @@ export function PilotCatalog({ modelId, initialQuery = "", onBack, onScan }) {
           ) : currentAssembly ? (
             <AssemblyView index={index} assemblyValue={currentAssembly} groups={groupedParts(currentAssembly)} limit={limit}
               onMore={() => setLimit((value) => value + 80)} onPart={(occurrence) => openPart(currentAssembly, occurrence)} />
-          ) : (
+          ) : showAssemblies ? (
             <FastMachineBrowse view={view} groupedParts={groupedParts} onAssembly={openAssembly} />
-          )}
+          ) : null}
         </div>
       </div>
     </div>
   );
+}
+
+function MachineWorkspace({ machine, query, searchInputRef, onQuery, onSearch, onScan, onBrowse, onChangeMachine }) {
+  return <section className="fast-machine-hero pilot-machine-workspace" aria-label={`${machine.displayName} part finder`}>
+    <div className="fast-step"><span>1</span> Your machine</div>
+    <div className="fast-machine-hero__title">
+      <div className="fast-machine-icon"><UIIcon.tractor width="30" height="30" /></div>
+      <div>
+        <h1>{machine.displayName}</h1>
+        <p>{machine.machineType} · {machine.partCount.toLocaleString()} verified parts</p>
+      </div>
+      <button onClick={onChangeMachine}>Change</button>
+    </div>
+
+    <div className="fast-step fast-step--second"><span>2</span> What part do you need?</div>
+    <div className="fast-part-search">
+      <UIIcon.search width="20" height="20" />
+      <input
+        ref={searchInputRef}
+        type="search"
+        value={query}
+        onChange={(event) => onQuery(event.target.value)}
+        onKeyDown={(event) => event.key === "Enter" && onSearch()}
+        placeholder="Part name or OEM number"
+        aria-label={`Search ${machine.displayName}`}
+      />
+      <button onClick={onSearch}>Find</button>
+    </div>
+    <div className="fast-actions">
+      <button className="fast-action fast-action--primary" onClick={onScan}>
+        <UIIcon.camera width="23" height="23" />
+        <span><strong>Use a picture</strong><small>Photograph the part or tag</small></span>
+      </button>
+      <button className="fast-action" onClick={onBrowse}>
+        <UIIcon.grid width="23" height="23" />
+        <span><strong>Browse assemblies</strong><small>Manual diagrams and parts</small></span>
+      </button>
+    </div>
+  </section>;
 }
 
 function FastMachineBrowse({ view, groupedParts, onAssembly }) {

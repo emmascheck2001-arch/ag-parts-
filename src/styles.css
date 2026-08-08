@@ -573,6 +573,96 @@ button:active {
 .fast-loading { padding: 24px; color: var(--text-muted); text-align: center; font-size: 12px; }
 .fast-recents { margin-top: 19px; }
 
+/* My Machines is the dashboard. The focused part finder opens after selection. */
+.fleet-home__inner { padding-top: 18px; }
+.fleet-home__head { align-items: center; margin-bottom: 23px; }
+.fleet-add {
+  min-height: 42px;
+  padding: 0 12px;
+  color: #061006;
+  background: var(--ag-green);
+  border: 0;
+  border-radius: 11px;
+  font-size: 11px;
+  font-weight: 850;
+}
+.fleet-add span { font-size: 16px; vertical-align: -1px; }
+.fleet-title { margin-bottom: 18px; }
+.fleet-title > div { display: flex; align-items: center; gap: 9px; margin-top: 5px; }
+.fleet-title h1 { font-size: 29px; line-height: 1.05; letter-spacing: -.025em; }
+.fleet-title > div strong {
+  min-width: 27px;
+  padding: 4px 7px;
+  color: var(--ag-green);
+  text-align: center;
+  background: var(--ag-green-soft);
+  border-radius: 999px;
+  font-size: 11px;
+}
+.fleet-title p { max-width: 480px; color: var(--text-muted); font-size: 11.5px; line-height: 1.5; margin-top: 9px; }
+.fleet-tools { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; margin-bottom: 12px; }
+.fleet-search {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 48px;
+  padding: 0 12px;
+  color: var(--ag-green);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.fleet-search:focus-within { border-color: var(--ag-green); box-shadow: 0 0 0 3px rgba(36, 179, 63, .08); }
+.fleet-search input { flex: 1; min-width: 0; color: var(--text); background: none; border: 0; outline: 0; font-size: 12px; }
+.fleet-search input::placeholder { color: #737d77; }
+.fleet-search button { width: 32px; height: 32px; color: var(--text-muted); background: none; border: 0; font-size: 18px; }
+.fleet-type-filter select {
+  height: 48px;
+  max-width: 142px;
+  padding: 0 28px 0 10px;
+  color: var(--text);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 10px;
+}
+.fleet-result-head { display: flex; justify-content: space-between; align-items: center; padding: 0 2px 8px; }
+.fleet-result-head span { color: var(--text); font-size: 11px; font-weight: 750; }
+.fleet-result-head small { color: var(--text-muted); font-size: 9px; }
+.fleet-machine-list { overflow: hidden; background: var(--card); border: 1px solid var(--border); border-radius: 15px; }
+.fleet-machine-row { display: grid; grid-template-columns: minmax(0, 1fr) 42px; border-bottom: 1px solid var(--border); }
+.fleet-machine-row:last-child { border-bottom: 0; }
+.fleet-machine-row__open {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 82px;
+  padding: 11px 8px 11px 12px;
+  color: var(--text);
+  text-align: left;
+  background: transparent;
+  border: 0;
+}
+.fleet-machine-row__open:active { background: var(--ag-green-soft); }
+.fleet-machine-row__main { min-width: 0; }
+.fleet-machine-row__name { display: flex; align-items: center; gap: 7px; }
+.fleet-machine-row__name strong { overflow: hidden; font-size: 13px; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
+.fleet-machine-row__name em { padding: 3px 5px; color: var(--ag-green); background: var(--ag-green-soft); border-radius: 5px; font-size: 7px; font-style: normal; font-weight: 850; letter-spacing: .04em; text-transform: uppercase; }
+.fleet-machine-row__main small, .fleet-machine-row__main > span:last-child { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fleet-machine-row__main small { color: var(--text-muted); font-size: 9.5px; line-height: 1.35; margin-top: 3px; }
+.fleet-machine-row__main > span:last-child { color: #bcc4bf; font-size: 8.5px; margin-top: 5px; }
+.fleet-machine-row__remove { align-self: stretch; min-width: 42px; color: #69736d; background: transparent; border: 0; border-left: 1px solid var(--border); font-size: 18px; }
+.fleet-machine-row__remove:active { color: var(--danger); background: rgba(214, 69, 69, .08); }
+.fleet-show-more { width: 100%; min-height: 46px; margin-top: 10px; color: var(--ag-green); background: var(--card); border: 1px solid var(--border); border-radius: 11px; font-size: 11px; font-weight: 750; }
+.fleet-empty { display: grid; justify-items: center; padding: 34px 24px; text-align: center; background: linear-gradient(145deg, var(--ag-green-soft), var(--card) 60%); border: 1px solid rgba(36, 179, 63, .35); border-radius: 16px; }
+.fleet-empty__icon { display: grid; place-items: center; width: 62px; height: 62px; margin-bottom: 14px; color: var(--ag-green); background: rgba(36, 179, 63, .12); border: 1px solid rgba(36, 179, 63, .3); border-radius: 17px; }
+.fleet-empty h2, .fleet-empty strong { font-size: 16px; }
+.fleet-empty p { max-width: 330px; color: var(--text-muted); font-size: 11px; line-height: 1.5; margin-top: 7px; }
+.fleet-empty button { min-height: 44px; padding: 0 15px; margin-top: 17px; color: #061006; background: var(--ag-green); border: 0; border-radius: 11px; font-size: 11px; font-weight: 850; }
+.fleet-empty--search { padding: 27px 20px; margin-top: 10px; }
+.fleet-empty--search button { color: var(--ag-green); background: transparent; border: 1px solid var(--ag-green); }
+
 .scan-machine-context {
   display: grid;
   gap: 3px;
@@ -852,15 +942,17 @@ button:active {
 .pilot-breadcrumbs::-webkit-scrollbar { display: none; }
 .pilot-breadcrumbs button { border: 0; background: none; color: var(--ag-green); font-size: 11px; font-weight: 700; padding: 3px 0; }
 .pilot-breadcrumbs span { color: #56605b; }
-.pilot-findbar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; margin-bottom: 18px; }
+.pilot-findbar { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 7px; margin-bottom: 18px; }
 .pilot-search { display: flex; align-items: center; gap: 9px; min-height: 50px; padding: 0 12px; margin-bottom: 0; background: var(--card); border: 1px solid var(--border); border-radius: 12px; }
 .pilot-search > span { color: var(--ag-green); font-size: 22px; }
 .pilot-search:focus-within { border-color: var(--ag-green); box-shadow: 0 0 0 3px rgba(36, 179, 63, .08); }
 .pilot-search input { flex: 1; min-width: 0; border: 0; outline: 0; color: var(--text); background: transparent; font-size: 14px; }
 .pilot-search button { border: 0; color: var(--ag-green); background: none; font-size: 11px; font-weight: 700; }
-.pilot-scan { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 76px; padding: 6px 9px; color: var(--ag-green); background: var(--ag-green-soft); border: 1px solid rgba(36, 179, 63, .4); border-radius: 12px; }
+.pilot-find-button { min-width: 55px; padding: 0 12px; color: #061006; background: var(--ag-green); border: 0; border-radius: 12px; font-size: 11px; font-weight: 850; }
+.pilot-scan { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 61px; padding: 6px 8px; color: var(--ag-green); background: var(--ag-green-soft); border: 1px solid rgba(36, 179, 63, .4); border-radius: 12px; }
 .pilot-scan span { font-size: 19px; line-height: 1; }
 .pilot-scan strong { color: var(--text); font-size: 9px; margin-top: 4px; white-space: nowrap; }
+.pilot-machine-workspace { margin: 3px 0 0; }
 .pilot-heading { display: flex; justify-content: space-between; gap: 14px; margin: 6px 2px 14px; }
 .pilot-heading h2, .pilot-part-detail h2 { color: var(--text); font-size: clamp(19px, 5vw, 25px); line-height: 1.15; margin-top: 3px; }
 .pilot-heading p { max-width: 560px; color: var(--text-muted); font-size: 12px; line-height: 1.5; margin-top: 7px; }
