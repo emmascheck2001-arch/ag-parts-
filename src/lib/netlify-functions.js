@@ -8,7 +8,8 @@ const DEFAULT_FUNCTIONS_ORIGIN = "https://ezparts.netlify.app";
 export function netlifyFunctionUrl(functionName) {
   const path = `/.netlify/functions/${encodeURIComponent(functionName)}`;
   if (typeof window === "undefined") return path;
-  if (!Capacitor.isNativePlatform()) return path;
+  const localPreview = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
+  if (!Capacitor.isNativePlatform() && !localPreview) return path;
 
   const configuredOrigin = String(import.meta.env.VITE_FUNCTIONS_ORIGIN || DEFAULT_FUNCTIONS_ORIGIN)
     .replace(/\/+$/, "");

@@ -13,11 +13,16 @@ const ALLOWED_ORIGINS = new Set([
   "http://localhost:3000",
   "https://ezparts.netlify.app",
 ]);
+const LOCAL_PREVIEW_ORIGIN = /^http:\/\/(?:localhost|127\.0\.0\.1)(?::\d+)?$/;
 
-function response(statusCode, body, requestOrigin) {
-  const origin = ALLOWED_ORIGINS.has(requestOrigin)
+function allowedOrigin(requestOrigin) {
+  return ALLOWED_ORIGINS.has(requestOrigin) || LOCAL_PREVIEW_ORIGIN.test(requestOrigin)
     ? requestOrigin
     : "https://ezparts.netlify.app";
+}
+
+function response(statusCode, body, requestOrigin) {
+  const origin = allowedOrigin(requestOrigin);
   return {
     statusCode,
     headers: {
