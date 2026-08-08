@@ -5,7 +5,7 @@ import { netlifyFunctionUrl } from "../lib/netlify-functions";
 // Snap (or upload) a photo of a part or its tag/label. Claude vision reads the
 // part number off it, then we drop the farmer straight into search results.
 // Uses the same extract-fitment function the dealer catalog importer uses.
-export function Scan({ onBack, onDetected }) {
+export function Scan({ machineName, onBack, onDetected }) {
   const [file, setFile] = useState(null); // { data, mediaType, name, preview }
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
@@ -36,7 +36,7 @@ export function Scan({ onBack, onDetected }) {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "HTTP " + res.status);
       if (json.configured === false) {
-        setError("Photo recognition isn't switched on yet. Type the part number on the home screen instead.");
+        setError("Photo recognition isn't switched on yet. Type the part number in the selected machine search instead.");
         return;
       }
       const candidates = json.candidates || [];
@@ -57,9 +57,14 @@ export function Scan({ onBack, onDetected }) {
 
   return (
     <div className="screen active">
-      <TopBar title="Scan Part" onBack={onBack} />
+      <TopBar title="Find Part from Photo" onBack={onBack} />
       <div className="scroll">
         <div style={{ padding: "16px" }}>
+          <div className="scan-machine-context">
+            <span>Machine selected</span>
+            <strong>{machineName}</strong>
+            <small>Photo results stay limited to parts for this machine.</small>
+          </div>
           <div className="card" style={{ marginBottom: "14px", textAlign: "center" }}>
             <div style={{ fontSize: "44px", marginBottom: "8px" }}>📷</div>
             <h3 style={{ fontSize: "15px", fontWeight: 700, marginBottom: "6px" }}>
@@ -67,7 +72,7 @@ export function Scan({ onBack, onDetected }) {
             </h3>
             <p style={{ fontSize: "12.5px", color: "var(--text-muted)", lineHeight: 1.5, marginBottom: "12px" }}>
               Take a clear photo of the part number stamped on the part or its label.
-              We'll read it and find who has it in stock.
+              We'll read it and search the selected machine's verified catalog.
             </p>
 
             {/* capture="environment" opens the rear camera on phones; on desktop
@@ -112,7 +117,7 @@ export function Scan({ onBack, onDetected }) {
           <div style={{ fontSize: "11.5px", color: "var(--text-muted)", lineHeight: 1.5, padding: "0 4px" }}>
             💡 <strong>Tip:</strong> the part number is usually stamped on the part or printed on a
             sticker — letters and digits like <span style={{ fontFamily: "monospace" }}>RE509672</span>.
-            You can also type it on the home screen.
+            You can also type it in the selected machine search.
           </div>
         </div>
       </div>

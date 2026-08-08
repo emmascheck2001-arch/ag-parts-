@@ -16,7 +16,7 @@ const input = {
 
 // Machine → the parts that fit it. Search engine only: browse/search parts,
 // see fitment, open the part. No sellers, prices, or ordering.
-export function MachineDetails({ machine, onBack, onPartSelect }) {
+export function MachineDetails({ machine, onBack, onScan, onPartSelect }) {
   const machineData = machineByName(machine);
   const manuals = machineData?.manuals || [];
   const [allParts, setAllParts] = useState([]);
@@ -110,6 +110,13 @@ export function MachineDetails({ machine, onBack, onPartSelect }) {
                   style={{ flex: 1, padding: 11, fontSize: 13, fontWeight: 700, background: fleet ? "var(--surface)" : undefined, color: fleet ? "var(--ag-green)" : undefined, border: fleet ? "1px solid var(--ag-green)" : "none" }}
                 >
                   {fleet ? "★ In My Machines" : "☆ Add to My Machines"}
+                </button>
+                <button
+                  onClick={onScan}
+                  className="btn-primary"
+                  style={{ flex: 1, padding: 11, fontSize: 13, fontWeight: 700 }}
+                >
+                  <UIIcon.camera width="17" height="17" /> Use a picture
                 </button>
               </div>
 

@@ -8,7 +8,7 @@ function countLabel(count, noun) {
   return `${count.toLocaleString()} ${noun}${count === 1 ? "" : "s"}`;
 }
 
-export function PilotCatalog({ modelId, onBack }) {
+export function PilotCatalog({ modelId, initialQuery = "", onBack, onScan }) {
   const [index, setIndex] = useState(null);
   const [error, setError] = useState("");
   const [systemId, setSystemId] = useState(null);
@@ -25,6 +25,14 @@ export function PilotCatalog({ modelId, onBack }) {
   }, []);
 
   useEffect(() => setLimit(80), [assemblyId, query]);
+
+  useEffect(() => {
+    setQuery(initialQuery || "");
+    setPartId(null);
+    setAssemblyId(null);
+    setSubsystemId(null);
+    setSystemId(null);
+  }, [initialQuery, modelId]);
 
   const view = useMemo(() => {
     if (!index) return null;
@@ -77,6 +85,14 @@ export function PilotCatalog({ modelId, onBack }) {
     setQuery("");
   };
 
+  const openAssembly = (assemblyValue) => {
+    setSystemId(assemblyValue.system.id);
+    setSubsystemId(assemblyValue.subsystem.id);
+    setAssemblyId(assemblyValue.assembly.id);
+    setPartId(null);
+    setQuery("");
+  };
+
   const groupedParts = (assemblyValue) => {
     const grouped = new Map();
     for (const occurrence of assemblyValue.occurrences) {
@@ -101,9 +117,12 @@ export function PilotCatalog({ modelId, onBack }) {
 
   const machineBack = () => {
     if (partId) return setPartId(null);
-    if (assemblyId) { setAssemblyId(null); return; }
-    if (subsystemId) { setSubsystemId(null); return; }
-    if (systemId) { setSystemId(null); return; }
+    if (assemblyId || subsystemId || systemId) {
+      setAssemblyId(null);
+      setSubsystemId(null);
+      setSystemId(null);
+      return;
+    }
     onBack();
   };
 
@@ -122,16 +141,19 @@ export function PilotCatalog({ modelId, onBack }) {
             <button onClick={() => resetBelow("machine")}>{view.machine.manufacturer}</button><span>›</span>
             <button onClick={() => resetBelow("machine")}>{view.machine.machineType}</button><span>›</span>
             <button onClick={() => resetBelow("machine")}>{view.machine.modelCode}</button>
-            {currentSystem && <><span>›</span><button onClick={() => resetBelow("system")}>{currentSystem.name}</button></>}
-            {currentSubsystem && <><span>›</span><button onClick={() => resetBelow("subsystem")}>{currentSubsystem.name}</button></>}
+            {currentSystem && <><span>›</span><button onClick={() => resetBelow("machine")}>{currentSystem.name}</button></>}
+            {currentSubsystem && <><span>›</span><button onClick={() => resetBelow("machine")}>{currentSubsystem.name}</button></>}
           </div>
 
           {!partId && (
-            <div className="pilot-search">
-              <span>⌕</span>
-              <input value={query} onChange={(event) => setQuery(event.target.value)}
-                placeholder={`Search ${view.machine.modelCode} parts or OEM number`} />
-              {query && <button onClick={() => setQuery("")}>Clear</button>}
+            <div className="pilot-findbar">
+              <div className="pilot-search">
+                <span>⌕</span>
+                <input value={query} onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Part name or OEM number" aria-label={`Search ${view.machine.displayName}`} autoFocus={Boolean(initialQuery)} />
+                {query && <button onClick={() => setQuery("")}>Clear</button>}
+              </div>
+              <button className="pilot-scan" onClick={() => onScan(view.machine.displayName)}><span>⌾</span><strong>Use a picture</strong></button>
             </div>
           )}
 
@@ -154,20 +176,8 @@ export function PilotCatalog({ modelId, onBack }) {
           ) : currentAssembly ? (
             <AssemblyView index={index} assemblyValue={currentAssembly} groups={groupedParts(currentAssembly)} limit={limit}
               onMore={() => setLimit((value) => value + 80)} onPart={(occurrence) => openPart(currentAssembly, occurrence)} />
-          ) : currentSubsystem ? (
-            <BrowseList kicker={currentSystem.name} title={currentSubsystem.name} items={currentSystem.assemblies.filter((value) => value.subsystem.id === subsystemId)
-              .sort((a, b) => a.assembly.name.localeCompare(b.assembly.name))}
-              render={(value) => ({ title: value.assembly.name, meta: `${countLabel(new Set(value.occurrences.map((item) => item.partId)).size, "part")} · source page ${value.sections[0].pageNumber}` })}
-              onSelect={(value) => setAssemblyId(value.assembly.id)} />
-          ) : currentSystem ? (
-            <BrowseList kicker="Major system" title="Choose a subsystem" items={[...new Map(currentSystem.assemblies.map((value) => [value.subsystem.id, value.subsystem])).values()].sort((a, b) => a.name.localeCompare(b.name))}
-              render={(subsystem) => { const values = currentSystem.assemblies.filter((value) => value.subsystem.id === subsystem.id); return { title: subsystem.name, meta: countLabel(values.length, "assembly") }; }}
-              onSelect={(subsystem) => setSubsystemId(subsystem.id)} />
           ) : (
-            <BrowseList kicker="Verified parts manual" title="Choose a major system" items={view.systems}
-              intro={`${view.machine.partCount.toLocaleString()} unique OEM parts placed in ${view.machine.assemblyCount} source-backed assemblies.`}
-              render={(system) => ({ title: system.name, meta: countLabel(system.assemblies.length, "assembly") })}
-              onSelect={(system) => setSystemId(system.id)} />
+            <FastMachineBrowse view={view} groupedParts={groupedParts} onAssembly={openAssembly} />
           )}
         </div>
       </div>
@@ -175,11 +185,36 @@ export function PilotCatalog({ modelId, onBack }) {
   );
 }
 
-function BrowseList({ kicker, title, intro, items, render, onSelect }) {
-  return <section><div className="pilot-heading"><div><span className="pilot-kicker">{kicker}</span><h2>{title}</h2>{intro && <p>{intro}</p>}</div></div>
-    <div className="pilot-list">{items.map((item) => { const row = render(item); return <button key={item.id || item.assembly?.id} className="pilot-row" onClick={() => onSelect(item)}>
-      <span className="pilot-row-main"><strong>{row.title}</strong><small>{row.meta}</small></span><Arrow />
-    </button>; })}</div></section>;
+function FastMachineBrowse({ view, groupedParts, onAssembly }) {
+  return <section className="pilot-fast-browse">
+    <div className="pilot-machine-summary">
+      <span className="pilot-kicker">Machine selected</span>
+      <h2>{view.machine.displayName}</h2>
+      <p>{view.machine.partCount.toLocaleString()} verified OEM parts · {view.machine.assemblyCount} illustrated assemblies</p>
+      <div><span>1</span> Search above or tap the exact assembly below.</div>
+    </div>
+    <div className="pilot-heading pilot-heading--browse"><div><span className="pilot-kicker">Manual browse</span><h2>Assemblies by system</h2><p>Subsystems are shown for context—no extra screen required.</p></div></div>
+    <div className="pilot-system-groups">
+      {view.systems.map((system) => (
+        <section key={system.id} className="pilot-system-group">
+          <header><div><span>Major system</span><h3>{system.name}</h3></div><strong>{countLabel(system.assemblies.length, "assembly")}</strong></header>
+          <div className="pilot-list">
+            {[...system.assemblies]
+              .sort((a, b) => a.assembly.name.localeCompare(b.assembly.name))
+              .map((assemblyValue) => (
+                <button key={assemblyValue.assembly.id} className="pilot-row" onClick={() => onAssembly(assemblyValue)}>
+                  <span className="pilot-row-main">
+                    <strong>{assemblyValue.assembly.name}</strong>
+                    <small>{assemblyValue.subsystem.name} · {countLabel(groupedParts(assemblyValue).length, "part")} · page {assemblyValue.sections[0].pageNumber}</small>
+                  </span>
+                  <Arrow />
+                </button>
+              ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  </section>;
 }
 
 function AssemblyView({ index, assemblyValue, groups, limit, onMore, onPart }) {
@@ -208,7 +243,11 @@ function PartView({ index, view, assemblyValue, part, number, onBack }) {
   return <section className="pilot-part-detail">
     <button className="pilot-inline-back" onClick={onBack}>‹ Back to {assemblyValue.assembly.name}</button>
     <span className="pilot-kicker">Verified individual part</span><h2>{part.canonicalName}</h2>
-    <div className="pilot-number"><small>OEM part number</small><strong>{number.number}</strong></div>
+    <div className="pilot-part-answer">
+      <div className="pilot-number"><small>OEM part number</small><strong>{number.number}</strong></div>
+      <div className="pilot-answer-callout"><small>Diagram callout</small><strong>{[...new Set(occurrences.map((item) => item.illustrationReference).filter(Boolean))].join(", ") || "Listed"}</strong></div>
+    </div>
+    {assemblyValue.sections[0]?.diagramUrl && <div className="pilot-diagram pilot-diagram--answer"><img src={assemblyValue.sections[0].diagramUrl} alt={`${part.canonicalName} source catalog diagram`} /><span>Exact source diagram · manual page {assemblyValue.sections[0].diagramPageNumber}</span></div>}
     <div className="pilot-proof"><span>✓</span><div><strong>Source verified</strong><small>Placed from the pinned manufacturer catalog—not inferred from a text category.</small></div></div>
     <dl className="pilot-facts">
       <div><dt>Machine</dt><dd>{view.machine.displayName}</dd></div>
@@ -220,6 +259,5 @@ function PartView({ index, view, assemblyValue, part, number, onBack }) {
     </dl>
     {aliases.length > 0 && <div className="pilot-note"><strong>Also described as</strong>{aliases.slice(0, 4).join(" · ")}</div>}
     <div className="pilot-note"><strong>Verified pilot fitment</strong>{[...new Set(allFitments)].join(" · ")}</div>
-    {assemblyValue.sections[0]?.diagramUrl && <div className="pilot-diagram"><img src={assemblyValue.sections[0].diagramUrl} alt="Source catalog page" /><span>Catalog diagram · source page {assemblyValue.sections[0].diagramPageNumber}</span></div>}
   </section>;
 }

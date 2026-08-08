@@ -11,14 +11,15 @@ const NavIcon = {
   machines: svg(<><circle cx="7" cy="17" r="3" /><circle cx="18" cy="17" r="2.5" /><path d="M4 17V9h6l2 5" /><path d="M10 9V6h4l2 6" /></>),
   cart: svg(<><circle cx="9" cy="20" r="1.4" /><circle cx="18" cy="20" r="1.4" /><path d="M2 3h3l2.4 12.4a1.6 1.6 0 0 0 1.6 1.3h8.2a1.6 1.6 0 0 0 1.6-1.3L22 7H6" /></>),
   account: svg(<><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6" /></>),
+  help: svg(<><circle cx="12" cy="12" r="9" /><path d="M9.8 9a2.4 2.4 0 1 1 3.7 2c-1 .7-1.5 1.2-1.5 2.5" /><path d="M12 17h.01" /></>),
 };
 
 export function BottomNav({ active, onNav, cartCount = 0 }) {
   // Search-engine only — no cart/orders/account (dealer/marketplace) tabs.
   const tabs = [
-    { id: "home", label: "Home" },
-    { id: "search", label: "Search" },
+    { id: "home", label: "Find" },
     { id: "machines", label: "Machines" },
+    { id: "help", label: "Help" },
   ];
 
   return (

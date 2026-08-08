@@ -29,7 +29,11 @@ export default function App() {
   const [selectedPart, setSelectedPart] = useState(null)
   const [partBackScreen, setPartBackScreen] = useState('home')
   const [selectedMachine, setSelectedMachine] = useState(null)
-  const [selectedPilotModel, setSelectedPilotModel] = useState(null)
+  const [selectedPilotModel, setSelectedPilotModel] = useState(() => {
+    try { return localStorage.getItem('ezparts_active_verified_machine') || null } catch { return null }
+  })
+  const [pilotInitialQuery, setPilotInitialQuery] = useState('')
+  const [scanContext, setScanContext] = useState(null)
   const [recent, setRecent] = useState(getRecent())
   const [, setIndexTick] = useState(0)
 
@@ -43,10 +47,14 @@ export default function App() {
   const handleNavigation = (navScreen) => {
     const map = { search: 'home', machines: 'machines-list' }
     const target = map[navScreen] || navScreen
-    const known = ['home', 'machines-list', 'categories', 'scan', 'help']
+    const known = ['home', 'machines-list', 'categories', 'help']
+    if (target === 'home') {
+      setPilotInitialQuery('')
+      setScanContext(null)
+    }
     setScreen(known.includes(target) ? target : 'home')
   }
-  const handleHome = () => setScreen('home')
+  const handleHome = () => { setPilotInitialQuery(''); setScanContext(null); setScreen('home') }
 
   const handleSearch = (query) => {
     setSearchQuery(query)
@@ -64,7 +72,12 @@ export default function App() {
   }
   const handleSelect = (type, value) => {
     if (type === 'machines') { setSelectedMachine(value); setScreen('machine-details') }
-    else if (type === 'pilot-machine') { setSelectedPilotModel(value); setScreen('pilot-catalog') }
+    else if (type === 'pilot-machine') {
+      setSelectedPilotModel(value)
+      setPilotInitialQuery('')
+      try { localStorage.setItem('ezparts_active_verified_machine', value) } catch { /* ignore */ }
+      setScreen('pilot-catalog')
+    }
     else if (type === 'category') { handleSearch(value) }
     else if (type === 'categories') { handleHome() }
   }
@@ -72,6 +85,25 @@ export default function App() {
     setSelectedPart(partNum)
     setPartBackScreen(backScreen)
     setScreen('part-details')
+  }
+  const handlePilotSearch = (modelId, query) => {
+    setSelectedPilotModel(modelId)
+    setPilotInitialQuery(query)
+    if (query && query.trim()) setRecent(addRecent(query))
+    try { localStorage.setItem('ezparts_active_verified_machine', modelId) } catch { /* ignore */ }
+    setScreen('pilot-catalog')
+  }
+  const handlePilotScan = (modelId, machineName = modelId) => {
+    setSelectedPilotModel(modelId)
+    setScanContext({ type: 'pilot', modelId, machineName })
+    setPilotInitialQuery('')
+    try { localStorage.setItem('ezparts_active_verified_machine', modelId) } catch { /* ignore */ }
+    setScreen('scan')
+  }
+  const handleMachineScan = (machineName) => {
+    setSelectedMachine(machineName)
+    setScanContext({ type: 'legacy', machineName })
+    setScreen('scan')
   }
 
   return (
@@ -83,6 +115,9 @@ export default function App() {
           onNav={handleNavigation}
           recent={recent}
           onClearRecent={() => setRecent(clearRecent())}
+          activePilotModel={selectedPilotModel}
+          onPilotSearch={handlePilotSearch}
+          onPilotScan={handlePilotScan}
         />
       </div>
 
@@ -121,16 +156,40 @@ export default function App() {
         <MachineDetails
           machine={selectedMachine}
           onBack={handleHome}
+          onScan={() => handleMachineScan(selectedMachine)}
           onPartSelect={(partNum) => handlePartSelect(partNum, 'machine-details')}
         />
       )}
 
       {screen === 'pilot-catalog' && selectedPilotModel && (
-        <PilotCatalog modelId={selectedPilotModel} onBack={() => setScreen('machines-list')} />
+        <PilotCatalog
+          modelId={selectedPilotModel}
+          initialQuery={pilotInitialQuery}
+          onBack={handleHome}
+          onScan={(machineName) => handlePilotScan(selectedPilotModel, machineName)}
+        />
       )}
 
       {screen === 'scan' && (
-        <Scan onBack={handleHome} onDetected={(pn) => { setSearchQuery(pn); setSearchMachine(null); setScreen('search-results') }} />
+        <Scan
+          machineName={scanContext?.machineName}
+          onBack={() => setScreen(scanContext?.type === 'pilot' ? 'pilot-catalog' : 'machine-details')}
+          onDetected={(pn) => {
+            if (scanContext?.type === 'pilot') {
+              setSelectedPilotModel(scanContext.modelId)
+              setPilotInitialQuery(pn)
+              setRecent(addRecent(pn))
+              setScanContext(null)
+              setScreen('pilot-catalog')
+            } else {
+              setSearchQuery(pn)
+              setSearchMachine(scanContext?.machineName || null)
+              setRecent(addRecent(pn))
+              setScanContext(null)
+              setScreen('search-results')
+            }
+          }}
+        />
       )}
 
       {screen === 'help' && (
@@ -138,7 +197,7 @@ export default function App() {
       )}
 
       <BottomNav
-        active={screen === 'machines-list' ? 'machines' : 'home'}
+        active={screen === 'machines-list' ? 'machines' : screen === 'help' ? 'help' : 'home'}
         onNav={handleNavigation}
       />
     </div>
