@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { TopBar } from "../components/TopBar";
+import { netlifyFunctionUrl } from "../lib/netlify-functions";
 
 // Snap (or upload) a photo of a part or its tag/label. Claude vision reads the
 // part number off it, then we drop the farmer straight into search results.
@@ -27,10 +28,10 @@ export function Scan({ onBack, onDetected }) {
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch("/.netlify/functions/extract-fitment", {
+      const res = await fetch(netlifyFunctionUrl("extract-fitment"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: file.data, mediaType: file.mediaType }),
+        body: JSON.stringify({ data: file.data, mediaType: file.mediaType, mode: "part-photo" }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "HTTP " + res.status);
@@ -38,14 +39,17 @@ export function Scan({ onBack, onDetected }) {
         setError("Photo recognition isn't switched on yet. Type the part number on the home screen instead.");
         return;
       }
-      const pn = (json.fitments || []).map((r) => r.part_number).find(Boolean);
+      const candidates = json.candidates || [];
+      const pn = candidates.find((candidate) => candidate.confidence === "high")?.part_number
+        || candidates.find((candidate) => candidate.confidence === "medium")?.part_number;
       if (!pn) {
-        setError("Couldn't read a part number from that photo. Try a clearer shot of the part tag, or type it in.");
+        setError("We couldn't confidently read a part number. Move closer to the stamped number, wipe away dirt if possible, and try again.");
         return;
       }
       onDetected && onDetected(pn.trim());
     } catch (e) {
-      setError(e.message || "Something went wrong reading the photo.");
+      console.error("Part photo scan failed", e);
+      setError("Photo recognition couldn't connect. Check your signal and try again.");
     } finally {
       setBusy(false);
     }
