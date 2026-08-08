@@ -9,13 +9,21 @@ const norm = (pn) => String(pn || "").toUpperCase().replace(/[\s-]/g, "");
 
 export async function loadDiagrams() {
   try {
-    const idx = await fetch("/diagrams/index.json").then((r) => r.json());
+    const idx = await fetch("/diagrams/index.json").then((r) => {
+      if (!r.ok) throw new Error(`Diagram index request failed (${r.status})`);
+      return r.json();
+    });
     MACHINE_SLUG = idx.machines || {};
     const slugs = [...new Set(Object.values(MACHINE_SLUG))];
     const loaded = {};
-    for (const slug of slugs) {
-      try { loaded[slug] = await fetch(`/diagrams/${slug}.json`).then((r) => r.json()); } catch { /* skip */ }
-    }
+    const manifests = await Promise.all(slugs.map(async (slug) => {
+      try {
+        const response = await fetch(`/diagrams/${slug}.json`);
+        if (!response.ok) return null;
+        return [slug, await response.json()];
+      } catch { return null; }
+    }));
+    manifests.filter(Boolean).forEach(([slug, manifest]) => { loaded[slug] = manifest; });
     MANIFESTS = loaded;
     return true;
   } catch { return false; }
@@ -29,27 +37,72 @@ export function diagramSlugFor(machineName) {
 // The diagram page image url for a machine + page.
 export const diagramImage = (slug, page) => `/diagrams/${slug}/p${page}.png`;
 
-// Find a part's diagram (searches all loaded manuals). Returns {slug,title,page,img} or null.
-export function diagramForPart(pn) {
-  if (!MANIFESTS) return null;
-  const n = norm(pn);
-  for (const [slug, man] of Object.entries(MANIFESTS)) {
-    const p2p = man.partToPage || {};
-    // partToPage is keyed by original part number; match on normalized form too.
-    let page = p2p[pn];
-    if (page == null) {
-      const hit = Object.keys(p2p).find((k) => norm(k) === n);
-      if (hit) page = p2p[hit];
-    }
-    if (page != null) return { slug, title: man.title, page, img: diagramImage(slug, page) };
+function pageParts(manifest) {
+  const byPage = {};
+  for (const [partNumber, page] of Object.entries(manifest?.partToPage || {})) {
+    (byPage[page] ||= []).push(partNumber);
+  }
+  return byPage;
+}
+
+function partPage(manifest, partNumber) {
+  const normalizedPartNumber = norm(partNumber);
+  for (const [candidate, page] of Object.entries(manifest?.partToPage || {})) {
+    if (norm(candidate) === normalizedPartNumber) return page;
   }
   return null;
+}
+
+// Find every manual occurrence for a part, optionally restricted to machines
+// it is already known to fit. Manufacturer scoping matters because a normalized
+// part number is not globally unique.
+export function diagramsForPart(partNumber, machineNames = []) {
+  if (!MANIFESTS) return null;
+  const allowedSlugs = new Set(
+    machineNames.map((machineName) => MACHINE_SLUG[machineName]).filter(Boolean)
+  );
+  const restrictToMachines = machineNames.length > 0;
+  const occurrences = [];
+  for (const [slug, manifest] of Object.entries(MANIFESTS)) {
+    if (restrictToMachines && !allowedSlugs.has(slug)) continue;
+    const page = partPage(manifest, partNumber);
+    if (page == null) continue;
+    const machine = Object.keys(MACHINE_SLUG).find((name) => MACHINE_SLUG[name] === slug) || "";
+    occurrences.push({
+      slug, machine, title: manifest.title, page,
+      img: diagramImage(slug, page),
+    });
+  }
+  return occurrences;
+}
+
+// Backward-compatible single occurrence lookup.
+export function diagramForPart(partNumber, machineNames = []) {
+  return diagramsForPart(partNumber, machineNames)?.[0] || null;
 }
 
 // All diagram pages for a machine (for a machine-level diagram browser).
 export function diagramPagesFor(machineName) {
   const slug = diagramSlugFor(machineName);
   if (!slug || !MANIFESTS?.[slug]) return null;
-  const man = MANIFESTS[slug];
-  return { slug, title: man.title, pages: man.pages.map((p) => ({ page: p, img: diagramImage(slug, p) })) };
+  const manifest = MANIFESTS[slug];
+  const partsByPage = pageParts(manifest);
+  return {
+    slug,
+    title: manifest.title,
+    pages: manifest.pages.map((page) => ({
+      page,
+      img: diagramImage(slug, page),
+      partNumbers: partsByPage[page] || [],
+    })),
+  };
+}
+
+// Locate a printed part number inside one machine's manual.
+export function diagramPageForMachinePart(machineName, partNumber) {
+  const slug = diagramSlugFor(machineName);
+  const manifest = slug && MANIFESTS?.[slug];
+  if (!manifest) return null;
+  const page = partPage(manifest, partNumber);
+  return page == null ? null : { slug, page, img: diagramImage(slug, page) };
 }

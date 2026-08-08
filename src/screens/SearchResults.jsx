@@ -1,79 +1,48 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { TopBar } from "../components/TopBar";
-import { NotifyMe } from "../components/NotifyMe";
-import { FitGuarantee } from "../components/FitGuarantee";
-import { SupplierCard } from "../components/SupplierCard";
-import { getParts, partsForMachine, getMachines } from "../lib/catalog";
-import { rankSuppliers } from "../lib/ranking";
+import { machines as getMachines, searchParts } from "../lib/db";
 import { TIER, partTier } from "../lib/fit-confidence";
-import { logMiss } from "../lib/index-store";
 
-export function SearchResults({ query, machine, onBack, onChangeMachine, onPartSelect, onBuy, onViewMap, onMachineSelect }) {
+export function SearchResults({ query, machine, onBack, onChangeMachine, onPartSelect, onMachineSelect }) {
   const q = (query || "").toLowerCase();
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [flagOpen, setFlagOpen] = useState(null);   // which part# has its red-flag note open
 
-  // When scoped to a machine, only show machines/parts that fit it.
-  const fitsMachine = (part) => !machine || (part.fitment || []).some((f) => f.machine === machine);
+  // Same part number used by 2+ manufacturers → collect each maker's version.
+  const byNumber = {};
+  results.forEach((p) => {
+    const key = p.pn;
+    (byNumber[key] = byNumber[key] || []).push(p);
+  });
+  const sharedMakers = (pn) => {
+    const parts = byNumber[pn] || [];
+    const makers = [...new Set(parts.flatMap((x) => x.makes && x.makes.length ? x.makes : [x.manufacturer || "?"]))];
+    return makers.length > 1 ? { makers, parts } : null;
+  };
 
-  // Machines matching the query (hidden when a machine is already chosen).
+  // Machines matching the query (from the cached machine list; hidden when scoped).
   const machineResults = machine ? [] : getMachines().filter(
     (m) => m.nm.toLowerCase().includes(q) || (m.ty || "").toLowerCase().includes(q)
   );
 
-  // Parts matching the query (number, name, fitment text, or category), scoped
-  // to the chosen machine so a farmer never sees a part that doesn't fit.
-  const results = Object.entries(getParts())
-    .filter(([pn, part]) =>
-      fitsMachine(part) && (
-        pn.toLowerCase().includes(q) ||
-        part.name.toLowerCase().includes(q) ||
-        part.fits.toLowerCase().includes(q) ||
-        (part.cat || "").toLowerCase().includes(q)
-      )
-    )
-    .map(([pn, part]) => ({ pn, ...part }));
-
-  const handleBuyClick = (pn, supplier, total) => onBuy({ pn, supplier, total });
-  const nothing = machineResults.length === 0 && results.length === 0;
-
-  // Demand signal: a search the index couldn't answer is the ingestion queue.
+  // Parts: query Supabase server-side (scales to millions), then scope to the
+  // chosen machine if one is set.
   useEffect(() => {
-    if (nothing && query) logMiss(query);
-  }, [query, nothing]);
+    let live = true;
+    setLoading(true);
+    searchParts(query, 80).then((parts) => {
+      if (!live) return;
+      const scoped = machine
+        ? parts.filter((p) => (p.fitment || []).some((f) => f.machine === machine))
+        : parts;
+      setResults(scoped);
+      setLoading(false);
+    });
+    return () => { live = false; };
+  }, [query, machine]);
 
-  // Own nothing: index dealers' listings, and point to where the rest already lives.
-  const enc = encodeURIComponent((query || "") + " tractor part");
-  const webSources = [
-    { label: "Google", url: "https://www.google.com/search?q=" + enc },
-    { label: "eBay", url: "https://www.ebay.com/sch/i.html?_nkw=" + enc },
-    { label: "Amazon", url: "https://www.amazon.com/s?k=" + enc },
-  ];
-  const externalSearch = (
-    <div className="card" style={{ marginTop: "8px", opacity: 0.9 }}>
-      <h3 style={{ fontSize: "12px", fontWeight: 700, marginBottom: "4px", color: "var(--text-muted)" }}>
-        Need it right now? Check elsewhere
-      </h3>
-      <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "10px", lineHeight: 1.4 }}>
-        While we line up a dealer, you can also look on:
-      </div>
-      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-        {webSources.map((s) => (
-          <a
-            key={s.label}
-            href={s.url}
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              flex: 1, minWidth: "90px", textAlign: "center", padding: "10px",
-              borderRadius: "8px", border: "1px solid var(--ag-green)",
-              color: "var(--ag-green)", textDecoration: "none", fontSize: "12px", fontWeight: 600,
-            }}
-          >
-            {s.label} ›
-          </a>
-        ))}
-      </div>
-    </div>
-  );
+  const nothing = !loading && machineResults.length === 0 && results.length === 0;
 
   return (
     <div className="screen active">
@@ -98,18 +67,14 @@ export function SearchResults({ query, machine, onBack, onChangeMachine, onPartS
           </div>
 
           {nothing ? (
-            <>
-              <div style={{ textAlign: "center", padding: "28px 20px 16px", color: "var(--text-muted)" }}>
-                <div style={{ fontSize: "40px", marginBottom: "12px" }}>🔍</div>
-                <div>
-                  {machine
-                    ? `No “${query}” parts found that fit ${machine} yet. Try “Change” above to search all machines — or have us notify you when it's listed.`
-                    : `No dealer has listed “${query}” yet. Be the first to know when one does.`}
-                </div>
+            <div style={{ textAlign: "center", padding: "28px 20px 16px", color: "var(--text-muted)" }}>
+              <div style={{ fontSize: "40px", marginBottom: "12px" }}>🔍</div>
+              <div>
+                {machine
+                  ? `No “${query}” parts found that fit ${machine} yet.`
+                  : `No parts found for “${query}”.`}
               </div>
-              <NotifyMe query={query} machine={machine} />
-              {externalSearch}
-            </>
+            </div>
           ) : (
             <>
               {/* Machines */}
@@ -119,7 +84,7 @@ export function SearchResults({ query, machine, onBack, onChangeMachine, onPartS
                     Machines ({machineResults.length})
                   </h3>
                   {machineResults.map((m) => {
-                    const count = partsForMachine(m.nm).length;
+                    const count = m.count;
                     return (
                       <div
                         key={m.nm}
@@ -145,55 +110,68 @@ export function SearchResults({ query, machine, onBack, onChangeMachine, onPartS
                 </div>
               )}
 
-              {/* Parts */}
+              {loading && (
+                <div style={{ textAlign: "center", padding: "24px", color: "var(--text-muted)", fontSize: 13 }}>
+                  Searching…
+                </div>
+              )}
+
+              {/* Parts — search-engine view: no sellers, no prices */}
               {results.length > 0 && (
                 <>
                   <h3 style={{ fontSize: "13px", fontWeight: 700, textTransform: "uppercase", marginBottom: "10px", color: "var(--text-muted)" }}>
                     Parts ({results.length})
                   </h3>
-                  <button
-                    onClick={onViewMap}
-                    style={{ width: "100%", padding: "10px", background: "transparent", border: "1px solid var(--ag-green)", color: "var(--ag-green)", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", marginBottom: "16px" }}
-                  >
-                    📍 View Suppliers Near Me
-                  </button>
-                  {results.map((part) => {
-                    const sorted = rankSuppliers(part.suppliers);
+                  {results.map((part, idx) => {
+                    const fit = machine ? (part.fitment || []).filter((f) => f.machine === machine) : part.fitment;
+                    const t = TIER[partTier(fit)];
+                    const shared = sharedMakers(part.pn);
+                    const mine = (part.makes && part.makes[0]) || part.manufacturer || "";
+                    const open = flagOpen === part.pn + ":" + idx;
                     return (
-                      <div key={part.pn} style={{ marginBottom: "20px" }}>
-                        <div className="card" onClick={() => onPartSelect(part.pn)} style={{ cursor: "pointer", marginBottom: "12px" }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
-                            <div>
-                              <div style={{ fontSize: "16px", fontWeight: "600" }}>{part.ic} {part.name}</div>
-                              <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "4px" }}>{part.pn}</div>
-                              {(() => {
-                                const fit = machine ? (part.fitment || []).filter((f) => f.machine === machine) : part.fitment;
-                                const t = TIER[partTier(fit)];
-                                return (
-                                  <div style={{ marginTop: "8px", display: "flex", flexWrap: "wrap", gap: "6px", alignItems: "center" }}>
-                                    <span style={{ display: "inline-flex", fontSize: "10.5px", fontWeight: 700,
-                                      padding: "3px 8px", borderRadius: "999px", color: t.color, background: t.soft }}>
-                                      {t.ok ? "✓ OEM-verified fit" : t.row === "⚠ Scan" ? "⚠ Scanned manual — verify #" : "⚠ Unverified — verify #"}
-                                    </span>
-                                    <FitGuarantee ok={t.ok} compact />
-                                  </div>
-                                );
-                              })()}
-                            </div>
+                      <div key={part.pn + ":" + idx} className="card" style={{ position: "relative", marginBottom: "12px" }}>
+                        {/* red flag — same number exists across manufacturers; tap to compare */}
+                        {shared && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setFlagOpen(open ? null : part.pn + ":" + idx); }}
+                            title="This number is used by more than one manufacturer — tap to compare"
+                            style={{ position: "absolute", top: 8, right: 8, background: "none", border: "none", cursor: "pointer", fontSize: 16, lineHeight: 1 }}
+                          >🚩</button>
+                        )}
+                        <div onClick={() => onPartSelect(part.pn)} style={{ cursor: "pointer" }}>
+                          <div style={{ fontSize: "16px", fontWeight: "600", paddingRight: shared ? 24 : 0 }}>{part.ic} {part.name}</div>
+                          <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "4px" }}>
+                            Part #: <strong>{part.pn}</strong> · {part.cat}{mine ? <> · <span style={{ color: "var(--ag-green)", fontWeight: 600 }}>{mine}</span></> : null}
+                          </div>
+                          <div style={{ marginTop: "8px" }}>
+                            <span style={{ display: "inline-flex", fontSize: "10.5px", fontWeight: 700, padding: "3px 8px", borderRadius: "999px", color: t.color, background: t.soft }}>
+                              {t.ok ? "✓ OEM-verified fit" : t.row === "⚠ Scan" ? "⚠ Scanned manual — verify #" : "⚠ Unverified — verify #"}
+                            </span>
                           </div>
                           <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "8px" }}>Fits: {part.fits}</div>
                         </div>
-                        {sorted.map((supplier, i) => (
-                          <SupplierCard key={i} supplier={supplier} partNum={part.pn} best={i === 0} onBuy={handleBuyClick} />
-                        ))}
+                        {/* the red-flag comparison note (only when the flag is tapped) */}
+                        {shared && open && (
+                          <div style={{ marginTop: 10, padding: "10px 12px", borderRadius: 8, background: "rgba(220,40,40,0.08)", border: "1px solid rgba(220,40,40,0.5)" }}>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "#d33", marginBottom: 6 }}>🚩 Part #{part.pn} is used by {shared.makers.length} manufacturers</div>
+                            <div style={{ fontSize: 11.5, color: "var(--text-muted)", marginBottom: 8, lineHeight: 1.4 }}>
+                              Same number, different parts — pick the one for your machine:
+                            </div>
+                            {shared.parts.map((sp, i) => (
+                              <div key={i} onClick={() => onPartSelect(sp.pn)} style={{ cursor: "pointer", padding: "6px 0", borderTop: i ? "1px solid var(--border)" : "none" }}>
+                                <div style={{ fontSize: 12.5, fontWeight: 600 }}>
+                                  <span style={{ color: "var(--ag-green)" }}>{(sp.makes && sp.makes[0]) || sp.manufacturer || "?"}</span> — {sp.name}
+                                </div>
+                                <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Fits: {sp.fits}</div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     );
                   })}
                 </>
               )}
-
-              {/* Always offer the web — own nothing, find anything */}
-              {externalSearch}
             </>
           )}
         </div>

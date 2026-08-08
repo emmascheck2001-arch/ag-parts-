@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { TopBar } from "../components/TopBar";
-import { getMachines, machinePartCounts } from "../lib/catalog";
+import { machinesWithParts } from "../lib/db";
 
 // After a home search, ask which machine the part is for — so results are scoped
 // to parts that actually FIT that machine (never the wrong part). "All machines"
 // is offered as an escape for cross-reference / general lookups.
 export function PickMachine({ query, onPick, onBack }) {
   const [q, setQ] = useState("");
-  const counts = machinePartCounts();
-  const all = getMachines().filter((m) => counts[m.nm] > 0);
+  const all = machinesWithParts();
   const query2 = q.trim().toLowerCase();
   const machines = query2
     ? all.filter((m) => m.nm.toLowerCase().includes(query2) || (m.ty || "").toLowerCase().includes(query2))
@@ -51,7 +50,7 @@ export function PickMachine({ query, onPick, onBack }) {
                 <span style={{ flex: 1, textAlign: "left" }}>
                   <span style={{ display: "block", fontSize: 14, fontWeight: 600 }}>{m.nm}</span>
                   <span style={{ display: "block", fontSize: 12, color: "var(--muted, #888)" }}>
-                    {m.ty} · {counts[m.nm]} part{counts[m.nm] === 1 ? "" : "s"}
+                    {m.ty} · {m.count} part{m.count === 1 ? "" : "s"}
                   </span>
                 </span>
                 <span className="recent-chev">›</span>

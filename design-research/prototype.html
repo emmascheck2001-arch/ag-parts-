@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>EzParts — Redesign Prototype (light-first)</title>
+<style>
+  :root{
+    --bg:#f7f8f6; --card:#ffffff; --ink:#0e1512; --muted:#5c6b63; --line:#dfe5e0;
+    --green:#1f9e37; --green-d:#177a2b; --green-soft:#e7f5ea;
+    --amber:#f5820a; --amber-soft:#fff1e0;
+    --fit:#1f9e37; --check:#c67a00; --nodata:#8a938d; --star:#f5a623;
+    --radius:16px; --shadow:0 1px 3px rgba(14,21,18,.08),0 8px 24px rgba(14,21,18,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+  body{background:#e9ede9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;color:var(--ink);padding:24px}
+  h1.lead{max-width:1200px;margin:0 auto 6px;font-size:20px}
+  p.sub{max-width:1200px;margin:0 auto 22px;color:#556;font-size:13px}
+  .row{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;max-width:1200px;margin:0 auto}
+  .phone{width:340px;background:var(--bg);border-radius:34px;box-shadow:var(--shadow);overflow:hidden;border:8px solid #10201a}
+  .status{height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-size:12px;font-weight:700;color:var(--ink)}
+  .screen{height:660px;overflow:hidden;display:flex;flex-direction:column}
+  .scroll{flex:1;overflow:auto;padding:0 16px 16px}
+  .caption{text-align:center;font-size:12px;color:#445;margin-top:10px;font-weight:600}
+
+  /* top bar */
+  .top{display:flex;align-items:center;justify-content:space-between;padding:8px 16px 12px}
+  .logo{font-size:22px;font-weight:800;letter-spacing:-.5px}
+  .logo b{color:var(--green)}
+  .fieldbtn{font-size:12px;font-weight:700;color:var(--muted);border:1.5px solid var(--line);border-radius:20px;padding:6px 12px;background:#fff}
+  .back{font-size:15px;font-weight:700;color:var(--ink)}
+
+  /* search */
+  .search{display:flex;gap:8px;margin:2px 0 16px}
+  .search .box{flex:1;display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:14px 14px;font-size:15px;color:var(--muted)}
+  .search .scan{background:var(--green);color:#fff;border-radius:14px;padding:0 16px;display:flex;align-items:center;font-weight:800;font-size:14px}
+
+  .sectlabel{font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;margin:6px 2px 10px;display:flex;justify-content:space-between;align-items:center}
+  .add{color:var(--green);font-weight:800}
+
+  /* garage cards */
+  .garage{display:flex;gap:12px;overflow:auto;padding-bottom:6px}
+  .mcard{min-width:150px;background:#fff;border:1.5px solid var(--line);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
+  .mcard .emoji{font-size:30px}
+  .mcard .nm{font-weight:800;font-size:16px;margin-top:8px}
+  .mcard .mod{color:var(--muted);font-size:13px}
+  .mcard .cnt{margin-top:8px;font-size:12px;font-weight:800;color:var(--green);background:var(--green-soft);display:inline-block;padding:3px 8px;border-radius:8px}
+
+  /* on-ramps */
+  .ramps{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:16px 0}
+  .ramp{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:14px 8px;text-align:center}
+  .ramp .i{font-size:22px}
+  .ramp .t{font-size:12.5px;font-weight:800;margin-top:6px}
+  .ramp .d{font-size:11px;color:var(--muted)}
+
+  .trust{display:flex;gap:6px;align-items:center;justify-content:center;background:var(--green-soft);color:var(--green-d);border-radius:12px;padding:11px;font-size:12px;font-weight:700;margin-top:6px}
+
+  /* machine header */
+  .mhead{background:#fff;border-bottom:1.5px solid var(--line);padding:12px 16px 14px}
+  .chip{display:inline-flex;gap:6px;align-items:center;background:var(--green-soft);color:var(--green-d);font-weight:800;font-size:12px;padding:5px 10px;border-radius:20px}
+  .tabs{display:flex;gap:8px;margin-top:12px}
+  .tab{flex:1;text-align:center;font-weight:800;font-size:13px;padding:9px;border-radius:11px;border:1.5px solid var(--line);color:var(--muted);background:#fff}
+  .tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  /* category rows */
+  .cat{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1.5px solid var(--line);border-radius:13px;padding:15px 14px;margin-top:10px;font-weight:800;font-size:15px}
+  .cat .n{color:var(--muted);font-weight:800}
+  .cat .chev{color:#b9c2bc;font-weight:800}
+
+  /* part card */
+  .pcard{display:flex;gap:12px;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px;margin-top:12px;box-shadow:var(--shadow)}
+  .pcard .thumb{width:64px;height:64px;border-radius:10px;background:#eef2ee;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+  .pcard .nm{font-weight:800;font-size:15px;line-height:1.25}
+  .pcard .pn{color:var(--muted);font-size:12.5px;margin-top:2px}
+  .badge{display:inline-flex;gap:5px;align-items:center;font-size:12px;font-weight:800;padding:3px 8px;border-radius:8px;margin-top:7px}
+  .b-fit{background:var(--green-soft);color:var(--green-d)}
+  .b-check{background:var(--amber-soft);color:#a15600}
+  .oem{font-size:10.5px;font-weight:800;color:var(--muted);border:1.2px solid var(--line);border-radius:6px;padding:1px 6px;margin-left:6px}
+  .price{margin-top:7px;font-weight:800;font-size:15px}
+  .price small{color:var(--muted);font-weight:700;font-size:12px}
+
+  /* part detail */
+  .hero{background:#eef2ee;height:150px;display:flex;align-items:center;justify-content:center;font-size:64px}
+  .fitbanner{display:flex;gap:8px;align-items:center;background:var(--green);color:#fff;font-weight:800;font-size:14px;padding:12px 14px}
+  .pd-name{font-size:20px;font-weight:800;margin:14px 0 2px}
+  .kv{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+  .kv .k{color:var(--muted)}
+  .kv .v{font-weight:700}
+  .seller{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;margin-top:8px}
+  .seller .best{font-size:10px;font-weight:800;color:#fff;background:var(--green);border-radius:6px;padding:2px 6px;margin-left:6px}
+  .buy{position:sticky;bottom:0;background:var(--amber);color:#fff;font-weight:800;font-size:16px;text-align:center;padding:15px;border-radius:14px;margin-top:14px;box-shadow:0 6px 18px rgba(245,130,10,.35)}
+  .guarantee{text-align:center;font-size:11.5px;color:var(--muted);margin-top:8px}
+
+  /* bottom nav */
+  .nav{display:flex;justify-content:space-around;background:#fff;border-top:1.5px solid var(--line);padding:10px 0 12px}
+  .nav div{text-align:center;font-size:10.5px;font-weight:700;color:var(--muted)}
+  .nav div.on{color:var(--green)}
+  .nav .i{font-size:18px;display:block}
+</style>
+</head>
+<body>
+<h1 class="lead">EzParts — redesign prototype · light-first + Field Mode</h1>
+<p class="sub">Real machines &amp; parts. Garage-centric, fitment-first. Open in a browser to view. (Static mockup — not the live app.)</p>
+<div class="row">
+
+  <!-- HOME -->
+  <div>
+  <div class="phone"><div class="screen">
+    <div class="status"><span>9:41</span><span>▮▮▮ 100%</span></div>
+    <div class="top"><div class="logo">Ez<b>Parts</b></div><div class="fieldbtn">☀ Field Mode</div></div>
+    <div class="scroll">
+      <div class="search"><div class="box">🔎 Part #, name, or cross-ref…</div><div class="scan">Scan</div></div>
+      <div class="sectlabel">Your machines <span class="add">+ Add</span></div>
+      <div class="garage">
+        <div class="mcard"><div class="emoji">🚜</div><div class="nm">North-field</div><div class="mod">JD 5075E</div><div class="cnt">412 parts</div></div>
+        <div class="mcard"><div class="emoji">🌾</div><div class="nm">Combine</div><div class="mod">JD S680</div><div class="cnt">110 parts</div></div>
+        <div class="mcard"><div class="emoji">🚜</div><div class="nm">Loader</div><div class="mod">Kubota L3901</div><div class="cnt">86 parts</div></div>
+      </div>
+      <div class="ramps">
+        <div class="ramp"><div class="i">📷</div><div class="t">Scan part</div><div class="d">use camera</div></div>
+        <div class="ramp"><div class="i">🚜</div><div class="t">By machine</div><div class="d">browse</div></div>
+        <div class="ramp"><div class="i">#️⃣</div><div class="t">Part no.</div><div class="d">or cross-ref</div></div>
+      </div>
+      <div class="trust">✓ Right-part guarantee · 3 dealers near you · free returns</div>
+    </div>
+    <div class="nav"><div class="on"><span class="i">⌂</span>Home</div><div><span class="i">🔎</span>Search</div><div><span class="i">🚜</span>Machines</div><div><span class="i">🧾</span>Orders</div><div><span class="i">☰</span>Account</div></div>
+  </div></div>
+  <div class="caption">1 · Home — garage is the hero</div>
+  </div>
+
+  <!-- MACHINE -->
+  <div>
+  <div class="phone"><div class="screen">
+    <div class="status"><span>9:41</span><span>▮▮▮ 100%</span></div>
+    <div class="mhead">
+      <div class="back">‹ John Deere 5075E</div>
+      <div style="margin-top:8px"><span class="chip">🔩 Serial LV5075E123 ▾</span></div>
+      <div class="tabs"><div class="tab on">Categories</div><div class="tab">Diagram</div></div>
+    </div>
+    <div class="scroll">
+      <div class="cat"><span>⚙️ Engine</span><span class="n">44 ›</span></div>
+      <div class="cat"><span>⛽ Fuel System</span><span class="n">24 ›</span></div>
+      <div class="cat"><span>🔧 Hydraulics</span><span class="n">31 ›</span></div>
+      <div class="cat"><span>🔲 Filters</span><span class="n">28 ›</span></div>
+      <div class="cat"><span>⚡ Electrical</span><span class="n">67 ›</span></div>
+      <div class="sectlabel" style="margin-top:16px">Belts (6)</div>
+      <div class="pcard">
+        <div class="thumb">➰</div>
+        <div><div class="nm">Fan Drive Belt<span class="oem">OEM</span></div>
+        <div class="pn">R216949 · John Deere</div>
+        <div class="badge b-fit">✓ Fits your 5075E</div>
+        <div class="price">$38 <small>· in stock · ships today</small></div></div>
+      </div>
+      <div class="pcard">
+        <div class="thumb">🔲</div>
+        <div><div class="nm">Engine Oil Filter<span class="oem">aftmkt</span></div>
+        <div class="pn">Baldwin B7577 · ↔ RE504836</div>
+        <div class="badge b-fit">✓ Fits your 5075E</div>
+        <div class="price">$9 <small>· 3 sellers</small></div></div>
+      </div>
+    </div>
+    <div class="nav"><div><span class="i">⌂</span>Home</div><div><span class="i">🔎</span>Search</div><div class="on"><span class="i">🚜</span>Machines</div><div><span class="i">🧾</span>Orders</div><div><span class="i">☰</span>Account</div></div>
+  </div></div>
+  <div class="caption">2 · Machine → parts (category tree + fitment)</div>
+  </div>
+
+  <!-- PART DETAIL -->
+  <div>
+  <div class="phone"><div class="screen">
+    <div class="status"><span>9:41</span><span>▮▮▮ 100%</span></div>
+    <div class="top" style="padding-bottom:8px"><div class="back">‹ Back</div><div class="fieldbtn">♡ Save</div></div>
+    <div class="scroll" style="padding-top:0">
+      <div class="hero">➰</div>
+      <div class="fitbanner">✓ Fits your John Deere 5075E</div>
+      <div class="pd-name">Fan Drive Belt</div>
+      <div class="pn" style="color:var(--muted);font-size:13px">Serpentine / fan drive · Belts</div>
+      <div style="margin-top:12px">
+        <div class="kv"><span class="k">OEM number</span><span class="v">R216949</span></div>
+        <div class="kv"><span class="k">Cross-refs</span><span class="v">R73784 · SU28900</span></div>
+        <div class="kv"><span class="k">Type</span><span class="v">OEM · aftermkt avail.</span></div>
+        <div class="kv"><span class="k">Fitment note</span><span class="v" style="max-width:150px;text-align:right">Fits 5045E–5075E (3029 engine)</span></div>
+      </div>
+      <div class="sectlabel" style="margin-top:16px">Compare sellers</div>
+      <div class="seller"><div><b>Prairie Equipment</b><span class="best">CHEAPEST</span><div class="pn">★4.8 · 12 mi · pickup today</div></div><b>$38</b></div>
+      <div class="seller"><div><b>Agri Parts Central</b><div class="pn">★4.7 · ships tomorrow</div></div><b>$41</b></div>
+      <div class="buy">Add to cart · $38</div>
+      <div class="guarantee">✓ Right-part guarantee — free return if a “Fits” part doesn’t fit</div>
+    </div>
+  </div></div>
+  <div class="caption">3 · Part detail (cross-refs + multi-seller compare)</div>
+  </div>
+
+</div>
+</body>
+</html>

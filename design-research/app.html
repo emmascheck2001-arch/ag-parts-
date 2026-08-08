@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>EzParts</title>
+<style>
+:root{--bg:#f7f8f6;--card:#fff;--ink:#0e1512;--muted:#5c6b63;--line:#dfe5e0;--green:#1f9e37;--green-d:#177a2b;--green-soft:#e7f5ea;--amber:#f5820a;--amber-soft:#fff1e0;--radius:16px;--shadow:0 1px 3px rgba(14,21,18,.08),0 8px 22px rgba(14,21,18,.06)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;color:var(--ink)}
+.app{height:100dvh;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
+.scr{flex:1;overflow:auto;display:none;padding:0 18px 16px}
+.scr.on{display:block}
+.top{display:flex;align-items:center;justify-content:space-between;padding:10px 2px 14px}
+.logo{font-size:24px;font-weight:800;letter-spacing:-.5px}.logo b{color:var(--green)}
+.pill{font-size:12.5px;font-weight:800;color:var(--muted);border:1.5px solid var(--line);border-radius:20px;padding:8px 13px;background:#fff}
+.back{font-size:16px;font-weight:800;padding:12px 2px}
+.search{display:flex;gap:8px;margin:2px 0 18px}
+.search .box{flex:1;display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:15px;font-size:15px;color:var(--muted)}
+.search .scan{background:var(--green);color:#fff;border-radius:14px;padding:0 18px;display:flex;align-items:center;font-weight:800}
+.sect{font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;margin:8px 2px 12px;display:flex;justify-content:space-between}
+.add{color:var(--green)}
+.garage{display:flex;gap:12px;overflow:auto;padding-bottom:6px}
+.mcard{min-width:158px;background:#fff;border:1.5px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.mcard .e{font-size:32px}.mcard .nm{font-weight:800;font-size:17px;margin-top:10px}.mcard .mo{color:var(--muted);font-size:13px}
+.mcard .c{margin-top:10px;font-size:12px;font-weight:800;color:var(--green);background:var(--green-soft);display:inline-block;padding:4px 9px;border-radius:8px}
+.ramps{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;margin:18px 0}
+.ramp{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:16px 8px;text-align:center}
+.ramp .i{font-size:24px}.ramp .t{font-size:13px;font-weight:800;margin-top:7px}.ramp .d{font-size:11px;color:var(--muted)}
+.trust{display:flex;gap:6px;align-items:center;justify-content:center;background:var(--green-soft);color:var(--green-d);border-radius:12px;padding:13px;font-size:12.5px;font-weight:700}
+.mhead{padding:2px 0 0}
+.chip{display:inline-flex;gap:6px;align-items:center;background:var(--green-soft);color:var(--green-d);font-weight:800;font-size:12.5px;padding:6px 11px;border-radius:20px}
+.tabs{display:flex;gap:8px;margin:14px 0}
+.tab{flex:1;text-align:center;font-weight:800;font-size:14px;padding:11px;border-radius:12px;border:1.5px solid var(--line);color:var(--muted);background:#fff}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.cat{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1.5px solid var(--line);border-radius:13px;padding:17px 15px;margin-top:11px;font-weight:800;font-size:16px}
+.cat .n{color:var(--muted)}
+.pcard{display:flex;gap:12px;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:13px;margin-top:12px;box-shadow:var(--shadow)}
+.thumb{width:64px;height:64px;border-radius:11px;background:#eef2ee;display:flex;align-items:center;justify-content:center;font-size:27px;flex-shrink:0}
+.nm{font-weight:800;font-size:16px;line-height:1.25}.pn{color:var(--muted);font-size:13px;margin-top:2px}
+.oem{font-size:10.5px;font-weight:800;color:var(--muted);border:1.2px solid var(--line);border-radius:6px;padding:1px 6px;margin-left:6px}
+.badge{display:inline-flex;gap:5px;align-items:center;font-size:12.5px;font-weight:800;padding:4px 9px;border-radius:8px;margin-top:8px;background:var(--green-soft);color:var(--green-d)}
+.price{margin-top:8px;font-weight:800;font-size:16px}.price small{color:var(--muted);font-weight:700;font-size:12.5px}
+.hint{font-size:12.5px;color:var(--muted);text-align:center;margin:4px 0 8px;font-weight:600}
+.diagram{background:#fff;border:1.5px solid var(--line);border-radius:var(--radius);padding:10px;box-shadow:var(--shadow)}
+.lbl{font:800 11px -apple-system,sans-serif;fill:var(--ink)}.count{font:800 10px -apple-system,sans-serif;fill:var(--green-d)}
+.callout{display:flex;align-items:center;justify-content:space-between;background:var(--green-soft);border:1.5px solid var(--green);border-radius:13px;padding:14px 15px;margin-top:14px}
+.callout b{font-size:17px}.callout .go{color:var(--green-d);font-weight:800}
+.hero{background:#eef2ee;height:170px;display:flex;align-items:center;justify-content:center;font-size:72px;border-radius:14px;margin-bottom:4px}
+.fitb{display:flex;gap:8px;align-items:center;background:var(--green);color:#fff;font-weight:800;font-size:15px;padding:13px 15px;border-radius:12px;margin-top:10px}
+.pdname{font-size:22px;font-weight:800;margin:14px 0 2px}
+.kv{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);font-size:15px}.kv .k{color:var(--muted)}.kv .v{font-weight:800}
+.seller{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;margin-top:9px}
+.best{font-size:10px;font-weight:800;color:#fff;background:var(--green);border-radius:6px;padding:2px 7px;margin-left:7px}
+.buy{background:var(--amber);color:#fff;font-weight:800;font-size:17px;text-align:center;padding:17px;border-radius:14px;margin-top:16px;box-shadow:0 6px 18px rgba(245,130,10,.35)}
+.gtee{text-align:center;font-size:12px;color:var(--muted);margin-top:10px}
+.nav{display:flex;justify-content:space-around;background:#fff;border-top:1.5px solid var(--line);padding:9px 0 calc(9px + env(safe-area-inset-bottom))}
+.nav div{text-align:center;font-size:10.5px;font-weight:700;color:var(--muted)}.nav div.on{color:var(--green)}.nav .i{font-size:20px;display:block}
+</style></head>
+<body>
+<div class="app">
+  <!-- HOME -->
+  <div class="scr on" id="home">
+    <div class="top"><div class="logo">Ez<b>Parts</b></div><div class="pill">☀ Field Mode</div></div>
+    <div class="search"><div class="box">🔎 Part #, name, or cross-ref…</div><div class="scan">Scan</div></div>
+    <div class="sect">Your machines <span class="add">+ Add</span></div>
+    <div class="garage">
+      <div class="mcard" onclick="go('machine')"><div class="e">🚜</div><div class="nm">North-field</div><div class="mo">JD 5075E</div><div class="c">412 parts</div></div>
+      <div class="mcard" onclick="go('machine')"><div class="e">🌾</div><div class="nm">Combine</div><div class="mo">JD S680</div><div class="c">110 parts</div></div>
+      <div class="mcard" onclick="go('machine')"><div class="e">🚜</div><div class="nm">Loader</div><div class="mo">Kubota L3901</div><div class="c">86 parts</div></div>
+    </div>
+    <div class="ramps">
+      <div class="ramp"><div class="i">📷</div><div class="t">Scan part</div><div class="d">use camera</div></div>
+      <div class="ramp" onclick="go('machine')"><div class="i">🚜</div><div class="t">By machine</div><div class="d">browse</div></div>
+      <div class="ramp"><div class="i">#️⃣</div><div class="t">Part no.</div><div class="d">or cross-ref</div></div>
+    </div>
+    <div class="trust">✓ Right-part guarantee · 3 dealers near you · free returns</div>
+  </div>
+
+  <!-- MACHINE -->
+  <div class="scr" id="machine">
+    <div class="mhead"><div class="back" onclick="go('home')">‹ John Deere 5075E</div><span class="chip">🔩 Serial LV5075E123 ▾</span>
+      <div class="tabs"><div class="tab on" id="tCat" onclick="mode('cat')">Categories</div><div class="tab" id="tDia" onclick="mode('dia')">Diagram</div></div></div>
+    <div id="catView">
+      <div class="cat"><span>⚙️ Engine</span><span class="n">44 ›</span></div>
+      <div class="cat"><span>⛽ Fuel System</span><span class="n">24 ›</span></div>
+      <div class="cat" onclick="go('part')"><span>🔧 Hydraulics</span><span class="n">31 ›</span></div>
+      <div class="cat"><span>🔲 Filters</span><span class="n">28 ›</span></div>
+      <div class="cat"><span>⚡ Electrical</span><span class="n">67 ›</span></div>
+      <div class="sect" style="margin-top:16px">Belts (6)</div>
+      <div class="pcard" onclick="go('part')"><div class="thumb">➰</div><div><div class="nm">Fan Drive Belt<span class="oem">OEM</span></div><div class="pn">R216949 · John Deere</div><div class="badge">✓ Fits your 5075E</div><div class="price">$38 <small>· in stock · ships today</small></div></div></div>
+    </div>
+    <div id="diaView" style="display:none">
+      <div class="hint">Tap a part of your machine to see its parts</div>
+      <div class="diagram"><svg viewBox="0 0 340 200" width="100%">
+        <line x1="10" y1="180" x2="330" y2="180" stroke="#e2e8e2" stroke-width="2"/>
+        <rect x="70" y="92" width="150" height="52" rx="8" fill="#eef2ee" stroke="#cfd8d1"/>
+        <rect x="212" y="98" width="66" height="44" rx="8" fill="#eef2ee" stroke="#cfd8d1"/>
+        <path d="M88 92 L102 56 L162 56 L176 92 Z" fill="#eef2ee" stroke="#cfd8d1"/>
+        <rect x="206" y="58" width="7" height="42" rx="3" fill="#cfd8d1"/>
+        <circle cx="106" cy="146" r="40" fill="#20302f"/><circle cx="106" cy="146" r="17" fill="#8a938d"/>
+        <circle cx="258" cy="156" r="24" fill="#20302f"/><circle cx="258" cy="156" r="10" fill="#8a938d"/>
+        <g onclick="go('part')"><rect x="214" y="100" width="62" height="40" rx="7" fill="#1f9e37" fill-opacity="0.12" stroke="#1f9e37" stroke-dasharray="4 3"/><text class="lbl" x="245" y="116" text-anchor="middle">Engine</text><text class="count" x="245" y="129" text-anchor="middle">44</text></g>
+        <g><path d="M88 92 L102 56 L162 56 L176 92 Z" fill="#1f9e37" fill-opacity="0.10" stroke="#1f9e37" stroke-dasharray="4 3"/><text class="lbl" x="132" y="74" text-anchor="middle">Cab·Elec</text><text class="count" x="132" y="87" text-anchor="middle">90</text></g>
+        <g onclick="go('part')"><rect x="30" y="108" width="58" height="40" rx="7" fill="#1f9e37" fill-opacity="0.30" stroke="#1f9e37" stroke-width="2.5"/><text class="lbl" x="59" y="125" text-anchor="middle" fill="#177a2b">Hydraulics</text><text class="count" x="59" y="138" text-anchor="middle">31 ✓</text></g>
+      </svg></div>
+      <div class="callout" onclick="go('part')"><div><b>🔧 Hydraulics</b><div class="pn">Pump, valves, cylinders, 3-pt</div></div><div class="go">31 parts ›</div></div>
+    </div>
+  </div>
+
+  <!-- PART -->
+  <div class="scr" id="part">
+    <div class="top" style="padding-bottom:6px"><div class="back" onclick="go('machine')">‹ Back</div><div class="pill">♡ Save</div></div>
+    <div class="hero">➰</div>
+    <div class="fitb">✓ Fits your John Deere 5075E</div>
+    <div class="pdname">Fan Drive Belt</div>
+    <div class="pn">Serpentine / fan drive · Belts</div>
+    <div style="margin-top:12px">
+      <div class="kv"><span class="k">OEM number</span><span class="v">R216949</span></div>
+      <div class="kv"><span class="k">Cross-refs</span><span class="v">R73784 · SU28900</span></div>
+      <div class="kv"><span class="k">Type</span><span class="v">OEM · aftmkt avail.</span></div>
+      <div class="kv"><span class="k">Fitment note</span><span class="v" style="max-width:170px;text-align:right;font-weight:700">Fits 5045E–5075E (3029)</span></div>
+    </div>
+    <div class="sect" style="margin-top:16px">Compare sellers</div>
+    <div class="seller"><div><b>Prairie Equipment</b><span class="best">CHEAPEST</span><div class="pn">★4.8 · 12 mi · pickup today</div></div><b>$38</b></div>
+    <div class="seller"><div><b>Agri Parts Central</b><div class="pn">★4.7 · ships tomorrow</div></div><b>$41</b></div>
+    <div class="buy">Add to cart · $38</div>
+    <div class="gtee">✓ Right-part guarantee — free return if a "Fits" part doesn't fit</div>
+  </div>
+
+  <div class="nav">
+    <div class="on" id="nHome" onclick="go('home')"><span class="i">⌂</span>Home</div>
+    <div onclick="go('machine')"><span class="i">🔎</span>Search</div>
+    <div onclick="go('machine')"><span class="i">🚜</span>Machines</div>
+    <div><span class="i">🧾</span>Orders</div>
+    <div><span class="i">☰</span>Account</div>
+  </div>
+</div>
+<script>
+function go(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');document.querySelector('.app').scrollTop=0;window.scrollTo(0,0);}
+function mode(m){document.getElementById('catView').style.display=m==='cat'?'block':'none';document.getElementById('diaView').style.display=m==='dia'?'block':'none';document.getElementById('tCat').classList.toggle('on',m==='cat');document.getElementById('tDia').classList.toggle('on',m==='dia');}
+</script>
+</body></html>

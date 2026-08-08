@@ -140,7 +140,7 @@ export function partsForMachine(machineName) {
       qty: fit.qty,
       years: fit.years,
       verified: fit.verified,
-      from: Math.min(...part.suppliers.map((s) => s.price)),
+      from: (part.suppliers && part.suppliers.length) ? Math.min(...part.suppliers.map((s) => s.price)) : null,
     });
   }
   return out;

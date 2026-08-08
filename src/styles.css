@@ -59,6 +59,8 @@ body {
   flex-direction: column;
   overflow: hidden;
   border-radius: 0;
+  /* iOS: clear the notch / Dynamic Island at top (bottom handled on .botnav) */
+  padding-top: env(safe-area-inset-top);
 }
 
 /* Screens */
@@ -615,6 +617,378 @@ button:active {
   font-size: 13px;
   font-weight: 600;
   color: var(--text);
+}
+
+/* Source-backed three-machine normalized catalog pilot */
+.pilot-machine-grid {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 26px;
+}
+
+.pilot-machine-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 12px;
+  width: 100%;
+  padding: 15px;
+  text-align: left;
+  color: var(--text);
+  background: linear-gradient(135deg, rgba(36, 179, 63, 0.14), var(--card) 58%);
+  border: 1px solid rgba(36, 179, 63, 0.42);
+  border-radius: 14px;
+}
+
+.pilot-machine-card strong { font-size: 15px; grid-column: 1; }
+.pilot-machine-card small { color: var(--text-muted); grid-column: 1; }
+.pilot-machine-card > span:last-child { color: var(--text-muted); font-size: 11px; grid-column: 1 / -1; margin-top: 5px; }
+.pilot-machine-check { grid-column: 2; grid-row: 1 / span 2; align-self: start; color: var(--ag-green); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+.pilot-legacy-head { padding-top: 18px; border-top: 1px solid var(--border); }
+.pilot-legacy-head > span { color: var(--text-muted); font-size: 12px; }
+
+.pilot-catalog .topbar { border-bottom: 1px solid var(--border); background: rgba(5, 13, 13, .92); }
+.pilot-catalog .ic-r { color: var(--ag-green); font-weight: 900; }
+.pilot-wrap { width: min(100%, 760px); margin: 0 auto; padding: 12px 14px 34px; }
+.pilot-breadcrumbs { display: flex; align-items: center; gap: 6px; overflow-x: auto; padding: 4px 2px 12px; white-space: nowrap; scrollbar-width: none; }
+.pilot-breadcrumbs::-webkit-scrollbar { display: none; }
+.pilot-breadcrumbs button { border: 0; background: none; color: var(--ag-green); font-size: 11px; font-weight: 700; padding: 3px 0; }
+.pilot-breadcrumbs span { color: #56605b; }
+.pilot-search { display: flex; align-items: center; gap: 9px; min-height: 46px; padding: 0 12px; margin-bottom: 18px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; }
+.pilot-search > span { color: var(--ag-green); font-size: 22px; }
+.pilot-search input { flex: 1; min-width: 0; border: 0; outline: 0; color: var(--text); background: transparent; font-size: 13px; }
+.pilot-search button { border: 0; color: var(--ag-green); background: none; font-size: 11px; font-weight: 700; }
+.pilot-heading { display: flex; justify-content: space-between; gap: 14px; margin: 6px 2px 14px; }
+.pilot-heading h2, .pilot-part-detail h2 { color: var(--text); font-size: clamp(19px, 5vw, 25px); line-height: 1.15; margin-top: 3px; }
+.pilot-heading p { max-width: 560px; color: var(--text-muted); font-size: 12px; line-height: 1.5; margin-top: 7px; }
+.pilot-heading > strong { display: grid; place-items: center; min-width: 34px; height: 28px; padding: 0 8px; color: var(--ag-green); background: var(--ag-green-soft); border-radius: 999px; font-size: 12px; }
+.pilot-kicker { color: var(--ag-green); font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.pilot-list { overflow: hidden; border: 1px solid var(--border); border-radius: 14px; background: var(--card); }
+.pilot-row { display: flex; align-items: center; gap: 11px; width: 100%; min-height: 64px; padding: 12px 13px; color: var(--text); text-align: left; border: 0; border-bottom: 1px solid var(--border); background: transparent; }
+.pilot-row:last-child { border-bottom: 0; }
+.pilot-row:active { background: var(--ag-green-soft); }
+.pilot-row-main { flex: 1; min-width: 0; }
+.pilot-row-main strong { display: block; font-size: 13px; line-height: 1.35; }
+.pilot-row-main small { display: block; color: var(--text-muted); font-size: 10.5px; line-height: 1.45; margin-top: 4px; }
+.pilot-row-main em { display: inline-block; color: #f2c86b; font-size: 10px; font-style: normal; margin-top: 4px; }
+.pilot-arrow { color: var(--ag-green); font-size: 22px; }
+.pilot-callout { display: grid; place-items: center; width: 30px; height: 30px; flex: 0 0 30px; color: #061006; background: var(--ag-green); border-radius: 50%; font-size: 11px; font-weight: 900; }
+.pilot-diagram { overflow: hidden; margin: 0 0 14px; border: 1px solid var(--border); border-radius: 14px; background: #fff; }
+.pilot-diagram img { display: block; width: 100%; max-height: 430px; object-fit: contain; }
+.pilot-diagram span { display: block; padding: 8px 11px; color: #cbd2cd; background: var(--card); font-size: 10px; }
+.pilot-more { width: 100%; margin-top: 10px; padding: 12px; color: var(--ag-green); border: 1px solid var(--border); border-radius: 10px; background: var(--card); font-weight: 700; }
+.pilot-empty, .pilot-state { padding: 28px 18px; color: var(--text-muted); text-align: center; font-size: 13px; line-height: 1.5; }
+.pilot-part-detail { padding-bottom: 20px; }
+.pilot-inline-back { padding: 4px 0 14px; color: var(--ag-green); border: 0; background: none; font-size: 12px; font-weight: 700; }
+.pilot-number { display: flex; flex-direction: column; gap: 4px; padding: 16px; margin: 16px 0 10px; background: linear-gradient(135deg, var(--ag-green-soft), var(--card)); border: 1px solid rgba(36, 179, 63, .45); border-radius: 14px; }
+.pilot-number small { color: var(--text-muted); text-transform: uppercase; font-size: 9px; letter-spacing: .08em; }
+.pilot-number strong { color: var(--ag-green); font-size: 25px; letter-spacing: .02em; }
+.pilot-proof { display: flex; gap: 10px; align-items: flex-start; padding: 13px; margin-bottom: 10px; color: var(--text); background: var(--card); border: 1px solid var(--border); border-radius: 12px; }
+.pilot-proof > span { color: var(--ag-green); font-weight: 900; }
+.pilot-proof strong, .pilot-proof small { display: block; }
+.pilot-proof strong { font-size: 12px; }
+.pilot-proof small { color: var(--text-muted); font-size: 10px; line-height: 1.5; margin-top: 3px; }
+.pilot-facts { overflow: hidden; margin: 0 0 10px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
+.pilot-facts > div { display: grid; grid-template-columns: 90px 1fr; gap: 12px; padding: 11px 13px; border-bottom: 1px solid var(--border); font-size: 11px; }
+.pilot-facts > div:last-child { border-bottom: 0; }
+.pilot-facts dt { color: var(--text-muted); }
+.pilot-facts dd { font-weight: 650; text-align: right; }
+.pilot-note { padding: 12px 13px; margin-bottom: 10px; color: var(--text-muted); background: var(--card); border: 1px solid var(--border); border-radius: 12px; font-size: 10.5px; line-height: 1.5; }
+.pilot-note strong { display: block; color: var(--text); font-size: 11px; margin-bottom: 4px; }
+
+@media (min-width: 700px) {
+  .pilot-machine-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .pilot-machine-card { display: flex; flex-direction: column; min-height: 142px; }
+  .pilot-machine-check { order: -1; }
+  .pilot-machine-card > span:last-child { margin-top: auto; }
+}
+
+/* Machine manual diagrams */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.machine-browse-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.machine-browse-tabs button {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.machine-browse-tabs button.active {
+  border-color: var(--ag-green);
+  background: var(--ag-green-soft);
+  color: var(--ag-green);
+}
+
+.diagram-browser {
+  margin-bottom: 20px;
+}
+
+.diagram-browser__intro {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.diagram-browser__intro h3 {
+  font-size: 16px;
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+
+.diagram-browser__intro p {
+  color: var(--text-muted);
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.diagram-browser__source {
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--ag-green-soft);
+  color: var(--ag-green);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.diagram-browser__search {
+  padding: 12px;
+  margin-bottom: 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.diagram-browser__search > label {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.diagram-browser__search > div {
+  display: flex;
+  gap: 8px;
+}
+
+.diagram-browser__search input {
+  min-width: 0;
+  flex: 1;
+  height: 48px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.diagram-browser__search button {
+  min-width: 72px;
+  height: 48px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--ag-green);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.diagram-browser__message {
+  margin-top: 8px;
+  color: var(--text-muted);
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+
+.diagram-browser__toolbar {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.diagram-browser__toolbar button,
+.diagram-browser__toolbar select {
+  width: 100%;
+  height: 48px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 700;
+}
+
+.diagram-browser__toolbar button {
+  font-size: 24px;
+}
+
+.diagram-browser__toolbar select {
+  padding: 0 10px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.diagram-browser button:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.diagram-browser__canvas {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.diagram-browser__zoom-controls {
+  position: absolute;
+  z-index: 2;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(14, 21, 18, 0.18);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 2px 8px rgba(14, 21, 18, 0.12);
+}
+
+.diagram-browser__zoom-controls button {
+  width: 48px;
+  height: 48px;
+  border: 0;
+  background: transparent;
+  color: #0e1512;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.diagram-browser__zoom-controls span {
+  min-width: 50px;
+  color: #334039;
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.diagram-browser__image-scroll {
+  width: 100%;
+  min-height: 230px;
+  max-height: 520px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.diagram-browser__image-scroll img {
+  min-width: 100%;
+  height: auto;
+  display: block;
+  transform-origin: top left;
+}
+
+.diagram-browser__page-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 2px 12px;
+  color: var(--text-muted);
+  font-size: 10.5px;
+}
+
+.diagram-browser__page-meta strong {
+  color: var(--text);
+  font-size: 11.5px;
+}
+
+.diagram-browser__parts {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.diagram-browser__parts h4 {
+  padding: 12px 13px 8px;
+  color: var(--text-muted);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.diagram-browser__parts > button {
+  width: 100%;
+  min-height: 58px;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border: 0;
+  border-top: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+}
+
+.diagram-browser__parts > button strong,
+.diagram-browser__parts > button small {
+  display: block;
+}
+
+.diagram-browser__parts > button strong {
+  margin-bottom: 3px;
+  font-size: 12.5px;
+}
+
+.diagram-browser__parts > button small {
+  color: var(--text-muted);
+  font-size: 10.5px;
+}
+
+.diagram-browser__empty {
+  padding: 12px 13px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 11.5px;
+  line-height: 1.5;
 }
 
 .viewall-s {

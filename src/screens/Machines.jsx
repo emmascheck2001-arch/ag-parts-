@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TopBar } from "../components/TopBar";
-import { getMachines, machinePartCounts } from "../lib/catalog";
+import { machinesWithParts } from "../lib/db";
+import { loadPilotCatalog } from "../lib/pilot-catalog";
 
 // Browse every machine in the fitment index (seed + ingested). This is the
 // screen that makes ingested machines discoverable — the storefront's full
@@ -8,9 +9,17 @@ import { getMachines, machinePartCounts } from "../lib/catalog";
 // are hidden so the storefront never shows a dead-end "0 parts" page.
 export function Machines({ onBack, onSelect }) {
   const [q, setQ] = useState("");
-  const counts = machinePartCounts();
-  const all = getMachines().filter((m) => counts[m.nm] > 0);
+  const [pilotMachines, setPilotMachines] = useState([]);
+  useEffect(() => {
+    let live = true;
+    loadPilotCatalog().then((catalog) => { if (live) setPilotMachines(catalog.machines); }).catch(() => {});
+    return () => { live = false; };
+  }, []);
+  const all = machinesWithParts();
   const query = q.trim().toLowerCase();
+  const pilots = query
+    ? pilotMachines.filter((machine) => `${machine.displayName} ${machine.manufacturer} ${machine.machineType}`.toLowerCase().includes(query))
+    : pilotMachines;
   const machines = query
     ? all.filter((m) => m.nm.toLowerCase().includes(query) || (m.ty || "").toLowerCase().includes(query))
     : all;
@@ -30,12 +39,28 @@ export function Machines({ onBack, onSelect }) {
           </div>
 
           <div className="section-head">
-            <h3>{machines.length} machine{machines.length === 1 ? "" : "s"}</h3>
+            <h3>Verified pilot catalogs</h3>
+          </div>
+
+          <div className="pilot-machine-grid">
+            {pilots.map((machine) => (
+              <button key={machine.id} className="pilot-machine-card" onClick={() => onSelect("pilot-machine", machine.id)}>
+                <span className="pilot-machine-check">✓ Source verified</span>
+                <strong>{machine.displayName}</strong>
+                <small>{machine.machineType}</small>
+                <span>{machine.partCount.toLocaleString()} unique parts · {machine.assemblyCount} assemblies</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="section-head pilot-legacy-head">
+            <h3>Legacy browse index</h3>
+            <span>{machines.length}</span>
           </div>
 
           <div className="recent-list">
             {machines.map((m) => {
-              const count = counts[m.nm] || 0;
+              const count = m.count || 0;
               return (
                 <button
                   key={m.nm}
@@ -59,7 +84,7 @@ export function Machines({ onBack, onSelect }) {
                 </button>
               );
             })}
-            {machines.length === 0 && (
+            {machines.length === 0 && pilots.length === 0 && (
               <div style={{ padding: 24, textAlign: "center", color: "var(--muted, #888)" }}>
                 No machines match “{q}”.
               </div>

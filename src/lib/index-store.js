@@ -123,7 +123,7 @@ export async function loadIndex() {
     });
     Object.entries(built).forEach(([pn, part]) => {
       part.fits = part.fitment.map((f) => f.machine).join(", ");
-      if (!part.suppliers.length) part.suppliers = sampleSuppliers(pn);
+      // No fake sellers — EzParts is a parts+machine search engine (no dealers yet).
     });
 
     indexParts = built;
