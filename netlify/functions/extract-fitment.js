@@ -11,13 +11,13 @@ const ALLOWED_ORIGINS = new Set([
   "capacitor://localhost",
   "http://localhost",
   "http://localhost:3000",
-  "https://shiny-otter-df5b7d.netlify.app",
+  "https://ezparts.netlify.app",
 ]);
 
 function response(statusCode, body, requestOrigin) {
   const origin = ALLOWED_ORIGINS.has(requestOrigin)
     ? requestOrigin
-    : "https://shiny-otter-df5b7d.netlify.app";
+    : "https://ezparts.netlify.app";
   return {
     statusCode,
     headers: {

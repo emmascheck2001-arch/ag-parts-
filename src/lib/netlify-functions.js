@@ -1,6 +1,6 @@
 import { Capacitor } from "@capacitor/core";
 
-const DEFAULT_FUNCTIONS_ORIGIN = "https://shiny-otter-df5b7d.netlify.app";
+const DEFAULT_FUNCTIONS_ORIGIN = "https://ezparts.netlify.app";
 
 // Browser builds can use Netlify's same-origin function path. Capacitor serves
 // the bundled app from capacitor://localhost, so native builds must call the
