@@ -69,3 +69,37 @@ Xcode with:
 npm run build
 npx cap sync ios
 ```
+
+## Degelman Pro-Till manual staging pilot
+
+The first expansion source is Degelman manual `143433` revision `v1.3` for
+Pro-Till 20, 20HD, 26, and 26HD machines at serial `PTL4652` and above. The
+manual is pinned locally by its official URL and SHA-256, but its PDF and page
+renders remain gitignored and are not copied into application assets.
+
+Build and validate the review-only staging bundle:
+
+```sh
+python3 scripts/catalog/build_degelman_pro_till_staging.py
+python3 scripts/catalog/test_degelman_pro_till_staging.py
+node scripts/catalog/stage-manual-bundle.mjs \
+  --dry-run \
+  --bundle data/catalog-staging/degelman-pro-till-ptl4652.json
+```
+
+After the ordered migrations have been applied to an explicitly selected local
+staging database, load the same bundle into `catalog_staging` only:
+
+```sh
+EZPARTS_STAGING_DATABASE_URL=postgresql://127.0.0.1:55439/ezparts_catalog_staging \
+node scripts/catalog/stage-manual-bundle.mjs \
+  --bundle data/catalog-staging/degelman-pro-till-ptl4652.json
+```
+
+The builder and loader cannot promote records. The job ends as `needs_review`,
+preserves every source mention with PDF page and bounding box, retains review
+issues, and creates no promotion batch. A second explicit serial range,
+`PTL5988+`, is limited to the source-backed 4 m scraper-center-clamp subsection.
+Do not use `--allow-remote` without naming and approving a non-production
+staging target. Do not publish manual page images until reuse permission has
+been confirmed.

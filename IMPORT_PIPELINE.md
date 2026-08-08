@@ -46,6 +46,16 @@ the staging candidate vocabulary, records issues, and writes only to
 verification, create occurrences, approve candidates, or promote catalog data.
 See `scripts/catalog/README.md` for safe usage.
 
+The official-manual pilot uses
+`scripts/catalog/build_degelman_pro_till_staging.py` and the generic
+`scripts/catalog/stage-manual-bundle.mjs` loader. It verifies the pinned source
+hash, preserves PDF-page and bounding-box provenance, and emits distinct model
+variants and part occurrences. The generated bundle in
+`data/catalog-staging/` is review evidence, not an approved catalog snapshot.
+The loader writes only to `catalog_staging`, ends at `needs_review`, and refuses
+bundles containing blocking issues, pre-approved candidates, resolved catalog
+IDs, or promotion batches.
+
 ## 2. Pipeline architecture
 
 ```text
