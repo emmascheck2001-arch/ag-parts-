@@ -31,7 +31,12 @@ export function Scan({ machineName, onBack, onDetected }) {
       const res = await fetch(netlifyFunctionUrl("extract-fitment"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: file.data, mediaType: file.mediaType, mode: "part-photo" }),
+        body: JSON.stringify({
+          data: file.data,
+          mediaType: file.mediaType,
+          mode: "part-photo",
+          machineName,
+        }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "HTTP " + res.status);

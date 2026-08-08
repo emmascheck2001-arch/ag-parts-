@@ -33,4 +33,18 @@ const SCAN_PROMPT = [
   "If no plausible part number can be read, return an empty candidates array.",
 ].join("\n");
 
-module.exports = { SCAN_SCHEMA, SCAN_PROMPT };
+function scanPromptFor(machineName) {
+  const selectedMachine = String(machineName || "")
+    .replace(/[\r\n\t]+/g, " ")
+    .trim()
+    .slice(0, 120);
+  if (!selectedMachine) return SCAN_PROMPT;
+  return [
+    SCAN_PROMPT,
+    `The farmer selected this machine before taking the photo: ${JSON.stringify(selectedMachine)}.`,
+    "Treat the selected machine as ranking context only when two or more visible readings are genuinely plausible.",
+    "Do not invent, complete, or alter characters merely to make a number seem appropriate for the selected machine.",
+  ].join("\n");
+}
+
+module.exports = { SCAN_SCHEMA, SCAN_PROMPT, scanPromptFor };

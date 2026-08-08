@@ -5,7 +5,7 @@
 
 const Anthropic = require("@anthropic-ai/sdk");
 const { SCHEMA, PROMPT } = require("./_extract-contract.cjs");
-const { SCAN_SCHEMA, SCAN_PROMPT } = require("./_scan-contract.cjs");
+const { SCAN_SCHEMA, scanPromptFor } = require("./_scan-contract.cjs");
 
 const ALLOWED_ORIGINS = new Set([
   "capacitor://localhost",
@@ -42,7 +42,7 @@ exports.handler = async (event) => {
 
   const client = new Anthropic({ apiKey: key });
   try {
-    const { data, mediaType, mode } = JSON.parse(event.body || "{}");
+    const { data, mediaType, mode, machineName } = JSON.parse(event.body || "{}");
     if (!data) return response(400, { error: "No file data provided" }, requestOrigin);
 
     const isPdf = (mediaType || "").includes("pdf");
@@ -55,7 +55,7 @@ exports.handler = async (event) => {
       model: "claude-opus-4-8",
       max_tokens: isPartPhoto ? 800 : 16000,
       output_config: { format: { type: "json_schema", schema: isPartPhoto ? SCAN_SCHEMA : SCHEMA } },
-      messages: [{ role: "user", content: [fileBlock, { type: "text", text: isPartPhoto ? SCAN_PROMPT : PROMPT }] }],
+      messages: [{ role: "user", content: [fileBlock, { type: "text", text: isPartPhoto ? scanPromptFor(machineName) : PROMPT }] }],
     });
 
     const textBlock = msg.content.find((b) => b.type === "text");
