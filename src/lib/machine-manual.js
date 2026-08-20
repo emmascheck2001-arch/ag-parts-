@@ -6,7 +6,7 @@
 // fallback for machines that predate the verified catalog — it cannot tell
 // OEM-badged variants apart (a Case IH and a New Holland D2 FM200 have
 // different catalogs) and so must never win over the pinned document.
-import { manualFor } from "../data/machine-manuals";
+import { manualFor } from "../data/machine-manuals.js";
 
 // Prefer the parts catalog the rows came from over an operator manual or a
 // compiled dataset. Mirrors pickMachineSourceDocument in

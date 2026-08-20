@@ -3,7 +3,7 @@ import { TopBar } from "../components/TopBar";
 import { estimateHardwareMeasurements, getHardwareMeasureCapabilities } from "../lib/hardware-measure";
 import { isHarvestFocusMachine } from "../lib/market-focus";
 import { machinePartsFor, searchParts } from "../lib/db";
-import { netlifyFunctionUrl } from "../lib/netlify-functions";
+import { netlifyFunctionFetch } from "../lib/netlify-functions";
 import { getPilotScanMatches, loadPilotCatalog, normalizePilotPartNumber } from "../lib/pilot-catalog";
 import { buildSearchTermGroups } from "../lib/search-language";
 
@@ -830,7 +830,7 @@ export function Scan({ machineName, scanContext, onBack, onDetected }) {
     const controller = new AbortController();
     const timeoutId = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
     try {
-      const res = await fetch(netlifyFunctionUrl("extract-fitment"), {
+      const res = await netlifyFunctionFetch("extract-fitment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,

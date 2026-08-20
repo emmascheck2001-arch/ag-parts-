@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "catalog:check-verified-bundle": "node scripts/catalog/check_verified_catalog_bundle.mjs",
+    "catalog:check-security": "node scripts/catalog/check_supabase_security.mjs",
     "catalog:build-three-machine-staging": "node scripts/catalog/build_three_machine_pilot_staging.mjs",
     "catalog:build-review-template": "node scripts/catalog/build-review-manifest-template.mjs",
     "catalog:bulk-promote": "node scripts/catalog/bulk-promote-staged-jobs.mjs",
@@ -22,8 +23,11 @@
     "catalog:validate": "node scripts/catalog/validate-migrations.mjs",
     "dev": "vite",
     "prebuild": "npm run catalog:check-verified-bundle",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "vite build && node scripts/catalog/prune_bundled_diagrams.mjs dist",
+    "preview": "vite preview",
+    "sync:ios": "npx cap sync ios && node scripts/catalog/prune_bundled_diagrams.mjs ios/App/App/public",
+    "refresh:ios": "npm run build && npm run sync:ios",
+    "test:js": "node --experimental-specifier-resolution=node --test src/lib/pilot-catalog.test.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.105.0",

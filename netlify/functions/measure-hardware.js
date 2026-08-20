@@ -1,38 +1,22 @@
 const Anthropic = require("@anthropic-ai/sdk");
 const { MEASURE_SCHEMA, measurePromptFor } = require("./_measure-contract.cjs");
+const {
+  enforceRateLimit,
+  parseJsonBody,
+  preflight,
+  requireBase64Payload,
+  response,
+} = require("./_function-access.cjs");
 
-const ALLOWED_ORIGINS = new Set([
-  "capacitor://localhost",
-  "http://localhost",
-  "http://localhost:3000",
-  "https://ezparts.netlify.app",
-]);
-const LOCAL_PREVIEW_ORIGIN = /^http:\/\/(?:localhost|127\.0\.0\.1)(?::\d+)?$/;
-
-function allowedOrigin(requestOrigin) {
-  return ALLOWED_ORIGINS.has(requestOrigin) || LOCAL_PREVIEW_ORIGIN.test(requestOrigin)
-    ? requestOrigin
-    : "https://ezparts.netlify.app";
-}
-
-function response(statusCode, body, requestOrigin) {
-  const origin = allowedOrigin(requestOrigin);
-  return {
-    statusCode,
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": origin,
-      "Access-Control-Allow-Headers": "Content-Type",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Vary": "Origin",
-    },
-    body: JSON.stringify(body),
-  };
-}
+const MAX_REQUEST_BODY_BYTES = 6 * 1024 * 1024;
+const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
+const RATE_LIMIT_WINDOW_SECONDS = Number(process.env.EZPARTS_MEASURE_WINDOW_SECONDS || 60 * 60);
+const RATE_LIMIT_REQUESTS = Number(process.env.EZPARTS_MEASURE_RATE_LIMIT || 60);
 
 exports.handler = async (event) => {
   const requestOrigin = event.headers?.origin || event.headers?.Origin || "";
-  if (event.httpMethod === "OPTIONS") return response(204, {}, requestOrigin);
+  const optionsResponse = preflight(event);
+  if (optionsResponse) return optionsResponse;
   if (event.httpMethod !== "POST") {
     return response(405, { error: "Method Not Allowed" }, requestOrigin);
   }
@@ -41,6 +25,11 @@ exports.handler = async (event) => {
   if (!key) return response(200, { configured: false }, requestOrigin);
 
   try {
+    await enforceRateLimit(event, {
+      scopeName: "measure-hardware",
+      windowSeconds: RATE_LIMIT_WINDOW_SECONDS,
+      requestLimit: RATE_LIMIT_REQUESTS,
+    });
     const {
       data,
       mediaType,
@@ -49,12 +38,12 @@ exports.handler = async (event) => {
       hardwareFamily,
       areaLabel,
       assemblyLabel,
-    } = JSON.parse(event.body || "{}");
-    if (!data) return response(400, { error: "No file data provided" }, requestOrigin);
+    } = parseJsonBody(event, { maxBodyBytes: MAX_REQUEST_BODY_BYTES });
+    requireBase64Payload(data, MAX_IMAGE_BYTES);
 
     const client = new Anthropic({ apiKey: key });
     const message = await client.messages.create({
-      model: "claude-opus-4-8",
+      model: "claude-opus-5",
       max_tokens: 1200,
       output_config: { format: { type: "json_schema", schema: MEASURE_SCHEMA } },
       messages: [{
@@ -87,6 +76,9 @@ exports.handler = async (event) => {
       notes: parsed.notes || "",
     }, requestOrigin);
   } catch (error) {
+    if (error.statusCode) {
+      return response(error.statusCode, { error: error.message, resetAt: error.meta?.resetAt || null }, requestOrigin);
+    }
     console.error("measure-hardware failed", { name: error.name, status: error.status });
     return response(500, { error: "Hardware measurement is temporarily unavailable" }, requestOrigin);
   }

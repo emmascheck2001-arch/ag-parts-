@@ -1,6 +1,6 @@
 import { Capacitor, registerPlugin } from "@capacitor/core";
 import { resolveDiagramAssetUrl } from "./diagram-assets";
-import { netlifyFunctionUrl } from "./netlify-functions";
+import { netlifyFunctionFetch } from "./netlify-functions";
 
 const HardwareMeasure = registerPlugin("HardwareMeasure");
 const diagramCalloutCache = new Map();
@@ -73,7 +73,7 @@ export async function estimateHardwareMeasurements({
     }
   }
 
-  const response = await fetch(netlifyFunctionUrl("measure-hardware"), {
+  const response = await netlifyFunctionFetch("measure-hardware", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

@@ -1,5 +1,5 @@
-import { pickSourceDocument } from "./machine-manual";
-import { sortMachinesForMarketFocus } from "./market-focus";
+import { pickSourceDocument } from "./machine-manual.js";
+import { sortMachinesForMarketFocus } from "./market-focus.js";
 
 const MACHINE_INDEX_URL = "/catalog/verified-machine-index.json";
 const MACHINE_CATALOG_DIR = "/catalog/verified-machines";
