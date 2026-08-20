@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { TopBar } from "../components/TopBar";
-import { loadMachines, machinesWithParts } from "../lib/db";
+import { loadMachines, machinesWithParts, preloadLegacyMachineCounts } from "../lib/db";
 
 // After a home search, ask which machine the part is for — so results are scoped
 // to parts that actually FIT that machine (never the wrong part). "All machines"
@@ -10,7 +10,12 @@ export function PickMachine({ query, onPick, onBack }) {
   const [, setRefreshTick] = useState(0);
   useEffect(() => {
     let live = true;
-    loadMachines().then(() => { if (live) setRefreshTick((tick) => tick + 1); }).catch(() => {});
+    loadMachines({ includeCounts: false })
+      .then(() => { if (live) setRefreshTick((tick) => tick + 1); })
+      .catch(() => {});
+    preloadLegacyMachineCounts()
+      .then(() => { if (live) setRefreshTick((tick) => tick + 1); })
+      .catch(() => {});
     return () => { live = false; };
   }, []);
   const all = machinesWithParts();

@@ -5,10 +5,14 @@ import { resolveDiagramAssetUrl } from "./diagram-assets";
 
 let MANIFESTS = null; // { slug: {title, slug, pages, partToPage} }
 let MACHINE_SLUG = {}; // machine name -> slug
+let diagramsPromise = null;
 
 const norm = (pn) => String(pn || "").toUpperCase().replace(/[\s-]/g, "");
 
 export async function loadDiagrams() {
+  if (MANIFESTS) return true;
+  if (diagramsPromise) return diagramsPromise;
+  diagramsPromise = (async () => {
   try {
     const idx = await fetch(resolveDiagramAssetUrl("/diagrams/index.json")).then((r) => {
       if (!r.ok) throw new Error(`Diagram index request failed (${r.status})`);
@@ -27,7 +31,12 @@ export async function loadDiagrams() {
     manifests.filter(Boolean).forEach(([slug, manifest]) => { loaded[slug] = manifest; });
     MANIFESTS = loaded;
     return true;
-  } catch { return false; }
+  } catch {
+    diagramsPromise = null;
+    return false;
+  }
+  })();
+  return diagramsPromise;
 }
 
 // Slug for a machine, if it has a diagram set.

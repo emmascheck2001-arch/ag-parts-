@@ -54,6 +54,21 @@ function legacySavedMachine(machine) {
   };
 }
 
+function legacySavedMachineFallback(machineName) {
+  return {
+    key: `legacy:${machineName}`,
+    kind: "legacy",
+    ref: machineName,
+    name: machineName,
+    subtitle: "",
+    meta: "Legacy machine",
+    detail: "Legacy catalog machine",
+    machineType: "Legacy machine",
+    searchText: machineName.toLowerCase(),
+    sortKey: "",
+  };
+}
+
 /**
  * Build the saved-machine list. Verified machines sort first (most recently used
  * first), then legacy machines alphabetically. The active machine leads.
@@ -81,9 +96,10 @@ export function buildSavedMachines({
     .filter(Boolean);
 
   const legacy = legacyFleet
-    .map((name) => lookupLegacy(name))
-    .filter(Boolean)
-    .map(legacySavedMachine);
+    .map((name) => {
+      const machine = lookupLegacy(name);
+      return machine ? legacySavedMachine(machine) : legacySavedMachineFallback(name);
+    });
 
   return [...verified, ...legacy].sort((a, b) => {
     if (a.ref === activeRef && a.kind === "verified") return -1;

@@ -1,11 +1,11 @@
 import { useState, useMemo, useEffect } from "react";
 import { TopBar } from "../components/TopBar";
 import { resolveExactParts, hasSerialBreaks } from "../data/demo";
-import { machineByName, machinePartsFor } from "../lib/db";
+import { loadMachines, machineByName, machinePartsFor } from "../lib/db";
 import { CATEGORIES } from "../lib/categories";
 import { UIIcon, CatIcon } from "../components/icons";
 import { manualFor } from "../data/machine-manuals";
-import { diagramPagesFor } from "../lib/diagrams";
+import { diagramPagesFor, loadDiagrams } from "../lib/diagrams";
 import { DiagramBrowser } from "../components/DiagramBrowser";
 
 const input = {
@@ -16,13 +16,26 @@ const input = {
 // Machine → the parts that fit it. Search engine only: browse/search parts,
 // see fitment, open the part. No sellers, prices, or ordering.
 export function MachineDetails({ machine, onBack, onScan, onPartSelect, inFleetSaved = false, onToggleFleet }) {
+  const [, setRefreshTick] = useState(0);
   const machineData = machineByName(machine);
   const manuals = machineData?.manuals || [];
   const primaryManualUrl = manualFor(machine, machineData?.make, machineData?.model);
   const [allParts, setAllParts] = useState([]);
+  const [diagramAssetsReady, setDiagramAssetsReady] = useState(false);
   useEffect(() => {
     let live = true;
-    machinePartsFor(machine).then((p) => { if (live) setAllParts(p); });
+    loadMachines({ includeCounts: false }).then(() => {
+      if (live) setRefreshTick((tick) => tick + 1);
+    }).catch(() => {});
+    return () => { live = false; };
+  }, [machine]);
+  useEffect(() => {
+    let live = true;
+    setAllParts([]);
+    loadMachines({ includeCounts: false })
+      .then(() => machinePartsFor(machine))
+      .then((p) => { if (live) setAllParts(p); })
+      .catch(() => { if (live) setAllParts([]); });
     return () => { live = false; };
   }, [machine]);
 
@@ -37,6 +50,16 @@ export function MachineDetails({ machine, onBack, onScan, onPartSelect, inFleetS
 
   useEffect(() => { setLimit(40); }, [cat, q, sort]);
   useEffect(() => { setBrowseMode("categories"); }, [machine]);
+  useEffect(() => {
+    let live = true;
+    setDiagramAssetsReady(false);
+    loadDiagrams().then((ok) => {
+      if (!live || !ok) return;
+      setDiagramAssetsReady(true);
+      setRefreshTick((tick) => tick + 1);
+    }).catch(() => {});
+    return () => { live = false; };
+  }, [machine]);
 
   const counts = useMemo(() => {
     const c = {};
@@ -177,6 +200,12 @@ export function MachineDetails({ machine, onBack, onScan, onPartSelect, inFleetS
                   >
                     <UIIcon.doc width="18" height="18" /> Diagrams
                   </button>
+                </div>
+              )}
+
+              {!diagramSet && !diagramAssetsReady && (
+                <div style={{ fontSize: "11.5px", color: "var(--text-muted)", marginBottom: 12 }}>
+                  Diagram pages load on demand for legacy machines.
                 </div>
               )}
 

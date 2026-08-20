@@ -9,8 +9,6 @@ import { PilotCatalog } from './screens/PilotCatalog'
 import { Scan } from './screens/Scan'
 import { HowItWorks } from './screens/HowItWorks'
 import { BottomNav } from './components/BottomNav'
-import { loadMachines } from './lib/db'
-import { loadDiagrams } from './lib/diagrams'
 import { loadPilotMachineIndex } from './lib/pilot-catalog'
 import { addRecent } from './lib/recent-searches'
 import { findVerifiedMatch } from './lib/saved-machines'
@@ -64,13 +62,11 @@ export default function App() {
   const [pilotInitialQuery, setPilotInitialQuery] = useState('')
   const [scanContext, setScanContext] = useState(null)
   const [catalogMachines, setCatalogMachines] = useState([])
-  const [, setIndexTick] = useState(0)
 
-  // Load only the (small) machine list up front — parts are queried per machine,
-  // so the app scales without loading the whole catalog.
+  // Load only the verified machine index up front. Legacy machine browse data
+  // and diagram manifests stay on-demand so verified-machine startup remains
+  // fast even on weaker field connections.
   useEffect(() => {
-    loadMachines().then(() => setIndexTick((t) => t + 1))
-    loadDiagrams().then((ok) => { if (ok) setIndexTick((t) => t + 1) })
     loadPilotMachineIndex()
       .then((value) => {
         const machines = value?.machines || []

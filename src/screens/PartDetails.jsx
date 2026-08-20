@@ -1,18 +1,29 @@
 import { useState, useEffect } from "react";
 import { TopBar } from "../components/TopBar";
-import { getPartByNumber, machineNames as getMachineNames } from "../lib/db";
+import { getPartByNumber, loadMachines, machineNames as getMachineNames } from "../lib/db";
 import { TIER, partTier } from "../lib/fit-confidence";
-import { diagramsForPart } from "../lib/diagrams";
+import { diagramsForPart, loadDiagrams } from "../lib/diagrams";
 
 // Search-engine view of a part: what it is, which machines it fits, the diagram,
 // and any cross-reference numbers. No sellers, no prices (no dealers yet).
 export function PartDetails({ partNum, onBack, onMachineSelect }) {
   const [part, setPart] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [, setAssetTick] = useState(0);
   useEffect(() => {
     let live = true;
     setLoading(true);
     getPartByNumber(partNum).then((p) => { if (live) { setPart(p); setLoading(false); } });
+    return () => { live = false; };
+  }, [partNum]);
+  useEffect(() => {
+    let live = true;
+    Promise.allSettled([
+      loadMachines({ includeCounts: false }),
+      loadDiagrams(),
+    ]).then(() => {
+      if (live) setAssetTick((tick) => tick + 1);
+    });
     return () => { live = false; };
   }, [partNum]);
 

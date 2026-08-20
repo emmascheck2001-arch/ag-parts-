@@ -25,23 +25,12 @@ function typeIcon(type, s) {
 // ---- machine list (small — cached) --------------------------------------
 let _machines = [];          // [{id, nm, make, model, ty, ic, img, year, count}]
 let _idByName = {};
+let _machineByName = new Map();
+let machinesPromise;
+let machineCountsPromise;
+let machineCountsLoaded = false;
 
-export async function loadMachines() {
-  const { data: ms } = await supabase
-    .from("machines")
-    .select("id, make, model, type, year_from, year_to, hp, image_url")
-    .limit(10000);
-  if (!ms) return [];
-  // per-machine part counts — page through fitments (the API caps each call at
-  // 1000 rows, so we must paginate or most machines look empty).
-  const counts = {};
-  for (let from = 0; from < 500000; from += 1000) {
-    const { data: fits } = await supabase.from("fitments").select("machine_id").range(from, from + 999);
-    if (!fits || !fits.length) break;
-    fits.forEach((f) => { counts[f.machine_id] = (counts[f.machine_id] || 0) + 1; });
-    if (fits.length < 1000) break;
-  }
-
+function machineSummaryRows(ms, counts = null) {
   _idByName = {};
   _machines = ms.map((m) => {
     const nm = `${m.make} ${m.model}`.trim();
@@ -51,16 +40,72 @@ export async function loadMachines() {
       id: m.id, nm, make: m.make, model: m.model, ty, ic,
       hp: m.hp || "", img: m.image_url || "",
       year: m.year_from ? `${m.year_from}–${m.year_to || ""}` : "",
-      count: counts[m.id] || 0,
+      count: counts ? (counts[m.id] || 0) : null,
     };
   }).sort((a, b) => a.nm.localeCompare(b.nm));
+  _machineByName = new Map(_machines.map((machine) => [machine.nm, machine]));
+  return _machines;
+}
+
+async function loadMachineCounts() {
+  const counts = {};
+  for (let from = 0; from < 500000; from += 1000) {
+    const { data: fits } = await supabase.from("fitments").select("machine_id").range(from, from + 999);
+    if (!fits || !fits.length) break;
+    fits.forEach((f) => { counts[f.machine_id] = (counts[f.machine_id] || 0) + 1; });
+    if (fits.length < 1000) break;
+  }
+  _machines = _machines
+    .map((machine) => ({ ...machine, count: counts[machine.id] || 0 }))
+    .sort((a, b) => a.nm.localeCompare(b.nm));
+  _machineByName = new Map(_machines.map((machine) => [machine.nm, machine]));
+  machineCountsLoaded = true;
+  return _machines;
+}
+
+export async function loadMachines({ includeCounts = false } = {}) {
+  if (!machinesPromise) {
+    machinesPromise = supabase
+      .from("machines")
+      .select("id, make, model, type, year_from, year_to, hp, image_url")
+      .limit(10000)
+      .then(({ data: ms }) => {
+        if (!ms) return [];
+        return machineSummaryRows(ms);
+      })
+      .catch((error) => {
+        machinesPromise = undefined;
+        throw error;
+      });
+  }
+
+  await machinesPromise;
+  if (includeCounts && !machineCountsLoaded) {
+    if (!machineCountsPromise) {
+      machineCountsPromise = loadMachineCounts().catch((error) => {
+        machineCountsPromise = undefined;
+        throw error;
+      });
+    }
+    await machineCountsPromise.catch(() => {});
+  }
   return _machines;
 }
 
 export function machines() { return _machines; }
-export function machinesWithParts() { return _machines.filter((m) => m.count > 0); }
-export function machineByName(nm) { return _machines.find((m) => m.nm === nm) || null; }
-export function machineNames() { return new Set(_machines.map((m) => m.nm)); }
+export function machinesWithParts() {
+  return machineCountsLoaded ? _machines.filter((m) => m.count > 0) : _machines;
+}
+export function machineByName(nm) { return _machineByName.get(nm) || null; }
+export function machineNames() { return new Set(_machineByName.keys()); }
+
+export async function preloadLegacyMachines() {
+  return loadMachines({ includeCounts: false });
+}
+
+export async function preloadLegacyMachineCounts() {
+  return loadMachines({ includeCounts: true });
+}
 
 // ---- part shaping --------------------------------------------------------
 const PART_SEL =
