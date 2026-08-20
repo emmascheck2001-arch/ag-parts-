@@ -1,6 +1,7 @@
 // Exploded parts-diagram manifests (built by scripts/extract_diagrams.py and
 // served from /public/diagrams). Loaded once at startup; lets the app show
 // "your part is on this diagram page" — the OEM parts-catalog experience.
+import { resolveDiagramAssetUrl } from "./diagram-assets";
 
 let MANIFESTS = null; // { slug: {title, slug, pages, partToPage} }
 let MACHINE_SLUG = {}; // machine name -> slug
@@ -9,7 +10,7 @@ const norm = (pn) => String(pn || "").toUpperCase().replace(/[\s-]/g, "");
 
 export async function loadDiagrams() {
   try {
-    const idx = await fetch("/diagrams/index.json").then((r) => {
+    const idx = await fetch(resolveDiagramAssetUrl("/diagrams/index.json")).then((r) => {
       if (!r.ok) throw new Error(`Diagram index request failed (${r.status})`);
       return r.json();
     });
@@ -18,7 +19,7 @@ export async function loadDiagrams() {
     const loaded = {};
     const manifests = await Promise.all(slugs.map(async (slug) => {
       try {
-        const response = await fetch(`/diagrams/${slug}.json`);
+        const response = await fetch(resolveDiagramAssetUrl(`/diagrams/${slug}.json`));
         if (!response.ok) return null;
         return [slug, await response.json()];
       } catch { return null; }
@@ -35,7 +36,7 @@ export function diagramSlugFor(machineName) {
 }
 
 // The diagram page image url for a machine + page.
-export const diagramImage = (slug, page) => `/diagrams/${slug}/p${page}.png`;
+export const diagramImage = (slug, page) => resolveDiagramAssetUrl(`/diagrams/${slug}/p${page}.png`);
 
 function pageParts(manifest) {
   const byPage = {};

@@ -3,7 +3,6 @@ import { TopBar } from "../components/TopBar";
 import { resolveExactParts, hasSerialBreaks } from "../data/demo";
 import { machineByName, machinePartsFor } from "../lib/db";
 import { CATEGORIES } from "../lib/categories";
-import { inFleet, toggleFleet } from "../lib/fleet";
 import { UIIcon, CatIcon } from "../components/icons";
 import { manualFor } from "../data/machine-manuals";
 import { diagramPagesFor } from "../lib/diagrams";
@@ -16,9 +15,10 @@ const input = {
 
 // Machine → the parts that fit it. Search engine only: browse/search parts,
 // see fitment, open the part. No sellers, prices, or ordering.
-export function MachineDetails({ machine, onBack, onScan, onPartSelect }) {
+export function MachineDetails({ machine, onBack, onScan, onPartSelect, inFleetSaved = false, onToggleFleet }) {
   const machineData = machineByName(machine);
   const manuals = machineData?.manuals || [];
+  const primaryManualUrl = manualFor(machine, machineData?.make, machineData?.model);
   const [allParts, setAllParts] = useState([]);
   useEffect(() => {
     let live = true;
@@ -30,7 +30,6 @@ export function MachineDetails({ machine, onBack, onScan, onPartSelect }) {
   const [q, setQ] = useState("");
   const [browseMode, setBrowseMode] = useState("categories");
   const [sort, setSort] = useState("name");        // name | category
-  const [fleet, setFleet] = useState(inFleet(machine));
   const [limit, setLimit] = useState(40);          // render cap — big machines freeze the DOM
   const [serial, setSerial] = useState("");
   const [result, setResult] = useState(null);
@@ -48,6 +47,24 @@ export function MachineDetails({ machine, onBack, onScan, onPartSelect }) {
   const query = q.trim().toLowerCase();
   const browsing = cat != null || query.length > 0;
   const diagramSet = diagramPagesFor(machine);
+  const manualEntries = useMemo(() => {
+    const deduped = [];
+    const seen = new Set();
+    const pushEntry = (entry) => {
+      if (!entry?.url || seen.has(entry.url)) return;
+      seen.add(entry.url);
+      deduped.push(entry);
+    };
+    if (primaryManualUrl) {
+      pushEntry({
+        title: "Parts Manual",
+        type: "Manufacturer parts catalog",
+        url: primaryManualUrl,
+      });
+    }
+    for (const manual of manuals) pushEntry(manual);
+    return deduped;
+  }, [manuals, primaryManualUrl]);
 
   const shown = useMemo(() => {
     if (!browsing) return [];
@@ -89,15 +106,31 @@ export function MachineDetails({ machine, onBack, onScan, onPartSelect }) {
             />
           </div>
 
-          {/* Parts manual — right below the search bar */}
-          {manualFor(machine, machineData?.make, machineData?.model) && (
-            <a href={manualFor(machine, machineData?.make, machineData?.model)} target="_blank" rel="noreferrer"
-              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%",
-                padding: 11, marginBottom: 14, borderRadius: 8, textDecoration: "none",
-                border: "1px solid var(--ag-green)", color: "var(--ag-green)", background: "var(--ag-green-soft)",
-                fontSize: 13.5, fontWeight: 700 }}>
-              <UIIcon.doc width="18" height="18" /> Parts Manual for this machine
-            </a>
+          {manualEntries.length > 0 && (
+            <div style={{ marginBottom: 16 }}>
+              <h3 style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", marginBottom: 10, color: "var(--text-muted)" }}>
+                Manuals & Guides
+              </h3>
+              <div style={{ display: "grid", gap: 8 }}>
+                {manualEntries.map((man) => (
+                  <a
+                    key={`${man.title}:${man.url}`}
+                    href={man.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="card"
+                    style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none", color: "var(--text)" }}
+                  >
+                    <span style={{ color: "var(--ag-green)", flexShrink: 0, lineHeight: 0 }}><UIIcon.doc width="22" height="22" /></span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600 }}>{man.title}</div>
+                      <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>{man.type}</div>
+                    </div>
+                    <span style={{ color: "var(--text-muted)", flexShrink: 0, lineHeight: 0 }}><UIIcon.external width="16" height="16" /></span>
+                  </a>
+                ))}
+              </div>
+            </div>
           )}
 
           {/* ---- HOME VIEW: category grid + machine info ---- */}
@@ -105,18 +138,18 @@ export function MachineDetails({ machine, onBack, onScan, onPartSelect }) {
             <>
               <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
                 <button
-                  onClick={() => { toggleFleet(machine); setFleet(inFleet(machine)); }}
+                  onClick={() => onToggleFleet && onToggleFleet(machine)}
                   className="btn-primary"
-                  style={{ flex: 1, padding: 11, fontSize: 13, fontWeight: 700, background: fleet ? "var(--surface)" : undefined, color: fleet ? "var(--ag-green)" : undefined, border: fleet ? "1px solid var(--ag-green)" : "none" }}
+                  style={{ flex: 1, padding: 11, fontSize: 13, fontWeight: 700, background: inFleetSaved ? "var(--surface)" : undefined, color: inFleetSaved ? "var(--ag-green)" : undefined, border: inFleetSaved ? "1px solid var(--ag-green)" : "none" }}
                 >
-                  {fleet ? "★ In My Machines" : "☆ Add to My Machines"}
+                  {inFleetSaved ? "★ In My Machines" : "☆ Add to My Machines"}
                 </button>
                 <button
                   onClick={onScan}
                   className="btn-primary"
                   style={{ flex: 1, padding: 11, fontSize: 13, fontWeight: 700 }}
                 >
-                  <UIIcon.camera width="17" height="17" /> Use a picture
+                  <UIIcon.camera width="17" height="17" /> Use a photo
                 </button>
               </div>
 
@@ -212,22 +245,6 @@ export function MachineDetails({ machine, onBack, onScan, onPartSelect }) {
                 </div>
                   )}
 
-              {/* Manuals */}
-                  {manuals.length > 0 && (
-                <div style={{ marginBottom: 20 }}>
-                  <h3 style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", marginBottom: 10, color: "var(--text-muted)" }}>Manuals & Guides</h3>
-                  {manuals.map((man) => (
-                    <a key={man.title} href={man.url} target="_blank" rel="noreferrer" className="card" style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8, textDecoration: "none", color: "var(--text)" }}>
-                      <span style={{ color: "var(--ag-green)", flexShrink: 0, lineHeight: 0 }}><UIIcon.doc width="22" height="22" /></span>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 13, fontWeight: 600 }}>{man.title}</div>
-                        <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>{man.type}</div>
-                      </div>
-                      <span style={{ color: "var(--text-muted)", flexShrink: 0, lineHeight: 0 }}><UIIcon.external width="16" height="16" /></span>
-                    </a>
-                  ))}
-                </div>
-                  )}
                 </>
               )}
             </>

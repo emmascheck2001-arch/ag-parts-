@@ -3,6 +3,8 @@
 // Only the (small) machine list is cached in memory.
 import { supabase } from "./supabase";
 import { fitTier } from "./fit-confidence";
+import { buildSearchQueryText, buildSearchTermGroups, normalizeSearchText } from "./search-language";
+import { categoryOf } from "./categories";
 
 const CAT_ICON = {
   Filters: "🔲", Hydraulics: "🔧", Hydraulic: "🔧", Belts: "➰", Blades: "🔪",
@@ -93,18 +95,49 @@ function shapePart(p) {
 // "engine"/"filter"/"belt" searches surface the right parts; verified parts
 // break ties upward. This is what stops results from coming back jumbled.
 const norm = (s) => String(s || "").toLowerCase().replace(/[\s-]/g, "");
-function scorePart(p, ql, qNorm) {
-  const pn = norm(p.pn), name = (p.name || "").toLowerCase(), cat = (p.cat || "").toLowerCase();
+const esc = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+function scorePart(p, queryText, groups) {
+  const pn = norm(p.pn);
+  const name = normalizeSearchText(p.name);
+  const cat = normalizeSearchText(p.cat);
   let s = 0;
-  if (pn === qNorm) s += 1000;
-  else if (pn.startsWith(qNorm)) s += 600;
-  else if (pn.includes(qNorm)) s += 280;
-  if (name === ql) s += 520;
-  else if (name.startsWith(ql)) s += 260;
-  else if (new RegExp(`\\b${ql.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`).test(name)) s += 150;
-  else if (name.includes(ql)) s += 70;
-  if (cat === ql) s += 220;
-  else if (cat.includes(ql) || ql.includes(cat)) s += 90;
+  const queryNorm = norm(queryText);
+  if (queryNorm) {
+    if (pn === queryNorm) s += 1000;
+    else if (pn.startsWith(queryNorm)) s += 600;
+    else if (pn.includes(queryNorm)) s += 280;
+    if (name === queryText) s += 520;
+    else if (name.startsWith(queryText)) s += 260;
+    else if (new RegExp(`\\b${esc(queryText)}`).test(name)) s += 150;
+    else if (name.includes(queryText)) s += 70;
+    if (cat === queryText) s += 220;
+    else if (cat.includes(queryText) || queryText.includes(cat)) s += 90;
+  }
+
+  let matchedGroups = 0;
+  for (const group of groups) {
+    let groupScore = 0;
+    let groupMatched = false;
+    for (const term of group) {
+      const termNorm = norm(term);
+      if (!termNorm) continue;
+      if (pn === termNorm) groupScore = Math.max(groupScore, 800);
+      else if (pn.startsWith(termNorm)) groupScore = Math.max(groupScore, 420);
+      else if (pn.includes(termNorm)) groupScore = Math.max(groupScore, 190);
+      if (name === term) groupScore = Math.max(groupScore, 420);
+      else if (name.startsWith(term)) groupScore = Math.max(groupScore, 220);
+      else if (new RegExp(`\\b${esc(term)}`).test(name)) groupScore = Math.max(groupScore, 170);
+      else if (name.includes(term)) groupScore = Math.max(groupScore, 85);
+      if (cat === term) groupScore = Math.max(groupScore, 160);
+      else if (cat.includes(term) || term.includes(cat)) groupScore = Math.max(groupScore, 75);
+      if (groupScore > 0) groupMatched = true;
+    }
+    if (!groupMatched) return -1;
+    matchedGroups += 1;
+    s += groupScore;
+  }
+
+  s += matchedGroups * 25;
   if ((p.fitment || []).some((f) => f.verified)) s += 25;
   return s;
 }
@@ -113,21 +146,27 @@ function scorePart(p, ql, qNorm) {
 export async function searchParts(q, limit = 60) {
   q = (q || "").trim();
   if (!q) return [];
-  const like = `%${q.replace(/[%,]/g, "")}%`;
+  const groups = buildSearchTermGroups(q);
+  const queryText = buildSearchQueryText(q);
+  const variants = [...new Set(groups.flat().map((value) => value.replace(/[%,]/g, "").trim()).filter(Boolean))];
+  if (!variants.length) return [];
   // Fetch a wider candidate pool (part number, name, OR category), then rank
   // client-side and return the best `limit`. Matching category too means a
   // search like "filter" or "engine" finds parts by their category, not just
   // parts with that word in the name.
+  const orFilters = variants.flatMap((value) => {
+    const like = `%${value}%`;
+    return [`part_number.ilike.${like}`, `name.ilike.${like}`, `category.ilike.${like}`];
+  }).join(",");
   const { data } = await supabase
     .from("parts")
     .select(PART_SEL)
-    .or(`part_number.ilike.${like},name.ilike.${like},category.ilike.${like}`)
+    .or(orFilters)
     .limit(Math.max(240, limit * 3));
-  const ql = q.toLowerCase();
-  const qNorm = norm(q);
   return (data || [])
     .map(shapePart)
-    .map((p) => ({ p, s: scorePart(p, ql, qNorm) }))
+    .map((p) => ({ p, s: scorePart(p, queryText, groups) }))
+    .filter((value) => value.s >= 0)
     .sort((a, b) => b.s - a.s || (b.p.fitment.length - a.p.fitment.length) || a.p.name.localeCompare(b.p.name))
     .slice(0, limit)
     .map((x) => x.p);
@@ -149,10 +188,13 @@ export async function machinePartsFor(machineName, limit = 3000) {
     .limit(limit);
   return (data || [])
     .filter((f) => f.part)
-    .map((f) => ({
+    .map((f) => {
+      const cat = categoryOf({ category: f.part.category, name: f.part.name || f.part.part_number });
+      return {
       pn: f.part.part_number, name: f.part.name || f.part.part_number,
-      cat: f.part.category || "Other", ic: partIcon(f.part.category),
+      cat, ic: partIcon(cat),
       fit: { position: f.position, qty: f.qty, verified: f.verified, tier: fitTier(f.source, !!f.verified) },
       cross: [],
-    }));
+      };
+    });
 }

@@ -1,52 +1,64 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { UIIcon } from "../components/icons";
-import { loadPilotCatalog } from "../lib/pilot-catalog";
+import { machineByName } from "../lib/db";
+import { loadPilotMachineIndex } from "../lib/pilot-catalog";
+import { buildSavedMachines, machineTypesOf } from "../lib/saved-machines";
 
 const PAGE_SIZE = 40;
+// How long a remove button stays armed before it disarms itself. A stray tap in
+// a shop should not leave a destructive control live indefinitely.
+const REMOVE_CONFIRM_MS = 3000;
 
 export function Home({
   onSelect,
   onNav,
   activePilotModel,
   verifiedFleet = [],
-  onRemovePilotMachine,
+  legacyFleet = [],
+  onRemoveMachine,
 }) {
-  const [pilotCatalog, setPilotCatalog] = useState(null);
+  const [catalogMachines, setCatalogMachines] = useState([]);
   const [search, setSearch] = useState("");
   const [machineType, setMachineType] = useState("all");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [pendingRemoveKey, setPendingRemoveKey] = useState(null);
+  const removeTimer = useRef(null);
 
   useEffect(() => {
     let live = true;
-    loadPilotCatalog().then((value) => { if (live) setPilotCatalog(value); }).catch(() => {});
+    loadPilotMachineIndex()
+      .then((value) => { if (live) setCatalogMachines(value.machines || []); })
+      .catch(() => {});
     return () => { live = false; };
   }, []);
 
-  const savedMachines = useMemo(() => {
-    if (!pilotCatalog) return [];
-    const machinesById = new Map(pilotCatalog.machines.map((machine) => [machine.id, machine]));
-    return verifiedFleet
-      .map((saved) => ({ ...saved, machine: machinesById.get(saved.modelId) }))
-      .filter((saved) => saved.machine)
-      .sort((a, b) => {
-        if (a.modelId === activePilotModel) return -1;
-        if (b.modelId === activePilotModel) return 1;
-        return String(b.lastUsedAt || "").localeCompare(String(a.lastUsedAt || ""));
-      });
-  }, [activePilotModel, pilotCatalog, verifiedFleet]);
+  useEffect(() => () => clearTimeout(removeTimer.current), []);
 
-  const machineTypes = useMemo(
-    () => [...new Set(savedMachines.map((saved) => saved.machine.machineType))].sort(),
-    [savedMachines],
+  const armRemove = (key) => {
+    clearTimeout(removeTimer.current);
+    setPendingRemoveKey(key);
+    removeTimer.current = setTimeout(() => setPendingRemoveKey(null), REMOVE_CONFIRM_MS);
+  };
+
+  const savedMachines = useMemo(
+    () => buildSavedMachines({
+      verifiedFleet,
+      legacyFleet,
+      catalogMachines,
+      lookupLegacy: machineByName,
+      activeRef: activePilotModel,
+    }),
+    [activePilotModel, catalogMachines, legacyFleet, verifiedFleet],
   );
+
+  const machineTypes = useMemo(() => machineTypesOf(savedMachines), [savedMachines]);
 
   const filteredMachines = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return savedMachines.filter((saved) => {
-      const matchesType = machineType === "all" || saved.machine.machineType === machineType;
-      const text = `${saved.nickname} ${saved.location} ${saved.machine.displayName} ${saved.machine.manufacturer} ${saved.machine.machineType}`.toLowerCase();
-      return matchesType && (!query || text.includes(query));
-    });
+    return savedMachines.filter((saved) =>
+      (machineType === "all" || saved.machineType === machineType) &&
+      (!query || saved.searchText.includes(query))
+    );
   }, [machineType, savedMachines, search]);
 
   useEffect(() => setVisibleCount(PAGE_SIZE), [machineType, search]);
@@ -66,12 +78,12 @@ export function Home({
           </header>
 
           <section className="fleet-title">
-            <span className="pilot-kicker">Farm equipment</span>
+            <span className="pilot-kicker">Harvest parts first</span>
             <div>
               <h1>My Machines</h1>
               <strong>{savedMachines.length.toLocaleString()}</strong>
             </div>
-            <p>Choose the exact machine first. Every part search, picture, and assembly stays inside that machine.</p>
+            <p>Every search and photo stays locked to the machine you pick.</p>
           </section>
 
           {savedMachines.length > 0 ? (
@@ -106,29 +118,44 @@ export function Home({
 
               <section className="fleet-machine-list" aria-label="Your saved machines">
                 {filteredMachines.slice(0, visibleCount).map((saved) => {
-                  const machine = saved.machine;
-                  const isRecent = machine.id === activePilotModel;
+                  const isActive = saved.kind === "verified" && saved.ref === activePilotModel;
+                  const isArmed = pendingRemoveKey === saved.key;
                   return (
-                    <article key={machine.id} className="fleet-machine-row">
-                      <button className="fleet-machine-row__open" onClick={() => onSelect("pilot-machine", machine.id)}>
+                    <article key={saved.key} className="fleet-machine-row">
+                      <button
+                        className="fleet-machine-row__open"
+                        onClick={() => onSelect(saved.kind === "verified" ? "pilot-machine" : "machines", saved.ref)}
+                      >
                         <span className="fast-machine-row__icon"><UIIcon.tractor width="24" height="24" /></span>
                         <span className="fleet-machine-row__main">
                           <span className="fleet-machine-row__name">
-                            <strong>{saved.nickname || machine.displayName}</strong>
-                            {isRecent && <em>Recent</em>}
+                            <strong>{saved.name}</strong>
+                            {isActive && <em>Recent</em>}
                           </span>
-                          {saved.nickname && <small>{machine.displayName}</small>}
-                          <small>{machine.machineType}{saved.location ? ` · ${saved.location}` : ""}</small>
-                          <span>{machine.partCount.toLocaleString()} verified parts · {machine.assemblyCount} assemblies</span>
+                          {saved.subtitle && <small>{saved.subtitle}</small>}
+                          <small>{saved.meta}</small>
+                          <span>{saved.detail}</span>
                         </span>
                         <span className="pilot-arrow" aria-hidden="true">›</span>
                       </button>
                       <button
-                        className="fleet-machine-row__remove"
-                        onClick={() => onRemovePilotMachine(machine.id)}
-                        aria-label={`Remove ${machine.displayName} from My Machines`}
-                        title="Remove from My Machines"
-                      >×</button>
+                        className={`fleet-machine-row__remove${isArmed ? " is-armed" : ""}`}
+                        onClick={() => {
+                          if (isArmed) {
+                            clearTimeout(removeTimer.current);
+                            setPendingRemoveKey(null);
+                            onRemoveMachine(saved);
+                            return;
+                          }
+                          armRemove(saved.key);
+                        }}
+                        aria-label={isArmed
+                          ? `Confirm remove ${saved.name} from My Machines`
+                          : `Remove ${saved.name} from My Machines`}
+                        title={isArmed ? "Tap again to remove" : "Remove from My Machines"}
+                      >
+                        {isArmed ? "Confirm" : "×"}
+                      </button>
                     </article>
                   );
                 })}
@@ -147,15 +174,13 @@ export function Home({
                 </button>
               )}
             </>
-          ) : pilotCatalog ? (
+          ) : (
             <section className="fleet-empty">
               <span className="fleet-empty__icon"><UIIcon.tractor width="34" height="34" /></span>
               <h2>Add your first machine</h2>
-              <p>Your saved equipment will appear here. EZPARTS will ask you to choose one before searching for a part.</p>
+              <p>Your saved equipment will appear here.</p>
               <button onClick={() => onNav("machines")}>＋ Add a machine</button>
             </section>
-          ) : (
-            <div className="fast-loading">Loading your machines…</div>
           )}
         </main>
       </div>

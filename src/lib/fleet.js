@@ -19,6 +19,20 @@ export function toggleFleet(machineName) {
   return next;
 }
 
+export function saveFleetMachine(machineName) {
+  const f = getFleet();
+  if (f.includes(machineName)) return f;
+  const next = [...f, machineName];
+  try { localStorage.setItem(KEY, JSON.stringify(next)); } catch { /* ignore */ }
+  return next;
+}
+
+export function removeFleetMachine(machineName) {
+  const next = getFleet().filter((m) => m !== machineName);
+  try { localStorage.setItem(KEY, JSON.stringify(next)); } catch { /* ignore */ }
+  return next;
+}
+
 // Source-backed machines use stable model IDs instead of display-name identity.
 // Keep the saved fleet separate from the catalog: this array says which machines
 // the farmer owns, while the normalized pilot catalog remains the source of truth
@@ -58,6 +72,13 @@ export function saveVerifiedMachine(modelId) {
 
 export function removeVerifiedMachine(modelId) {
   const next = getVerifiedFleet().filter((row) => row.modelId !== modelId);
+  try { localStorage.setItem(VERIFIED_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+  return next;
+}
+
+export function pruneVerifiedFleet(validModelIds = []) {
+  const allowed = new Set(validModelIds.filter(Boolean));
+  const next = getVerifiedFleet().filter((row) => allowed.has(row.modelId));
   try { localStorage.setItem(VERIFIED_KEY, JSON.stringify(next)); } catch { /* ignore */ }
   return next;
 }

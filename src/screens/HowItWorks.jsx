@@ -5,14 +5,14 @@ import { UIIcon } from "../components/icons";
 const steps = [
   {
     number: "1",
-    title: "Choose from My Machines",
-    description: "Save your farm equipment once, then pick the exact unit before every part search.",
+    title: "Choose the exact machine",
+    description: "Save the machine once, then keep every search, photo, and assembly locked to that exact machine.",
     icon: UIIcon.tractor,
   },
   {
     number: "2",
-    title: "Search or use a picture",
-    description: "Enter a part name or OEM number, or photograph the number stamped on the part or tag.",
+    title: "Search or use a photo",
+    description: "Enter a part name or OEM number, or photograph the number stamped on the part or tag. The current strongest flow is MacDon/header/draper harvest parts.",
     icon: UIIcon.camera,
   },
   {
@@ -26,12 +26,12 @@ const steps = [
 export function HowItWorks({ onBack }) {
   return (
     <div className="screen active">
-      <TopBar title="How EZPARTS Works" onBack={onBack} />
+      <TopBar title="How EzParts Works" onBack={onBack} />
       <div className="scroll">
         <div className="help-fast">
-          <span className="pilot-kicker">Fewest clicks possible</span>
-          <h2>My Machines → part → answer</h2>
-          <p className="help-fast__intro">Your home screen holds your equipment. After you choose a machine, the catalog hierarchy stays organized behind the screen and every result remains machine-specific.</p>
+          <span className="pilot-kicker">Current rollout</span>
+          <h2>Machine → part → verified answer</h2>
+          <p className="help-fast__intro">EzParts is narrowing in on the fastest trustworthy flow for harvest parts. Pick the machine first, then search, scan, or browse assemblies without leaving that machine context.</p>
 
           <div className="help-fast__steps">
             {steps.map((step) => {
@@ -48,7 +48,7 @@ export function HowItWorks({ onBack }) {
 
           <div className="help-fast__proof">
             <strong>What “verified” means</strong>
-            <p>Parts are placed from pinned manufacturer catalog pages. EZPARTS keeps the machine, system, subsystem, assembly, callout, and source page connected so a matching word alone cannot decide fitment.</p>
+            <p>Parts are placed from pinned manufacturer catalog pages. EzParts keeps the machine, system, subsystem, assembly, callout, and source page connected so a matching word alone cannot decide fitment.</p>
           </div>
         </div>
       </div>

@@ -1,12 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TopBar } from "../components/TopBar";
-import { machinesWithParts } from "../lib/db";
+import { loadMachines, machinesWithParts } from "../lib/db";
 
 // After a home search, ask which machine the part is for — so results are scoped
 // to parts that actually FIT that machine (never the wrong part). "All machines"
 // is offered as an escape for cross-reference / general lookups.
 export function PickMachine({ query, onPick, onBack }) {
   const [q, setQ] = useState("");
+  const [, setRefreshTick] = useState(0);
+  useEffect(() => {
+    let live = true;
+    loadMachines().then(() => { if (live) setRefreshTick((tick) => tick + 1); }).catch(() => {});
+    return () => { live = false; };
+  }, []);
   const all = machinesWithParts();
   const query2 = q.trim().toLowerCase();
   const machines = query2
@@ -22,15 +28,6 @@ export function PickMachine({ query, onPick, onBack }) {
           <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 14, lineHeight: 1.4 }}>
             Pick your machine and we'll show only “{query}” parts confirmed to fit it.
           </div>
-
-          {/* Escape hatch — search the whole catalog */}
-          <button
-            onClick={() => onPick(null)}
-            className="btn-primary"
-            style={{ width: "100%", padding: 12, fontWeight: 700, marginBottom: 16, background: "var(--surface)", color: "var(--ag-green)", border: "1px solid var(--ag-green)" }}
-          >
-            Search all machines instead →
-          </button>
 
           <div className="searchbar">
             <input type="text" placeholder="Filter machines — e.g. Hagie, Country Clipper" value={q} onChange={(e) => setQ(e.target.value)} />
@@ -49,7 +46,7 @@ export function PickMachine({ query, onPick, onBack }) {
                   : <span style={{ fontSize: 26, width: 52, textAlign: "center", flexShrink: 0 }}>{m.ic || "🚜"}</span>}
                 <span style={{ flex: 1, textAlign: "left" }}>
                   <span style={{ display: "block", fontSize: 14, fontWeight: 600 }}>{m.nm}</span>
-                  <span style={{ display: "block", fontSize: 12, color: "var(--muted, #888)" }}>
+                  <span className="row-subtle">
                     {m.ty} · {m.count} part{m.count === 1 ? "" : "s"}
                   </span>
                 </span>
@@ -57,8 +54,25 @@ export function PickMachine({ query, onPick, onBack }) {
               </button>
             ))}
             {machines.length === 0 && (
-              <div style={{ padding: 24, textAlign: "center", color: "var(--muted, #888)" }}>No machines match “{q}”.</div>
+              <div className="empty-note">No machines match “{q}”.</div>
             )}
+          </div>
+
+          <div style={{ marginTop: 14, textAlign: "center" }}>
+            <button
+              onClick={() => onPick(null)}
+              style={{
+                background: "none",
+                border: "none",
+                color: "var(--text-muted)",
+                fontSize: 12,
+                fontWeight: 600,
+                textDecoration: "underline",
+                cursor: "pointer",
+              }}
+            >
+              Not sure yet? Search all machines
+            </button>
           </div>
         </div>
       </div>

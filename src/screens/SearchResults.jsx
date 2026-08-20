@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import { TopBar } from "../components/TopBar";
 import { machines as getMachines, searchParts } from "../lib/db";
 import { TIER, partTier } from "../lib/fit-confidence";
+import { buildSearchTermGroups, normalizeSearchText } from "../lib/search-language";
 
 export function SearchResults({ query, machine, onBack, onChangeMachine, onPartSelect, onMachineSelect }) {
-  const q = (query || "").toLowerCase();
+  const q = normalizeSearchText(query);
+  const groups = buildSearchTermGroups(query);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [flagOpen, setFlagOpen] = useState(null);   // which part# has its red-flag note open
@@ -23,7 +25,10 @@ export function SearchResults({ query, machine, onBack, onChangeMachine, onPartS
 
   // Machines matching the query (from the cached machine list; hidden when scoped).
   const machineResults = machine ? [] : getMachines().filter(
-    (m) => m.nm.toLowerCase().includes(q) || (m.ty || "").toLowerCase().includes(q)
+    (m) => {
+      const haystack = normalizeSearchText(`${m.nm} ${m.ty || ""}`);
+      return groups.length ? groups.every((group) => group.some((term) => haystack.includes(term))) : haystack.includes(q);
+    }
   );
 
   // Parts: query Supabase server-side (scales to millions), then scope to the

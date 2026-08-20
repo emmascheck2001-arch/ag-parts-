@@ -1,0 +1,2460 @@
+{
+  "schemaVersion": "ezparts.verified-serial-index.v1",
+  "generatedAt": "2026-08-17T17:53:37.019Z",
+  "machines": [
+    {
+      "modelId": "5e602344-8655-53f3-8bab-b55cf886e352",
+      "displayName": "CA20",
+      "modelCode": "CA20",
+      "manufacturer": "MacDon",
+      "machineType": "Header Adapter",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 187810,
+          "note": "–187810",
+          "rangeCode": "source-note-187810"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 168560,
+          "serialTo": 174609,
+          "note": "168560–174609",
+          "rangeCode": "source-note-168560174609"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 174610,
+          "serialTo": null,
+          "note": "174610–",
+          "rangeCode": "source-note-174610"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 216500,
+          "serialTo": null,
+          "note": "216500–",
+          "rangeCode": "source-note-216500"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 216510,
+          "serialTo": 285419,
+          "note": "216510–285419",
+          "rangeCode": "source-note-216510285419"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 184453,
+          "note": "–184453",
+          "rangeCode": "source-note-184453"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 168559,
+          "note": "–168559",
+          "rangeCode": "source-note-168559"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 179760,
+          "serialTo": null,
+          "note": "179760–",
+          "rangeCode": "source-note-179760"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 216500,
+          "serialTo": 216509,
+          "note": "216500–216509",
+          "rangeCode": "source-note-216500216509"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 187811,
+          "serialTo": null,
+          "note": "187811–",
+          "rangeCode": "source-note-187811"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 184454,
+          "serialTo": null,
+          "note": "184454–",
+          "rangeCode": "source-note-184454"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 216499,
+          "note": "–216499",
+          "rangeCode": "source-note-216499"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 195759,
+          "note": "–195759",
+          "rangeCode": "source-note-195759"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 216509,
+          "note": "–216509",
+          "rangeCode": "source-note-216509"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 179759,
+          "note": "–179759",
+          "rangeCode": "source-note-179759"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 185860,
+          "serialTo": null,
+          "note": "185860–",
+          "rangeCode": "source-note-185860"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 285420,
+          "serialTo": null,
+          "note": "285420–",
+          "rangeCode": "source-note-285420"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 174609,
+          "note": "–174609",
+          "rangeCode": "source-note-174609"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 185859,
+          "note": "–185859",
+          "rangeCode": "source-note-185859"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 195760,
+          "serialTo": null,
+          "note": "195760–",
+          "rangeCode": "source-note-195760"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 168560,
+          "serialTo": 216509,
+          "note": "168560–216509",
+          "rangeCode": "source-note-168560216509"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 216510,
+          "serialTo": null,
+          "note": "216510–",
+          "rangeCode": "source-note-216510"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 168560,
+          "serialTo": null,
+          "note": "168560–",
+          "rangeCode": "source-note-168560"
+        }
+      ]
+    },
+    {
+      "modelId": "35ab9142-7a3c-54e0-aeef-7c8807f5e0a6",
+      "displayName": "CA25",
+      "modelCode": "CA25",
+      "manufacturer": "MacDon",
+      "machineType": "Header Adapter",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": 301190,
+          "serialTo": null,
+          "note": "301190–",
+          "rangeCode": "source-note-301190-4949CBA3CCA0"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 301189,
+          "note": "–301189",
+          "rangeCode": "source-note-301189-5FC031E2FA34"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 285419,
+          "note": "–285419",
+          "rangeCode": "source-note-285419-6325DCD8F84B"
+        }
+      ]
+    },
+    {
+      "modelId": "377d385e-4d6c-5f33-8143-6e8a4acf917a",
+      "displayName": "D2",
+      "modelCode": "D2",
+      "manufacturer": "MacDon",
+      "machineType": "Draper Header",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": 486190,
+          "serialTo": null,
+          "note": "486190–",
+          "rangeCode": "source-note-486190-1D7DF2416664"
+        }
+      ]
+    },
+    {
+      "modelId": "f4f4f1e6-5504-5d09-8335-443d6475fa68",
+      "displayName": "D2 FM200",
+      "modelCode": "D2 FM200",
+      "manufacturer": "Case IH",
+      "machineType": "Header",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 556189,
+          "note": "–556189",
+          "rangeCode": "source-note-556189-04F314CF79E6"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 396190,
+          "serialTo": null,
+          "note": "396190–",
+          "rangeCode": "source-note-396190-11043538C204"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 521190,
+          "note": "–521190",
+          "rangeCode": "source-note-521190-12C95CB41B15"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 421190,
+          "serialTo": null,
+          "note": "421190–",
+          "rangeCode": "source-note-421190-1A036BBFC83E"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 521189,
+          "note": "–521189",
+          "rangeCode": "source-note-521189-5BD657786686"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 486190,
+          "serialTo": null,
+          "note": "486190–",
+          "rangeCode": "source-note-486190-76923F904D10"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 521190,
+          "serialTo": null,
+          "note": "521190–",
+          "rangeCode": "source-note-521190-7F799F93137A"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 486189,
+          "note": "–486189",
+          "rangeCode": "source-note-486189-BADA022DDD63"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 421189,
+          "note": "–421189",
+          "rangeCode": "source-note-421189-D8F4D42445CB"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 556190,
+          "serialTo": null,
+          "note": "556190–",
+          "rangeCode": "source-note-556190-DDC7C4105F53"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 396189,
+          "note": "–396189",
+          "rangeCode": "source-note-396189-E1FAF9E31989"
+        }
+      ]
+    },
+    {
+      "modelId": "31b87b49-1015-592b-8326-bf0e9b1da65b",
+      "displayName": "D2 FM200",
+      "modelCode": "D2 FM200",
+      "manufacturer": "New Holland",
+      "machineType": "Header",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 421189,
+          "note": "–421189",
+          "rangeCode": "source-note-421189-0A3B7CE205CA"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 396189,
+          "note": "–396189",
+          "rangeCode": "source-note-396189-1D3896BC6299"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 396190,
+          "serialTo": null,
+          "note": "396190–",
+          "rangeCode": "source-note-396190-2545A207F37D"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 556190,
+          "serialTo": null,
+          "note": "556190–",
+          "rangeCode": "source-note-556190-3866FA947B20"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 486190,
+          "serialTo": null,
+          "note": "486190–",
+          "rangeCode": "source-note-486190-4177F3657C9A"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 421190,
+          "serialTo": null,
+          "note": "421190–",
+          "rangeCode": "source-note-421190-4E3FED5776C3"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 521190,
+          "note": "–521190",
+          "rangeCode": "source-note-521190-848919C977AC"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 486189,
+          "note": "–486189",
+          "rangeCode": "source-note-486189-9F9E35795D4F"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 521189,
+          "note": "–521189",
+          "rangeCode": "source-note-521189-B631E6ED886A"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 556189,
+          "note": "–556189",
+          "rangeCode": "source-note-556189-C3CEF5865890"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 521190,
+          "serialTo": null,
+          "note": "521190–",
+          "rangeCode": "source-note-521190-E45D34CFA26D"
+        }
+      ]
+    },
+    {
+      "modelId": "5040fa6d-c6d0-5550-ac27-2cf70d658837",
+      "displayName": "D2 FM200 MacDon",
+      "modelCode": "D2 FM200 MacDon",
+      "manufacturer": "MacDon",
+      "machineType": "Header",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 556189,
+          "note": "–556189",
+          "rangeCode": "source-note-556189-0A4B33543FE0"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 521190,
+          "serialTo": null,
+          "note": "521190–",
+          "rangeCode": "source-note-521190-2599B41E519D"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 521190,
+          "note": "–521190",
+          "rangeCode": "source-note-521190-42C3DD90FA5A"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 396189,
+          "note": "–396189",
+          "rangeCode": "source-note-396189-7226C687F04C"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 421189,
+          "note": "–421189",
+          "rangeCode": "source-note-421189-735CCAE9C7C5"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 486190,
+          "serialTo": null,
+          "note": "486190–",
+          "rangeCode": "source-note-486190-861524E6883F"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 421190,
+          "serialTo": null,
+          "note": "421190–",
+          "rangeCode": "source-note-421190-907F51209BE9"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 396190,
+          "serialTo": null,
+          "note": "396190–",
+          "rangeCode": "source-note-396190-C904E04E9B5C"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 556190,
+          "serialTo": null,
+          "note": "556190–",
+          "rangeCode": "source-note-556190-DC6F59A32AA3"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 521189,
+          "note": "–521189",
+          "rangeCode": "source-note-521189-E118B895F352"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 486189,
+          "note": "–486189",
+          "rangeCode": "source-note-486189-F56BBC88EF89"
+        }
+      ]
+    },
+    {
+      "modelId": "0b19e10d-e2ad-538f-a43c-c4c397e80fd3",
+      "displayName": "D65",
+      "modelCode": "D65",
+      "manufacturer": "MacDon",
+      "machineType": "Draper Header",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 179759,
+          "note": "–179759",
+          "rangeCode": "source-note-179759-0FAA5719500A"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 266819,
+          "note": "–266819",
+          "rangeCode": "source-note-266819-2E6660ABF620"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 266820,
+          "serialTo": null,
+          "note": "266820–",
+          "rangeCode": "source-note-266820-6C5A7B4451D0"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 244010,
+          "serialTo": null,
+          "note": "244010–",
+          "rangeCode": "source-note-244010-73F1A9E9839F"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 179760,
+          "serialTo": null,
+          "note": "179760–",
+          "rangeCode": "source-note-179760-968D4D3CAF3D"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 244009,
+          "note": "–244009",
+          "rangeCode": "source-note-244009-EFB28396D65E"
+        }
+      ]
+    },
+    {
+      "modelId": "41fa000c-1ad6-5861-8edb-a110e28be632",
+      "displayName": "FD2",
+      "modelCode": "FD2",
+      "manufacturer": "MacDon",
+      "machineType": "FlexDraper Header",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": 486190,
+          "serialTo": null,
+          "note": "486190–",
+          "rangeCode": "source-note-486190-0257F78C2C55"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 521189,
+          "note": "–521189",
+          "rangeCode": "source-note-521189-1C7FFD8D2EBA"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 521190,
+          "note": "–521190",
+          "rangeCode": "source-note-521190-8530F5643582"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 521190,
+          "serialTo": null,
+          "note": "521190–",
+          "rangeCode": "source-note-521190-8D0F72A1701C"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 451189,
+          "note": "–451189",
+          "rangeCode": "source-note-451189-966903CA1905"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 396189,
+          "note": "–396189",
+          "rangeCode": "source-note-396189-A8705496EEF4"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 396190,
+          "serialTo": null,
+          "note": "396190–",
+          "rangeCode": "source-note-396190-B72073479EE5"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 421190,
+          "serialTo": null,
+          "note": "421190–",
+          "rangeCode": "source-note-421190-B87ED9618A5B"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 451190,
+          "serialTo": null,
+          "note": "451190–",
+          "rangeCode": "source-note-451190-C03BF31C8D17"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 421189,
+          "note": "–421189",
+          "rangeCode": "source-note-421189-E31A08437A07"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 486189,
+          "note": "–486189",
+          "rangeCode": "source-note-486189-F7A7CF13C2AB"
+        }
+      ]
+    },
+    {
+      "modelId": "ab4a86c4-084c-50d5-983c-5400d11dcd56",
+      "displayName": "FD2 FM200",
+      "modelCode": "FD2 FM200",
+      "manufacturer": "Case IH",
+      "machineType": "Header",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": 486190,
+          "serialTo": null,
+          "note": "486190–",
+          "rangeCode": "source-note-486190-0509222DD1F9"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 486189,
+          "note": "–486189",
+          "rangeCode": "source-note-486189-0A4EDE45270C"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 451190,
+          "serialTo": null,
+          "note": "451190–",
+          "rangeCode": "source-note-451190-1282B1E719AB"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 556190,
+          "serialTo": null,
+          "note": "556190–",
+          "rangeCode": "source-note-556190-2C1E1964B20F"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 451189,
+          "note": "–451189",
+          "rangeCode": "source-note-451189-3606E50B779B"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 521190,
+          "note": "–521190",
+          "rangeCode": "source-note-521190-3F01D7F931F9"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 556189,
+          "note": "–556189",
+          "rangeCode": "source-note-556189-424FA222D781"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 486190,
+          "serialTo": 591189,
+          "note": "486190– 591189",
+          "rangeCode": "source-note-486190591189-54A054CAA8F6"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 521189,
+          "note": "–521189",
+          "rangeCode": "source-note-521189-5BBBB04B43B6"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 591189,
+          "note": "–591189",
+          "rangeCode": "source-note-591189-5D7989F9ED85"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 396189,
+          "note": "–396189",
+          "rangeCode": "source-note-396189-7629276DA2C3"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 396190,
+          "serialTo": null,
+          "note": "396190–",
+          "rangeCode": "source-note-396190-83CBC12FADFF"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 591190,
+          "serialTo": null,
+          "note": "591190–",
+          "rangeCode": "source-note-591190-9986A7812EFF"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 421189,
+          "note": "–421189",
+          "rangeCode": "source-note-421189-9AA3946BFA78"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 521190,
+          "serialTo": null,
+          "note": "521190–",
+          "rangeCode": "source-note-521190-9B01E452B2E6"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 421190,
+          "serialTo": null,
+          "note": "421190–",
+          "rangeCode": "source-note-421190-D748D1155BB6"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 599190,
+          "serialTo": null,
+          "note": "599190–",
+          "rangeCode": "source-note-599190-E3BE2E0DAD9E"
+        }
+      ]
+    },
+    {
+      "modelId": "a29ce244-60cd-5169-8d69-3f57e6c363d7",
+      "displayName": "FD2 FM200",
+      "modelCode": "FD2 FM200",
+      "manufacturer": "New Holland",
+      "machineType": "Header",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": 486190,
+          "serialTo": null,
+          "note": "486190–",
+          "rangeCode": "source-note-486190-03B1D9391842"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 451189,
+          "note": "–451189",
+          "rangeCode": "source-note-451189-1DF2B1414D83"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 451190,
+          "serialTo": null,
+          "note": "451190–",
+          "rangeCode": "source-note-451190-26D5FBC55365"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 521190,
+          "note": "–521190",
+          "rangeCode": "source-note-521190-3A98D6CB9BA5"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 396189,
+          "note": "–396189",
+          "rangeCode": "source-note-396189-47C69D083421"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 556190,
+          "serialTo": null,
+          "note": "556190–",
+          "rangeCode": "source-note-556190-539DE8E6A280"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 486190,
+          "serialTo": 591189,
+          "note": "486190– 591189",
+          "rangeCode": "source-note-486190591189-65D9EFA47E68"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 486189,
+          "note": "–486189",
+          "rangeCode": "source-note-486189-6C9C4F4629F3"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 591189,
+          "note": "–591189",
+          "rangeCode": "source-note-591189-7C9148158A07"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 556189,
+          "note": "–556189",
+          "rangeCode": "source-note-556189-8631F3086AC1"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 591190,
+          "serialTo": null,
+          "note": "591190–",
+          "rangeCode": "source-note-591190-8F5322F6E4C9"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 521190,
+          "serialTo": null,
+          "note": "521190–",
+          "rangeCode": "source-note-521190-A8F5682A0656"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 396190,
+          "serialTo": null,
+          "note": "396190–",
+          "rangeCode": "source-note-396190-D4856D136F45"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 421189,
+          "note": "–421189",
+          "rangeCode": "source-note-421189-E435FA0855B0"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 599190,
+          "serialTo": null,
+          "note": "599190–",
+          "rangeCode": "source-note-599190-EBA76F418FDC"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 421190,
+          "serialTo": null,
+          "note": "421190–",
+          "rangeCode": "source-note-421190-EE658CE0D02D"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 521189,
+          "note": "–521189",
+          "rangeCode": "source-note-521189-FF32EF684244"
+        }
+      ]
+    },
+    {
+      "modelId": "3a146623-e6fb-5c6d-9e41-e5941aea7d5f",
+      "displayName": "FD2 FM200 MacDon",
+      "modelCode": "FD2 FM200 MacDon",
+      "manufacturer": "MacDon",
+      "machineType": "Header",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": 556190,
+          "serialTo": null,
+          "note": "556190–",
+          "rangeCode": "source-note-556190-0A0712BC3B5A"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 396190,
+          "serialTo": null,
+          "note": "396190–",
+          "rangeCode": "source-note-396190-148B9C2661E8"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 421190,
+          "serialTo": null,
+          "note": "421190–",
+          "rangeCode": "source-note-421190-15AECCB17040"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 599190,
+          "serialTo": null,
+          "note": "599190–",
+          "rangeCode": "source-note-599190-20316591BD5F"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 486190,
+          "serialTo": null,
+          "note": "486190–",
+          "rangeCode": "source-note-486190-32F8790979FF"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 591189,
+          "note": "–591189",
+          "rangeCode": "source-note-591189-3619089F373F"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 591190,
+          "serialTo": null,
+          "note": "591190–",
+          "rangeCode": "source-note-591190-4B0B522E7134"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 451189,
+          "note": "–451189",
+          "rangeCode": "source-note-451189-653C4D34BE34"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 521190,
+          "serialTo": null,
+          "note": "521190–",
+          "rangeCode": "source-note-521190-660A890CA9BD"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 521189,
+          "note": "–521189",
+          "rangeCode": "source-note-521189-6A2F5F531B98"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 421189,
+          "note": "–421189",
+          "rangeCode": "source-note-421189-8468C6E8ABE1"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 486190,
+          "serialTo": 591189,
+          "note": "486190– 591189",
+          "rangeCode": "source-note-486190591189-8F83DE3887C8"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 521190,
+          "note": "–521190",
+          "rangeCode": "source-note-521190-C23FD3E4BCB0"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 396189,
+          "note": "–396189",
+          "rangeCode": "source-note-396189-C62713704C49"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 451190,
+          "serialTo": null,
+          "note": "451190–",
+          "rangeCode": "source-note-451190-E8A0A88E7718"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 486189,
+          "note": "–486189",
+          "rangeCode": "source-note-486189-E8C73C0D1787"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 556189,
+          "note": "–556189",
+          "rangeCode": "source-note-556189-FB33B0AA675B"
+        }
+      ]
+    },
+    {
+      "modelId": "6e0a90af-3145-520e-8b41-f8b1b565d667",
+      "displayName": "FD75",
+      "modelCode": "FD75",
+      "manufacturer": "MacDon",
+      "machineType": "Header",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": 244010,
+          "serialTo": null,
+          "note": "244010–",
+          "rangeCode": "source-note-244010"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 244009,
+          "note": "–244009",
+          "rangeCode": "source-note-244009"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 371189,
+          "note": "–371189",
+          "rangeCode": "source-note-371189"
+        }
+      ]
+    },
+    {
+      "modelId": "d4338c71-8fd8-5dad-822d-fd963bee7204",
+      "displayName": "M1170NT",
+      "modelCode": "M1170NT",
+      "manufacturer": "MacDon",
+      "machineType": "Windrower",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": 451190,
+          "serialTo": null,
+          "note": "451190–",
+          "rangeCode": "source-note-451190-3F6C4A54F0E8"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 451189,
+          "note": "–451189",
+          "rangeCode": "source-note-451189-9BF56AE48984"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 371189,
+          "note": "–371189",
+          "rangeCode": "source-note-371189-A883CA9FF4B1"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 371190,
+          "serialTo": null,
+          "note": "371190–",
+          "rangeCode": "source-note-371190-E647DA8F7B96"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 421190,
+          "serialTo": null,
+          "note": "421190–",
+          "rangeCode": "source-note-421190-E7A517F66CEC"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 421189,
+          "note": "–421189",
+          "rangeCode": "source-note-421189-FAC90A7FCC88"
+        }
+      ]
+    },
+    {
+      "modelId": "5ad6e9f8-04fe-5e54-99a8-1e8acbd65502",
+      "displayName": "M1240",
+      "modelCode": "M1240",
+      "manufacturer": "MacDon",
+      "machineType": "Windrower",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 421189,
+          "note": "–421189",
+          "rangeCode": "source-note-421189-0D2050CC837B"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 346190,
+          "serialTo": null,
+          "note": "346190–",
+          "rangeCode": "source-note-346190-2673829978CC"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 346190,
+          "serialTo": 451189,
+          "note": "346190– 451189",
+          "rangeCode": "source-note-346190451189-5D8567FBFF7C"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 321189,
+          "note": "–321189",
+          "rangeCode": "source-note-321189-642F263A2449"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 371189,
+          "note": "–371189",
+          "rangeCode": "source-note-371189-73A33F470C3B"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 346190,
+          "serialTo": 371189,
+          "note": "346190–371189",
+          "rangeCode": "source-note-346190371189-8B7EFD5B67E8"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 556190,
+          "serialTo": null,
+          "note": "556190–",
+          "rangeCode": "source-note-556190-A45A75931CEB"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 451190,
+          "serialTo": null,
+          "note": "451190–",
+          "rangeCode": "source-note-451190-A6EC5A6ECB68"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 321190,
+          "serialTo": null,
+          "note": "321190–",
+          "rangeCode": "source-note-321190-A826475BA061"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 421190,
+          "serialTo": null,
+          "note": "421190–",
+          "rangeCode": "source-note-421190-A9C05C5BE347"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 346189,
+          "note": "–346189",
+          "rangeCode": "source-note-346189-B9C22269E106"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 378277,
+          "note": "–378277",
+          "rangeCode": "source-note-378277-B9D7B6212AEC"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 378278,
+          "serialTo": null,
+          "note": "378278–",
+          "rangeCode": "source-note-378278-CED80E1EA97D"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 396189,
+          "note": "–396189",
+          "rangeCode": "source-note-396189-CFBF37AA805E"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 396190,
+          "serialTo": null,
+          "note": "396190–",
+          "rangeCode": "source-note-396190-D0CF70B04FA5"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 371190,
+          "serialTo": null,
+          "note": "371190–",
+          "rangeCode": "source-note-371190-DA5AC8D2389C"
+        }
+      ]
+    },
+    {
+      "modelId": "9bea94fe-002f-548e-9281-3abdad9ee284",
+      "displayName": "M155",
+      "modelCode": "M155",
+      "manufacturer": "MacDon",
+      "machineType": "Windrower",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 321189,
+          "note": "–321189",
+          "rangeCode": "source-note-321189-05CD40124D2D"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 229509,
+          "note": "–229509",
+          "rangeCode": "source-note-229509-0DA4F0EED7B2"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 285420,
+          "serialTo": null,
+          "note": "285420–",
+          "rangeCode": "source-note-285420-136C38022A55"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 216510,
+          "serialTo": 229510,
+          "note": "216510–229510",
+          "rangeCode": "source-note-216510229510-2CF0F171C295"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 216500,
+          "serialTo": null,
+          "note": "216500–",
+          "rangeCode": "source-note-216500-32ED90F8F625"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 301190,
+          "serialTo": null,
+          "note": "301190–",
+          "rangeCode": "source-note-301190-32F60DFAAFA1"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 244010,
+          "serialTo": null,
+          "note": "244010–",
+          "rangeCode": "source-note-244010-4A7780FE1A4C"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 285419,
+          "note": "–285419",
+          "rangeCode": "source-note-285419-572C0A62CDA0"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 321190,
+          "serialTo": null,
+          "note": "321190–",
+          "rangeCode": "source-note-321190-6E1919CE960C"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 486189,
+          "note": "–486189",
+          "rangeCode": "source-note-486189-742CF845C6D3"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 266819,
+          "note": "–266819",
+          "rangeCode": "source-note-266819-78CC0F4D0511"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 244009,
+          "note": "–244009",
+          "rangeCode": "source-note-244009-870197D7A4DA"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 486190,
+          "serialTo": null,
+          "note": "486190–",
+          "rangeCode": "source-note-486190-ADBE77BDFBD9"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 266820,
+          "serialTo": null,
+          "note": "266820–",
+          "rangeCode": "source-note-266820-AF91A86C6601"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 301189,
+          "note": "–301189",
+          "rangeCode": "source-note-301189-B10CF2A80F8F"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 216510,
+          "serialTo": null,
+          "note": "216510–",
+          "rangeCode": "source-note-216510-B6FBD70D04D7"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 216509,
+          "note": "–216509",
+          "rangeCode": "source-note-216509-D9B28AF3EF5D"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 321190,
+          "serialTo": 371189,
+          "note": "321190–371189",
+          "rangeCode": "source-note-321190371189-E0C7D33450A3"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 216499,
+          "note": "–216499",
+          "rangeCode": "source-note-216499-EFDF8832DBD7"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 229510,
+          "serialTo": null,
+          "note": "229510–",
+          "rangeCode": "source-note-229510-FD32DBBA2764"
+        }
+      ]
+    },
+    {
+      "modelId": "4c26d316-146e-5105-ae11-ae0f613b3767",
+      "displayName": "M155E4",
+      "modelCode": "M155E4",
+      "manufacturer": "MacDon",
+      "machineType": "Windrower",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": 229510,
+          "serialTo": null,
+          "note": "229510–",
+          "rangeCode": "source-note-229510"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 301189,
+          "note": "–301189",
+          "rangeCode": "source-note-301189"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 346190,
+          "serialTo": null,
+          "note": "346190–",
+          "rangeCode": "source-note-346190"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 321190,
+          "serialTo": null,
+          "note": "321190–",
+          "rangeCode": "source-note-321190"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 346189,
+          "note": "–346189",
+          "rangeCode": "source-note-346189"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 451189,
+          "note": "–451189",
+          "rangeCode": "source-note-451189"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 285419,
+          "note": "–285419",
+          "rangeCode": "source-note-285419"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 421189,
+          "note": "–421189",
+          "rangeCode": "source-note-421189"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 285420,
+          "serialTo": null,
+          "note": "285420–",
+          "rangeCode": "source-note-285420"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 229509,
+          "note": "–229509",
+          "rangeCode": "source-note-229509"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 266819,
+          "note": "–266819",
+          "rangeCode": "source-note-266819"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 301190,
+          "serialTo": null,
+          "note": "301190–",
+          "rangeCode": "source-note-301190"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 421190,
+          "serialTo": null,
+          "note": "421190–",
+          "rangeCode": "source-note-421190"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 451190,
+          "serialTo": null,
+          "note": "451190–",
+          "rangeCode": "source-note-451190"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 244009,
+          "note": "–244009",
+          "rangeCode": "source-note-244009"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 244010,
+          "serialTo": null,
+          "note": "244010–",
+          "rangeCode": "source-note-244010"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 346190,
+          "serialTo": 371189,
+          "note": "346190–371189",
+          "rangeCode": "source-note-346190371189"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 321189,
+          "note": "–321189",
+          "rangeCode": "source-note-321189"
+        }
+      ]
+    },
+    {
+      "modelId": "b8498e12-eabe-5a63-8ffc-fe0eb28b0374",
+      "displayName": "M205",
+      "modelCode": "M205",
+      "manufacturer": "MacDon",
+      "machineType": "Windrower",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": 321190,
+          "serialTo": null,
+          "note": "321190–",
+          "rangeCode": "source-note-321190"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 301189,
+          "note": "–301189",
+          "rangeCode": "source-note-301189"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 216509,
+          "note": "–216509",
+          "rangeCode": "source-note-216509"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 229510,
+          "serialTo": null,
+          "note": "229510–",
+          "rangeCode": "source-note-229510"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 216499,
+          "note": "–216499",
+          "rangeCode": "source-note-216499"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 216510,
+          "serialTo": null,
+          "note": "216510–",
+          "rangeCode": "source-note-216510"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 301190,
+          "serialTo": null,
+          "note": "301190–",
+          "rangeCode": "source-note-301190"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 207010,
+          "serialTo": null,
+          "note": "207010–",
+          "rangeCode": "source-note-207010"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 266819,
+          "note": "–266819",
+          "rangeCode": "source-note-266819"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 216500,
+          "serialTo": 321189,
+          "note": "216500–321189",
+          "rangeCode": "source-note-216500321189"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 229509,
+          "note": "–229509",
+          "rangeCode": "source-note-229509"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 321189,
+          "note": "–321189",
+          "rangeCode": "source-note-321189"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 244010,
+          "serialTo": null,
+          "note": "244010–",
+          "rangeCode": "source-note-244010"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 216500,
+          "serialTo": null,
+          "note": "216500–",
+          "rangeCode": "source-note-216500"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 244009,
+          "note": "–244009",
+          "rangeCode": "source-note-244009"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 207009,
+          "note": "–207009",
+          "rangeCode": "source-note-207009"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 266820,
+          "serialTo": null,
+          "note": "266820–",
+          "rangeCode": "source-note-266820"
+        }
+      ]
+    },
+    {
+      "modelId": "1c6e95d5-91df-5953-963b-b9bc1ff41b9d",
+      "displayName": "M2170",
+      "modelCode": "M2170",
+      "manufacturer": "MacDon",
+      "machineType": "Windrower",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": 521190,
+          "serialTo": null,
+          "note": "521190–",
+          "rangeCode": "source-note-521190-A5C81D921B4E"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 521189,
+          "note": "–521189",
+          "rangeCode": "source-note-521189-E3FFE3AE3968"
+        }
+      ]
+    },
+    {
+      "modelId": "ec310dbf-79a1-5c97-81f0-0f814f44b9c4",
+      "displayName": "M2260",
+      "modelCode": "M2260",
+      "manufacturer": "MacDon",
+      "machineType": "Windrower",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 371189,
+          "note": "–371189",
+          "rangeCode": "source-note-371189"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 591189,
+          "note": "–591189",
+          "rangeCode": "source-note-591189"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 521190,
+          "serialTo": null,
+          "note": "521190–",
+          "rangeCode": "source-note-521190"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 371190,
+          "serialTo": null,
+          "note": "371190–",
+          "rangeCode": "source-note-371190"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 591190,
+          "serialTo": null,
+          "note": "591190–",
+          "rangeCode": "source-note-591190"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 556189,
+          "note": "–556189",
+          "rangeCode": "source-note-556189"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 556190,
+          "serialTo": null,
+          "note": "556190–",
+          "rangeCode": "source-note-556190"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 521189,
+          "note": "–521189",
+          "rangeCode": "source-note-521189"
+        }
+      ]
+    },
+    {
+      "modelId": "f4c53144-3c0f-5c8c-b70f-15fb992b49f4",
+      "displayName": "MacDon D60",
+      "modelCode": "D60",
+      "manufacturer": "MacDon",
+      "machineType": "Header",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 179759,
+          "note": "–179759",
+          "rangeCode": "source-note-179759-23C7D02CFEF6"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 168559,
+          "note": "–168559",
+          "rangeCode": "source-note-168559-3807F9C17686"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 185860,
+          "serialTo": null,
+          "note": "185860–",
+          "rangeCode": "source-note-185860-47700B969F81"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 195759,
+          "note": "–195759",
+          "rangeCode": "source-note-195759-529523AAF1A1"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 183407,
+          "serialTo": null,
+          "note": "183407–",
+          "rangeCode": "source-note-183407-56DE883E355D"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 183406,
+          "note": "–183406",
+          "rangeCode": "source-note-183406-59673030A5EA"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 174610,
+          "serialTo": null,
+          "note": "174610–",
+          "rangeCode": "source-note-174610-6DE3E6C1F793"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 195760,
+          "serialTo": null,
+          "note": "195760–",
+          "rangeCode": "source-note-195760-70C5F22B3CC9"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 207009,
+          "note": "–207009",
+          "rangeCode": "source-note-207009-7AE1F6467C05"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 216499,
+          "note": "–216499",
+          "rangeCode": "source-note-216499-81639048D8AD"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 207010,
+          "serialTo": null,
+          "note": "207010–",
+          "rangeCode": "source-note-207010-98701A0077D8"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 179760,
+          "serialTo": null,
+          "note": "179760–",
+          "rangeCode": "source-note-179760-AA2A71868A4F"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 183407,
+          "note": "–183407",
+          "rangeCode": "source-note-183407-B609631B2D8C"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 216500,
+          "serialTo": null,
+          "note": "216500–",
+          "rangeCode": "source-note-216500-BF1E3AAF8820"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 168560,
+          "serialTo": null,
+          "note": "168560–",
+          "rangeCode": "source-note-168560-C13282BA4455"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 174609,
+          "note": "–174609",
+          "rangeCode": "source-note-174609-E20D8AF6CAD9"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 185859,
+          "note": "–185859",
+          "rangeCode": "source-note-185859-ED64BA055832"
+        }
+      ]
+    },
+    {
+      "modelId": "c4a5e925-1711-550b-ad13-e58ba1df8693",
+      "displayName": "MacDon FD70 FlexDraper Header",
+      "modelCode": "FD70",
+      "manufacturer": "MacDon",
+      "machineType": "Header",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 174609,
+          "note": "–174609",
+          "rangeCode": "source-note-174609-10B81CDEDCBE"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 216499,
+          "note": "–216499",
+          "rangeCode": "source-note-216499-1DA7126ECBA4"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 195759,
+          "note": "–195759",
+          "rangeCode": "source-note-195759-334F8D3535B1"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 183407,
+          "serialTo": null,
+          "note": "183407–",
+          "rangeCode": "source-note-183407-360398D3460A"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 207010,
+          "serialTo": null,
+          "note": "207010–",
+          "rangeCode": "source-note-207010-54B3CFDD9FCF"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 183406,
+          "note": "–183406",
+          "rangeCode": "source-note-183406-58B2B953F1BF"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 216500,
+          "serialTo": null,
+          "note": "216500–",
+          "rangeCode": "source-note-216500-5AF5FF9906D0"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 179759,
+          "note": "–179759",
+          "rangeCode": "source-note-179759-7125B1582C4D"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 207009,
+          "note": "–207009",
+          "rangeCode": "source-note-207009-8DF4F3FA22D4"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 179760,
+          "serialTo": null,
+          "note": "179760–",
+          "rangeCode": "source-note-179760-9B3A99690E68"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 174610,
+          "serialTo": null,
+          "note": "174610–",
+          "rangeCode": "source-note-174610-D02507F6623C"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 168559,
+          "note": "–168559",
+          "rangeCode": "source-note-168559-D98ADA7B2020"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 195760,
+          "serialTo": null,
+          "note": "195760–",
+          "rangeCode": "source-note-195760-EAD1FA7C66AA"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 183407,
+          "note": "–183407",
+          "rangeCode": "source-note-183407-F575E5C8F6ED"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 168560,
+          "serialTo": null,
+          "note": "168560–",
+          "rangeCode": "source-note-168560-F9011DF94E26"
+        }
+      ]
+    },
+    {
+      "modelId": "1d82a5c7-2e05-5f99-814f-8812a32dde49",
+      "displayName": "Pro-Till 20",
+      "modelCode": "Pro-Till",
+      "manufacturer": "Degelman",
+      "machineType": "High-Speed Disc",
+      "serialRanges": [
+        {
+          "prefix": "PTL",
+          "serialFrom": 4652,
+          "serialTo": null,
+          "note": "PTL4652 and above",
+          "rangeCode": "source-note-PTL4652ANDABOVE-C41266CD6BDE"
+        }
+      ]
+    },
+    {
+      "modelId": "19fd95ef-744e-5ff2-9aba-4b3229b33b28",
+      "displayName": "Pro-Till 20HD",
+      "modelCode": "Pro-Till",
+      "manufacturer": "Degelman",
+      "machineType": "High-Speed Disc",
+      "serialRanges": [
+        {
+          "prefix": "PTL",
+          "serialFrom": 4652,
+          "serialTo": null,
+          "note": "PTL4652 and above",
+          "rangeCode": "source-note-PTL4652ANDABOVE-EC3C0F83C986"
+        }
+      ]
+    },
+    {
+      "modelId": "377e2da3-33e9-56aa-8ad8-1eb980a44eea",
+      "displayName": "Pro-Till 26",
+      "modelCode": "Pro-Till",
+      "manufacturer": "Degelman",
+      "machineType": "High-Speed Disc",
+      "serialRanges": [
+        {
+          "prefix": "PTL",
+          "serialFrom": 5988,
+          "serialTo": null,
+          "note": "PTL5988 and above — 4 m scraper center clamp",
+          "rangeCode": "source-note-PTL5988ANDABOVE4-27FCB5E6B9C0"
+        },
+        {
+          "prefix": "PTL",
+          "serialFrom": 4652,
+          "serialTo": null,
+          "note": "PTL4652 and above",
+          "rangeCode": "source-note-PTL4652ANDABOVE-B88623B177CC"
+        }
+      ]
+    },
+    {
+      "modelId": "87cef42c-8157-56eb-94fe-a630e7aada3d",
+      "displayName": "Pro-Till 26HD",
+      "modelCode": "Pro-Till",
+      "manufacturer": "Degelman",
+      "machineType": "High-Speed Disc",
+      "serialRanges": [
+        {
+          "prefix": "PTL",
+          "serialFrom": 4652,
+          "serialTo": null,
+          "note": "PTL4652 and above",
+          "rangeCode": "source-note-PTL4652ANDABOVE-8D0B14ECCF9E"
+        },
+        {
+          "prefix": "PTL",
+          "serialFrom": 5988,
+          "serialTo": null,
+          "note": "PTL5988 and above — 4 m scraper center clamp",
+          "rangeCode": "source-note-PTL5988ANDABOVE4-BEE3701877FC"
+        }
+      ]
+    },
+    {
+      "modelId": "fe75677f-854b-5574-a31e-6b5fd8e1040c",
+      "displayName": "PW8",
+      "modelCode": "PW8",
+      "manufacturer": "MacDon",
+      "machineType": "Pickup Header",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": 266820,
+          "serialTo": null,
+          "note": "266820–",
+          "rangeCode": "source-note-266820"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 451189,
+          "note": "–451189",
+          "rangeCode": "source-note-451189"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 371190,
+          "serialTo": null,
+          "note": "371190–",
+          "rangeCode": "source-note-371190"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 285419,
+          "note": "–285419",
+          "rangeCode": "source-note-285419"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 266819,
+          "note": "–266819",
+          "rangeCode": "source-note-266819"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 285420,
+          "serialTo": null,
+          "note": "285420–",
+          "rangeCode": "source-note-285420"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 346189,
+          "note": "–346189",
+          "rangeCode": "source-note-346189"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 369189,
+          "note": "–369189",
+          "rangeCode": "source-note-369189"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 346190,
+          "serialTo": null,
+          "note": "346190–",
+          "rangeCode": "source-note-346190"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 451190,
+          "serialTo": null,
+          "note": "451190–",
+          "rangeCode": "source-note-451190"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 396190,
+          "serialTo": null,
+          "note": "396190–",
+          "rangeCode": "source-note-396190"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 371189,
+          "note": "–371189",
+          "rangeCode": "source-note-371189"
+        }
+      ]
+    },
+    {
+      "modelId": "0a3a5217-8c09-5414-a8cd-ebb1cdc7b6f5",
+      "displayName": "R113 R116",
+      "modelCode": "R113 R116",
+      "manufacturer": "MacDon",
+      "machineType": "Rotary Disc Header",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 346189,
+          "note": "–346189",
+          "rangeCode": "source-note-346189-0CCDF83DC73D"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 521190,
+          "serialTo": null,
+          "note": "521190–",
+          "rangeCode": "source-note-521190-0E21EE203B2E"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 521189,
+          "note": "–521189",
+          "rangeCode": "source-note-521189-226E732C1A3B"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 486190,
+          "serialTo": null,
+          "note": "486190–",
+          "rangeCode": "source-note-486190-368CACF00E56"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 396190,
+          "serialTo": null,
+          "note": "396190–",
+          "rangeCode": "source-note-396190-41622A9831BB"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 285420,
+          "serialTo": 486189,
+          "note": "285420–486189",
+          "rangeCode": "source-note-285420486189-95ECB46B2D0C"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 486189,
+          "note": "–486189",
+          "rangeCode": "source-note-486189-A8BF3AD74D21"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 321190,
+          "serialTo": null,
+          "note": "321190–",
+          "rangeCode": "source-note-321190-B397B23FC5F2"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 346190,
+          "serialTo": null,
+          "note": "346190–",
+          "rangeCode": "source-note-346190-C4C54721BFF2"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 396189,
+          "note": "–396189",
+          "rangeCode": "source-note-396189-CCB5C9F519DE"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 321189,
+          "note": "–321189",
+          "rangeCode": "source-note-321189-E0485E84F5D9"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 285420,
+          "serialTo": null,
+          "note": "285420–",
+          "rangeCode": "source-note-285420-EDD7EDEACD38"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 266820,
+          "serialTo": 285419,
+          "note": "266820–285419",
+          "rangeCode": "source-note-266820285419-F8455B92BC65"
+        }
+      ]
+    },
+    {
+      "modelId": "a0ea17b4-1829-5fd3-8cda-b8a9786f4d54",
+      "displayName": "R113 R116 FR",
+      "modelCode": "R113 R116 FR",
+      "manufacturer": "MacDon",
+      "machineType": "Header",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 521189,
+          "note": "–521189",
+          "rangeCode": "source-note-521189-AB22B049273E"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 521190,
+          "serialTo": null,
+          "note": "521190–",
+          "rangeCode": "source-note-521190-B4677595FF11"
+        }
+      ]
+    },
+    {
+      "modelId": "fb8e12b6-82e4-5939-aa43-d60a22376e89",
+      "displayName": "R113 R116 PT",
+      "modelCode": "R113 R116 PT",
+      "manufacturer": "MacDon",
+      "machineType": "Header",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": 272420,
+          "serialTo": 285419,
+          "note": "272420–285419",
+          "rangeCode": "source-note-272420285419-1F627C315304"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 521190,
+          "serialTo": null,
+          "note": "521190–",
+          "rangeCode": "source-note-521190-259894AD6B90"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 371190,
+          "serialTo": null,
+          "note": "371190–",
+          "rangeCode": "source-note-371190-29FAA70B8CBE"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 556190,
+          "serialTo": null,
+          "note": "556190–",
+          "rangeCode": "source-note-556190-466445A805F4"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 321190,
+          "serialTo": null,
+          "note": "321190–",
+          "rangeCode": "source-note-321190-75D580E9A8D0"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 346189,
+          "note": "–346189",
+          "rangeCode": "source-note-346189-86B0FCDF5530"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 346190,
+          "serialTo": null,
+          "note": "346190–",
+          "rangeCode": "source-note-346190-8A4D90F6D07E"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 521189,
+          "note": "–521189",
+          "rangeCode": "source-note-521189-9E784CF54E86"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 285420,
+          "serialTo": 321189,
+          "note": "285420–321189",
+          "rangeCode": "source-note-285420321189-A0F403FBBAF0"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 285420,
+          "serialTo": 486189,
+          "note": "285420–486189",
+          "rangeCode": "source-note-285420486189-A13ED03CD804"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 321189,
+          "note": "–321189",
+          "rangeCode": "source-note-321189-A6A1E72B782E"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 371189,
+          "note": "–371189",
+          "rangeCode": "source-note-371189-BD5EEB327B43"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 486190,
+          "serialTo": null,
+          "note": "486190–",
+          "rangeCode": "source-note-486190-E30CE9B0E660"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 285420,
+          "serialTo": null,
+          "note": "285420–",
+          "rangeCode": "source-note-285420-E6E5BE7D0ADD"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 266820,
+          "serialTo": 285419,
+          "note": "266820–285419",
+          "rangeCode": "source-note-266820285419-ECC4BBA106B6"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 285420,
+          "serialTo": 346189,
+          "note": "285420–346189",
+          "rangeCode": "source-note-285420346189-F3448C4843D4"
+        }
+      ]
+    },
+    {
+      "modelId": "0c947d37-f065-5657-82dc-e719e2e3c91b",
+      "displayName": "R216",
+      "modelCode": "R216",
+      "manufacturer": "MacDon",
+      "machineType": "Rotary Disc Header",
+      "serialRanges": [
+        {
+          "prefix": null,
+          "serialFrom": 556190,
+          "serialTo": null,
+          "note": "556190–",
+          "rangeCode": "source-note-556190"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 521190,
+          "serialTo": null,
+          "note": "521190–",
+          "rangeCode": "source-note-521190"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 396189,
+          "note": "–396189",
+          "rangeCode": "source-note-396189"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 285420,
+          "serialTo": 486189,
+          "note": "285420–486189",
+          "rangeCode": "source-note-285420486189"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 371189,
+          "note": "–371189",
+          "rangeCode": "source-note-371189"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 486190,
+          "serialTo": 556189,
+          "note": "486190–556189",
+          "rangeCode": "source-note-486190556189"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 556189,
+          "note": "–556189",
+          "rangeCode": "source-note-556189"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 396190,
+          "serialTo": null,
+          "note": "396190–",
+          "rangeCode": "source-note-396190"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 521189,
+          "note": "–521189",
+          "rangeCode": "source-note-521189"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 396190,
+          "serialTo": 486189,
+          "note": "396190–486189",
+          "rangeCode": "source-note-396190486189"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 421189,
+          "note": "–421189",
+          "rangeCode": "source-note-421189"
+        },
+        {
+          "prefix": null,
+          "serialFrom": 486190,
+          "serialTo": null,
+          "note": "486190–",
+          "rangeCode": "source-note-486190"
+        },
+        {
+          "prefix": null,
+          "serialFrom": null,
+          "serialTo": 486189,
+          "note": "–486189",
+          "rangeCode": "source-note-486189"
+        }
+      ]
+    }
+  ]
+}

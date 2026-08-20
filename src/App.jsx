@@ -1,28 +1,50 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Home } from './screens/Home'
 import { SearchResults } from './screens/SearchResults'
 import { PartDetails } from './screens/PartDetails'
-import { Categories } from './screens/Categories'
+import { PickMachine } from './screens/PickMachine'
 import { MachineDetails } from './screens/MachineDetails'
 import { Machines } from './screens/Machines'
-import { PickMachine } from './screens/PickMachine'
 import { PilotCatalog } from './screens/PilotCatalog'
 import { Scan } from './screens/Scan'
 import { HowItWorks } from './screens/HowItWorks'
 import { BottomNav } from './components/BottomNav'
 import { loadMachines } from './lib/db'
 import { loadDiagrams } from './lib/diagrams'
-import { getRecent, addRecent } from './lib/recent-searches'
-import { getVerifiedFleet, removeVerifiedMachine, saveVerifiedMachine } from './lib/fleet'
+import { loadPilotMachineIndex } from './lib/pilot-catalog'
+import { addRecent } from './lib/recent-searches'
+import { findVerifiedMatch } from './lib/saved-machines'
+import {
+  getFleet,
+  getVerifiedFleet,
+  pruneVerifiedFleet,
+  removeFleetMachine,
+  removeVerifiedMachine,
+  saveFleetMachine,
+  saveVerifiedMachine,
+  toggleFleet,
+} from './lib/fleet'
 
-// A single token of letters/digits/dashes, length >= 4, containing at least one
-// digit (e.g. RE509672, 125138) — a part number, not a phrase.
-function looksLikePartNumber(query) {
-  const q = (query || '').trim()
-  return /^[A-Za-z0-9-]{4,}$/.test(q) && /\d/.test(q)
+const ACTIVE_MACHINE_KEY = 'ezparts_active_verified_machine'
+
+function readActiveMachine() {
+  try { return localStorage.getItem(ACTIVE_MACHINE_KEY) || null } catch { return null }
 }
 
-// EzParts — a parts + machine SEARCH ENGINE. No dealers, prices, or checkout.
+function writeActiveMachine(modelId) {
+  try {
+    if (modelId) localStorage.setItem(ACTIVE_MACHINE_KEY, modelId)
+    else localStorage.removeItem(ACTIVE_MACHINE_KEY)
+  } catch { /* ignore */ }
+}
+
+// EzParts — a parts + machine search engine. Pick the machine, then find the
+// part. No dealers, prices, or checkout.
+//
+// Two machine paths exist: the verified catalog (PilotCatalog — diagrams and
+// source-backed numbers) and the older browse index (MachineDetails ->
+// SearchResults -> PartDetails), which still serves machines saved before the
+// verified catalog covered them.
 export default function App() {
   const [screen, setScreen] = useState('home')
   const [searchQuery, setSearchQuery] = useState('')
@@ -30,115 +52,141 @@ export default function App() {
   const [selectedPart, setSelectedPart] = useState(null)
   const [partBackScreen, setPartBackScreen] = useState('home')
   const [selectedMachine, setSelectedMachine] = useState(null)
-  const [selectedPilotModel, setSelectedPilotModel] = useState(() => {
-    try { return localStorage.getItem('ezparts_active_verified_machine') || null } catch { return null }
-  })
+  const [selectedPilotModel, setSelectedPilotModel] = useState(readActiveMachine)
   const [verifiedFleet, setVerifiedFleet] = useState(() => {
     const current = getVerifiedFleet()
-    let activeModelId = null
-    try { activeModelId = localStorage.getItem('ezparts_active_verified_machine') } catch { /* ignore */ }
+    const activeModelId = readActiveMachine()
     return activeModelId && !current.some((machine) => machine.modelId === activeModelId)
       ? saveVerifiedMachine(activeModelId)
       : current
   })
+  const [legacyFleet, setLegacyFleet] = useState(getFleet)
   const [pilotInitialQuery, setPilotInitialQuery] = useState('')
   const [scanContext, setScanContext] = useState(null)
-  const [recent, setRecent] = useState(getRecent())
+  const [catalogMachines, setCatalogMachines] = useState([])
   const [, setIndexTick] = useState(0)
 
-  // Load only the (small) machine list up front — parts are queried server-side
-  // per search, so the app scales to millions without loading the whole catalog.
+  // Load only the (small) machine list up front — parts are queried per machine,
+  // so the app scales without loading the whole catalog.
   useEffect(() => {
     loadMachines().then(() => setIndexTick((t) => t + 1))
     loadDiagrams().then((ok) => { if (ok) setIndexTick((t) => t + 1) })
+    loadPilotMachineIndex()
+      .then((value) => {
+        const machines = value?.machines || []
+        setCatalogMachines(machines)
+        const validModelIds = machines.map((machine) => machine.id)
+        setVerifiedFleet(pruneVerifiedFleet(validModelIds))
+        if (selectedPilotModel && !validModelIds.includes(selectedPilotModel)) {
+          setSelectedPilotModel(null)
+          writeActiveMachine(null)
+        }
+      })
+      .catch(() => {})
   }, [])
 
-  const handleNavigation = (navScreen) => {
-    const map = { search: 'home', machines: 'machines-list' }
-    const target = map[navScreen] || navScreen
-    const known = ['home', 'machines-list', 'categories', 'help']
-    if (target === 'home') {
-      setPilotInitialQuery('')
-      setScanContext(null)
-    }
-    setScreen(known.includes(target) ? target : 'home')
+  const handleHome = () => {
+    setPilotInitialQuery('')
+    setScanContext(null)
+    setScreen('home')
   }
-  const handleHome = () => { setPilotInitialQuery(''); setScanContext(null); setScreen('home') }
 
-  const handleSearch = (query) => {
-    setSearchQuery(query)
-    if (query && query.trim()) setRecent(addRecent(query))
-    if (looksLikePartNumber(query)) {
-      setSearchMachine(null)
-      setScreen('search-results')
-    } else {
-      setScreen('pick-machine')
-    }
+  const handleNavigation = (navScreen) => {
+    const target = navScreen === 'machines' ? 'machines-list' : navScreen
+    if (target === 'home') return handleHome()
+    setScreen(['machines-list', 'help'].includes(target) ? target : 'home')
   }
-  const handlePickSearchMachine = (machineName) => {
-    setSearchMachine(machineName)
-    setScreen('search-results')
+
+  const openVerifiedMachine = (modelId, query = '') => {
+    setSelectedPilotModel(modelId)
+    setVerifiedFleet(saveVerifiedMachine(modelId))
+    setPilotInitialQuery(query)
+    if (query.trim()) addRecent(query)
+    writeActiveMachine(modelId)
+    setScreen('pilot-catalog')
   }
+
   const handleSelect = (type, value) => {
-    if (type === 'machines') { setSelectedMachine(value); setScreen('machine-details') }
-    else if (type === 'pilot-machine') {
-      setSelectedPilotModel(value)
-      setVerifiedFleet(saveVerifiedMachine(value))
-      setPilotInitialQuery('')
-      try { localStorage.setItem('ezparts_active_verified_machine', value) } catch { /* ignore */ }
-      setScreen('pilot-catalog')
+    if (type === 'pilot-machine') return openVerifiedMachine(value)
+
+    if (type === 'machines' || type === 'legacy-machine') {
+      // Prefer the verified catalog when this legacy name now has one.
+      const verifiedMatchId = findVerifiedMatch(value, catalogMachines)
+      if (verifiedMatchId) return openVerifiedMachine(verifiedMatchId)
+
+      if (type === 'legacy-machine') setLegacyFleet(saveFleetMachine(value))
+      setSelectedMachine(value)
+      setScreen('machine-details')
     }
-    else if (type === 'category') { handleSearch(value) }
-    else if (type === 'categories') { handleHome() }
   }
+
+  const handleRemoveMachine = (saved) => {
+    if (saved.kind === 'verified') {
+      setVerifiedFleet(removeVerifiedMachine(saved.ref))
+      if (selectedPilotModel === saved.ref) {
+        setSelectedPilotModel(null)
+        writeActiveMachine(null)
+      }
+      return
+    }
+    setLegacyFleet(removeFleetMachine(saved.ref))
+  }
+
   const handlePartSelect = (partNum, backScreen = 'home') => {
     setSelectedPart(partNum)
     setPartBackScreen(backScreen)
     setScreen('part-details')
   }
-  const handlePilotSearch = (modelId, query) => {
-    setSelectedPilotModel(modelId)
-    setVerifiedFleet(saveVerifiedMachine(modelId))
-    setPilotInitialQuery(query)
-    if (query && query.trim()) setRecent(addRecent(query))
-    try { localStorage.setItem('ezparts_active_verified_machine', modelId) } catch { /* ignore */ }
-    setScreen('pilot-catalog')
-  }
-  const handlePilotScan = (modelId, machineName = modelId) => {
-    setSelectedPilotModel(modelId)
-    setVerifiedFleet(saveVerifiedMachine(modelId))
-    setScanContext({ type: 'pilot', modelId, machineName })
+
+  const handlePilotScan = (machineName) => {
+    setScanContext({ type: 'pilot', modelId: selectedPilotModel, machineName })
     setPilotInitialQuery('')
-    try { localStorage.setItem('ezparts_active_verified_machine', modelId) } catch { /* ignore */ }
     setScreen('scan')
   }
+
   const handleMachineScan = (machineName) => {
     setSelectedMachine(machineName)
     setScanContext({ type: 'legacy', machineName })
     setScreen('scan')
   }
-  const handleRemovePilotMachine = (modelId) => {
-    setVerifiedFleet(removeVerifiedMachine(modelId))
-    if (selectedPilotModel === modelId) {
-      setSelectedPilotModel(null)
-      try { localStorage.removeItem('ezparts_active_verified_machine') } catch { /* ignore */ }
+
+  const handleDetected = (partNumber) => {
+    addRecent(partNumber)
+    if (scanContext?.type === 'pilot') {
+      const modelId = scanContext.modelId
+      setScanContext(null)
+      openVerifiedMachine(modelId, partNumber)
+      return
     }
+    setSearchQuery(partNumber)
+    setSearchMachine(scanContext?.machineName || null)
+    setScanContext(null)
+    setScreen('search-results')
   }
 
   return (
     <div className="phone">
-      <div style={{ display: screen === 'home' ? 'flex' : 'none', flexDirection: 'column', flex: 1, minHeight: 0, paddingBottom: '74px' }}>
+      <div className={screen === 'home' ? 'app-route app-route--active' : 'app-route'}>
         <Home
           onSelect={handleSelect}
           onNav={handleNavigation}
           activePilotModel={selectedPilotModel}
           verifiedFleet={verifiedFleet}
-          onRemovePilotMachine={handleRemovePilotMachine}
+          legacyFleet={legacyFleet}
+          onRemoveMachine={handleRemoveMachine}
         />
       </div>
 
+      {screen === 'machines-list' && (
+        <Machines onBack={handleHome} onSelect={handleSelect} />
+      )}
+
       {screen === 'pick-machine' && (
-        <PickMachine query={searchQuery} onPick={handlePickSearchMachine} onBack={handleHome} />
+        <PickMachine
+          query={searchQuery}
+          onPick={(machineName) => { setSearchMachine(machineName); setScreen('search-results') }}
+          onBack={handleHome}
+        />
       )}
 
       {screen === 'search-results' && (
@@ -148,7 +196,7 @@ export default function App() {
           onBack={handleHome}
           onChangeMachine={() => setScreen('pick-machine')}
           onPartSelect={(partNum) => handlePartSelect(partNum, 'search-results')}
-          onMachineSelect={(nm) => handleSelect('machines', nm)}
+          onMachineSelect={(machineName) => handleSelect('machines', machineName)}
         />
       )}
 
@@ -156,16 +204,8 @@ export default function App() {
         <PartDetails
           partNum={selectedPart}
           onBack={() => setScreen(partBackScreen)}
-          onMachineSelect={(nm) => handleSelect('machines', nm)}
+          onMachineSelect={(machineName) => handleSelect('machines', machineName)}
         />
-      )}
-
-      {screen === 'categories' && (
-        <Categories onBack={handleHome} onSelect={handleSelect} />
-      )}
-
-      {screen === 'machines-list' && (
-        <Machines onBack={handleHome} onSelect={handleSelect} />
       )}
 
       {screen === 'machine-details' && selectedMachine && (
@@ -174,6 +214,8 @@ export default function App() {
           onBack={handleHome}
           onScan={() => handleMachineScan(selectedMachine)}
           onPartSelect={(partNum) => handlePartSelect(partNum, 'machine-details')}
+          inFleetSaved={legacyFleet.includes(selectedMachine)}
+          onToggleFleet={(machineName) => setLegacyFleet(toggleFleet(machineName))}
         />
       )}
 
@@ -182,29 +224,16 @@ export default function App() {
           modelId={selectedPilotModel}
           initialQuery={pilotInitialQuery}
           onBack={handleHome}
-          onScan={(machineName) => handlePilotScan(selectedPilotModel, machineName)}
+          onScan={handlePilotScan}
         />
       )}
 
       {screen === 'scan' && (
         <Scan
           machineName={scanContext?.machineName}
+          scanContext={scanContext}
           onBack={() => setScreen(scanContext?.type === 'pilot' ? 'pilot-catalog' : 'machine-details')}
-          onDetected={(pn) => {
-            if (scanContext?.type === 'pilot') {
-              setSelectedPilotModel(scanContext.modelId)
-              setPilotInitialQuery(pn)
-              setRecent(addRecent(pn))
-              setScanContext(null)
-              setScreen('pilot-catalog')
-            } else {
-              setSearchQuery(pn)
-              setSearchMachine(scanContext?.machineName || null)
-              setRecent(addRecent(pn))
-              setScanContext(null)
-              setScreen('search-results')
-            }
-          }}
+          onDetected={handleDetected}
         />
       )}
 
