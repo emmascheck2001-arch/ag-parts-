@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { TopBar } from "../components/TopBar";
 import { UIIcon } from "../components/icons";
 import { resolveDiagramAssetUrl } from "../lib/diagram-assets";
-import { getManualDiagramHotspot } from "../lib/diagram-hotspot-overrides";
+import { getEstimatedDiagramHotspot, getManualDiagramHotspot } from "../lib/diagram-hotspot-overrides";
 import { resolveMachineManual } from "../lib/machine-manual";
 import { detectDiagramCallouts, normalizeCalloutRef } from "../lib/hardware-measure";
 import { isHarvestFocusMachine, marketFocusLabel } from "../lib/market-focus";
@@ -721,6 +721,7 @@ function AssemblyView({ index, assemblyValue, groups, limit, onMore, onPart }) {
           return {
             id: `${resolvedRef}:${index}:${item.x}:${item.y}`,
             ref: resolvedRef,
+            source: "detected",
             x: Number(item.x) || 0,
             y: Number(item.y) || 0,
             width: Number(item.width) || 0,
@@ -965,10 +966,21 @@ function PartView({ index, view, assemblyValue, part, number, selectedRef, initi
     const seededHotspot = initialHotspot && primaryRef && initialHotspot.ref === primaryRef
       ? initialHotspot
       : null;
+    const loadEstimatedHotspot = async () => {
+      try {
+        const hotspot = await getEstimatedDiagramHotspot(diagramSection?.diagramUrl, primaryRef);
+        if (live) setCalloutPreviewHotspot(hotspot);
+      } catch {
+        if (live) setCalloutPreviewHotspot(null);
+      }
+    };
+
     setCalloutPreviewHotspot(seededHotspot);
     if (seededHotspot || !diagramSection?.diagramUrl || !primaryRef) {
       if (diagramSection?.diagramUrl && primaryRef) {
-        setCalloutPreviewHotspot(seededHotspot || getManualDiagramHotspot(diagramSection.diagramUrl, primaryRef));
+        const manualHotspot = seededHotspot || getManualDiagramHotspot(diagramSection.diagramUrl, primaryRef);
+        setCalloutPreviewHotspot(manualHotspot);
+        if (!manualHotspot) void loadEstimatedHotspot();
       }
       return () => { live = false; };
     }
@@ -990,11 +1002,21 @@ function PartView({ index, view, assemblyValue, part, number, selectedRef, initi
             height: Number(item.height) || 0,
           };
         }).filter(Boolean)));
-        setCalloutPreviewHotspot(hotspotForRef(diagramSection.diagramUrl, primaryRef, mapped));
+        const resolved = hotspotForRef(diagramSection.diagramUrl, primaryRef, mapped);
+        if (resolved) {
+          setCalloutPreviewHotspot(resolved);
+          return;
+        }
+        void loadEstimatedHotspot();
       })
       .catch(() => {
         if (!live) return;
-        setCalloutPreviewHotspot(getManualDiagramHotspot(diagramSection?.diagramUrl, primaryRef));
+        const manualHotspot = getManualDiagramHotspot(diagramSection?.diagramUrl, primaryRef);
+        if (manualHotspot) {
+          setCalloutPreviewHotspot(manualHotspot);
+          return;
+        }
+        void loadEstimatedHotspot();
       });
 
     return () => { live = false; };
@@ -1031,6 +1053,9 @@ function PartView({ index, view, assemblyValue, part, number, selectedRef, initi
     backgroundSize: `${(1.95 * 100).toFixed(2)}% auto`,
   } : null;
   const activePreviewStyle = cropPreviewStyle || sectionPreviewStyle;
+  const hasEstimatedHotspot = calloutPreviewHotspot?.source === "fallback";
+  const hasExactHotspot = Boolean(calloutPreviewHotspot) && !hasEstimatedHotspot;
+  const shouldShowSourcePage = Boolean(diagramSection?.diagramUrl) && (hasEstimatedHotspot || !calloutPreviewHotspot || showSourcePage);
 
   return <section className="pilot-part-detail">
     <button className="pilot-inline-back" onClick={onBack}>‹ Back to {assemblyValue.assembly.name}</button>
@@ -1038,31 +1063,33 @@ function PartView({ index, view, assemblyValue, part, number, selectedRef, initi
     <div className="pilot-part-answer">
       <div className="pilot-number"><small>{partNumberTypeLabel(number)} part number</small><strong>{number.number}</strong></div>
       <div className="pilot-answer-callout">
-        <small>{calloutPreviewHotspot ? "Source callout" : "Source page"}</small>
+        <small>{hasExactHotspot ? "Source callout" : hasEstimatedHotspot ? "Estimated hotspot" : "Source page"}</small>
         <strong>{primaryRef ? `Callout ${primaryRef}` : (occurrenceRefs.join(", ") || "Listed")}</strong>
         <small className="pilot-answer-callout__note">
-          {calloutPreviewHotspot
+          {hasExactHotspot
             ? "Showing the exact callout area from the source diagram."
-            : "Showing the source illustration zoom. Exact callout highlighting is not pinned for this page yet."}
+            : hasEstimatedHotspot
+              ? "Showing an estimated hotspot derived from the source page."
+              : "Showing the source illustration zoom while the source page loads."}
         </small>
       </div>
     </div>
     {activePreviewStyle && <div className="pilot-callout-crop">
       <div className="pilot-callout-crop__head">
-        <small>{calloutPreviewHotspot ? "Callout close-up" : "Source illustration zoom"}</small>
-        {diagramSection?.diagramUrl && <button type="button" onClick={() => setShowSourcePage((value) => !value)}>
+        <small>{hasExactHotspot ? "Callout close-up" : hasEstimatedHotspot ? "Estimated source area" : "Source illustration zoom"}</small>
+        {hasExactHotspot && diagramSection?.diagramUrl && <button type="button" onClick={() => setShowSourcePage((value) => !value)}>
           {showSourcePage ? "Hide full page" : "Show full page"}
         </button>}
       </div>
       <div className="pilot-callout-crop__image" style={activePreviewStyle}>
       </div>
     </div>}
-    {diagramSection?.diagramUrl && (!calloutPreviewHotspot || showSourcePage) && <div className="pilot-diagram pilot-diagram--answer">
+    {shouldShowSourcePage && <div className="pilot-diagram pilot-diagram--answer">
       <div className="pilot-diagram__stage">
         <img src={diagramSectionDiagramSrc} alt={`${part.canonicalName} source catalog diagram`} />
         {focusRingStyle && <div className="pilot-diagram-focus-ring" style={focusRingStyle} aria-hidden="true" />}
       </div>
-      <span>{calloutPreviewHotspot ? "Selected callout highlighted on source page" : "Exact source diagram"} · manual page {diagramSection.diagramPageNumber || diagramSection.pageNumber}</span>
+      <span>{hasExactHotspot ? "Selected callout highlighted on source page" : hasEstimatedHotspot ? "Estimated hotspot highlighted on source page" : "Exact source diagram"} · manual page {diagramSection.diagramPageNumber || diagramSection.pageNumber}</span>
     </div>}
     <div className="pilot-proof"><span>✓</span><div><strong>{proofTitle}</strong><small>{proofBody}</small></div></div>
     <dl className="pilot-facts">
